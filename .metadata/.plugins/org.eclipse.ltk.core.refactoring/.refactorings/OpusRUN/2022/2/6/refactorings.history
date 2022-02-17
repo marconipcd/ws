@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;contrato&apos; in &apos;domain.ArquivosOse2&apos; to &apos;ose&apos;&#x0D;&#x0A;- Original project: &apos;OpusRUN&apos;&#x0D;&#x0A;- Original element: &apos;domain.ArquivosOse2.contrato&apos;&#x0D;&#x0A;- Renamed element: &apos;domain.ArquivosOse2.ose&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;contrato&apos;" flags="589826" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;domain{ArquivosOse2.java[ArquivosOse2^contrato" name="ose" references="true" setter="false" stamp="1643830378635" textual="false" version="1.0"/>
+</session>
