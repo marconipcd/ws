@@ -182,6 +182,9 @@ public class AcessoCliente {
 	@Column(name="PREST_SERV_MANUTENCAO")
 	private String prest_serv_manutecao;
 	
+	@Column(name="PENDENCIA_UPLOAD")
+	private boolean pendencia_upload;
+	
 	public AcessoCliente(String coluna, Long qtd) {		
 		this.coluna = coluna;
 		this.qtd = qtd;
@@ -715,6 +718,16 @@ public class AcessoCliente {
 			double isencao_prest_serv_manutencao) {
 		this.isencao_prest_serv_manutencao = isencao_prest_serv_manutencao;
 	}
+
+	public boolean isPendencia_upload() {
+		return pendencia_upload;
+	}
+
+	public void setPendencia_upload(boolean pendencia_upload) {
+		this.pendencia_upload = pendencia_upload;
+	}
+
+	
 
 	
 	

@@ -108,7 +108,7 @@ public class ArquivosUpload extends Window {
 	
 	private void uploadNovoArquivo(){
 			
-		final FileUploadUtil imgUtil = new FileUploadUtil("Upload de Arquivo", true, "contratos");
+		final FileUploadUtil imgUtil = new FileUploadUtil("Upload de Arquivo", true, "contratos", contrato.getId().toString());
 		imgUtil.addListerner(new FileUploadUtil.FileUploadUtilListerner() {
 			
 			@Override
@@ -117,6 +117,8 @@ public class ArquivosUpload extends Window {
 					ArquivosContratoDAO.save2(new ArquivosContrato2(null, contrato,event.getNome(), new Date(), event.getLink()));
 					containerArquivos.refresh();											
 					imgUtil.close();
+					
+					
 				}
 			}
 		});

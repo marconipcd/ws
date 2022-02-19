@@ -52,7 +52,11 @@ public class FileUploadUtil extends Window {
 	
 	String pasta;
 	
-	public FileUploadUtil(String title, boolean modal, String pasta){
+	String cod_contrato;
+	
+	public FileUploadUtil(String title, boolean modal, String pasta, String cod_contrato){
+		
+		this.cod_contrato = cod_contrato;
 		
 		this.pasta = pasta;
 		setWidth("426px");
@@ -233,23 +237,22 @@ public class FileUploadUtil extends Window {
 			
 			boolean check = true;
 			FileOutputStream fos = null;
+			boolean valid_nomeclatura = true;
+			
+			
 				try {
 
 						
 						String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 						
 						file = new File(basepath + "/WEB-INF/uploads/" + filename);		
-//						long size = Files.size(Paths.get(file.getAbsolutePath()));
-//						
-//						if(size <= 5000000){
-//							check = true;
-//						}else{
-//							check = false;
-//						}
-								
 						fos = new FileOutputStream(file);
-							
-					if(mimeType.equals("application/pdf") && check){
+						
+						if(!filename.contains(cod_contrato)){
+							valid_nomeclatura = false;
+						}
+													
+					if(mimeType.equals("application/pdf") && check && valid_nomeclatura){
 						return fos;
 					}else{
 						
@@ -259,6 +262,10 @@ public class FileUploadUtil extends Window {
 						
 						if(!check){
 							Notify.Show("Não é possível fazer upload de arquivos maiores de 2 Mb", Notify.TYPE_ERROR);
+						}
+						
+						if(!valid_nomeclatura){
+							Notify.Show("Não é possível fazer upload de arquivos que não são deste contrato!", Notify.TYPE_ERROR);
 						}
 						
 						return null;

@@ -811,7 +811,8 @@ public class AcessoDAO {
 				em.getTransaction().begin();
 				
 				//Atualiza informações de benefíficio de adesão, comodato e instalação gratis no contrato
-				contrato.setArquivo_upload(null); 
+				//contrato.setArquivo_upload(null); 
+				contrato.setPendencia_upload(true); // Cria pendencia para novo Upload
 				contrato.setValor_beneficio_adesao(Real.formatStringToDBDouble(contrato.getContrato().getValor_adesao()));
 				contrato.setValor_beneficio_comodato(Real.formatStringToDBDouble(contrato.getContrato().getValor_equipamento()));
 				contrato.setInstalacao_gratis(InstGratis);

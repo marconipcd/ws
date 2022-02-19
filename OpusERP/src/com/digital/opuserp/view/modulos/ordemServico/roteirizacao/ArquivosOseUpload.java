@@ -14,8 +14,8 @@ import com.digital.opuserp.domain.Ose;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
-import com.digital.opuserp.view.util.FileUploadUtil;
 import com.digital.opuserp.view.util.FileUploadUtil.FileUploadUtilEvent;
+import com.digital.opuserp.view.util.FileUploadUtilOse;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -105,13 +105,16 @@ public class ArquivosOseUpload extends Window {
 	
 	private void uploadNovoArquivo(){
 			
-		final FileUploadUtil imgUtil = new FileUploadUtil("Upload de Arquivo", true,"ordens_servico");
-		imgUtil.addListerner(new FileUploadUtil.FileUploadUtilListerner() {
+		final FileUploadUtilOse imgUtil = new FileUploadUtilOse("Upload de Arquivo", true,"ordens_servico");
+		imgUtil.addListerner(new FileUploadUtilOse.FileUploadUtilListerner() {
 			
+			
+
 			@Override
-			public void onClose(FileUploadUtilEvent event) {
+			public void onClose(
+					com.digital.opuserp.view.util.FileUploadUtilOse.FileUploadUtilEvent event) {
 				if(event.isConfirm()){
-															
+					
 					ArquivosOseDAO.save2(new ArquivosOse2(null, ose.getId(),event.getNome(),  new Date(),event.getLink()));				
 					
 					containerArquivos.refresh();											

@@ -144,7 +144,7 @@ public class ContratoAcessoView extends VerticalLayout {
 	Button btClientesConectados;
 	Button btNovo;	
 	Button btLiberar;
-	Button btImprimir;
+	Button btDocumentos;
 		
 	//Mudanças de Vencimento e Titularidade
 	Button btEdicoes;	
@@ -329,7 +329,7 @@ public class ContratoAcessoView extends VerticalLayout {
 				btEdicoes.setEnabled(false);
 				btEncerrar.setEnabled(false);
 				btHistorico.setEnabled(false);
-				btImprimir.setEnabled(false);
+				btDocumentos.setEnabled(false);
 				//btLiberar.setEnabled(false);
 				btVisualizar.setEnabled(false);
 				//btBloquear.setCaption("Bloquear/Desbloquear");
@@ -590,7 +590,7 @@ public class ContratoAcessoView extends VerticalLayout {
 	
 
 	private Component BuildbtDocumentos() {
-		btImprimir = new Button("Documentos",new Button.ClickListener() {
+		btDocumentos = new Button("Documentos",new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -641,8 +641,8 @@ public class ContratoAcessoView extends VerticalLayout {
 			}
 	
 		});
-		btImprimir.setEnabled(false);		
-		return btImprimir;
+		btDocumentos.setEnabled(false);		
+		return btDocumentos;
 	}
 
 	private Component BuildbtLiberar() {
@@ -938,11 +938,23 @@ public class ContratoAcessoView extends VerticalLayout {
 
 				//Image img = new Image(null, new ThemeResource("icons/check-32-inative.png"));
 				
-				if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue() != null){	
+				if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue() != null){
+					
 					if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString().equals("0")){
 						return "";
 					}else{
-						return source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString();
+						
+						boolean pendencia_upload = false;
+						
+						if(source.getItem(itemId).getItemProperty("pendencia_upload").getValue() != null){
+							pendencia_upload = (boolean)source.getItem(itemId).getItemProperty("pendencia_upload").getValue();
+						}
+						
+						if(pendencia_upload){							
+							return new Label("<div style='text-align:center;width: 100%;color: red;font-size: 14px;font-weight: bold;'>!  "+source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString()+"</div>",ContentMode.HTML);
+						}else{
+							return source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString();
+						}
 					}
 				}else{					
 					return new Label("<div style='text-align:center;width: 100%;color: red;font-size: 14px;font-weight: bold;'>!</div>",ContentMode.HTML);					
@@ -986,7 +998,8 @@ public class ContratoAcessoView extends VerticalLayout {
 		
 				   
 		tb.setVisibleColumns(new Object[] {
-				"id","Up","codigo_cartao","cliente.nome_razao","plano.nome","contrato.nome","regime","Carência","data_venc_contrato","base.identificacao","interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
+				"id","Up","codigo_cartao","cliente.nome_razao","plano.nome","contrato.nome","regime","Carência","data_venc_contrato",
+				"base.identificacao","interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
 				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia"});
 		
 		tb.setImmediate(true);
@@ -1000,7 +1013,7 @@ public class ContratoAcessoView extends VerticalLayout {
 						btFuncoesAdminsitrativas.setEnabled(false);
 					}
 					btLiberar.setEnabled(true);
-					btImprimir.setEnabled(false);
+					btDocumentos.setEnabled(false);
 					btEdicoes.setEnabled(false);
 					btEncerrar.setEnabled(false);
 					btVisualizar.setEnabled(false);
@@ -1012,7 +1025,8 @@ public class ContratoAcessoView extends VerticalLayout {
 					
 					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && 
 							tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("ATIVO")){
-						btImprimir.setEnabled(true);
+						
+						btDocumentos.setEnabled(true);
 						btEdicoes.setEnabled(true);
 						btEncerrar.setEnabled(true);
 						btVisualizar.setEnabled(true);
@@ -1022,11 +1036,12 @@ public class ContratoAcessoView extends VerticalLayout {
      					if(btFuncoesAdminsitrativas != null){
      						btFuncoesAdminsitrativas.setEnabled(true);
      					}
+     					
 					}
 					
 					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && 
 							tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("SUSPENSO")){
-						btImprimir.setEnabled(true);
+						btDocumentos.setEnabled(true);
 						btEdicoes.setEnabled(true);
 						btEncerrar.setEnabled(true);
 						btVisualizar.setEnabled(true);
@@ -1038,7 +1053,7 @@ public class ContratoAcessoView extends VerticalLayout {
 					}					
 					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && 
 							tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("BLOQUEADO")){
-						btImprimir.setEnabled(true);					
+						btDocumentos.setEnabled(true);					
 						btEncerrar.setEnabled(true);
 						btEdicoes.setEnabled(true);
 						btVisualizar.setEnabled(true);
@@ -1051,11 +1066,14 @@ public class ContratoAcessoView extends VerticalLayout {
 						}
 					}
 					
-					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("ENCERRADO")){						
+					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && 
+							tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("ENCERRADO")){	
+						
 						btVisualizar.setEnabled(true);
 						btHistorico.setEnabled(true);
 //						btBloquear.setCaption("Bloquear");
 						btBloquear.setEnabled(false);
+						btDocumentos.setEnabled(true);
 						
 						if(btFuncoesAdminsitrativas != null){
 							btFuncoesAdminsitrativas.setEnabled(false);
@@ -1064,7 +1082,7 @@ public class ContratoAcessoView extends VerticalLayout {
 					
 					if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("PENDENTE_INSTALACAO")){
 						//btLiberar.setEnabled(true);
-						btImprimir.setEnabled(true);
+						btDocumentos.setEnabled(true);
 						btEdicoes.setEnabled(true);
 						btEncerrar.setEnabled(true);
 						btVisualizar.setEnabled(true);
@@ -1082,7 +1100,7 @@ public class ContratoAcessoView extends VerticalLayout {
 				}else{
 					btPendencia.setEnabled(false);
 					btLiberar.setEnabled(false);
-					btImprimir.setEnabled(false);
+					btDocumentos.setEnabled(false);
 					btEdicoes.setEnabled(false);
 					btEncerrar.setEnabled(false);
 					btVisualizar.setEnabled(false);
@@ -1164,7 +1182,7 @@ public class ContratoAcessoView extends VerticalLayout {
 			public void valueChange(ValueChangeEvent event) {
 				tb.refreshRowCache();
 				//btLiberar.setEnabled(false);
-				btImprimir.setEnabled(false);
+				btDocumentos.setEnabled(false);
 				btEdicoes.setEnabled(false);
 				btEncerrar.setEnabled(false);
 //				btAddFiltros.setEnabled(false);

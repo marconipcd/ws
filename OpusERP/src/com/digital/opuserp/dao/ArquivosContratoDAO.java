@@ -111,11 +111,12 @@ public class ArquivosContratoDAO {
 		
 		AcessoCliente ac = fileOsp.getContrato();
 		ac.setArquivo_upload(new String().valueOf(listarArquivos2(fileOsp.getContrato()).size()+1));
+		ac.setPendencia_upload(false); 
 		
 		try{
 			em.getTransaction().begin();
 		
-			//em.merge(ac);
+			em.merge(ac);
 			
 			fileOsp.setUsuario(OpusERP4UI.getUsuarioLogadoUI().getUsername());
 			em.persist(fileOsp);
