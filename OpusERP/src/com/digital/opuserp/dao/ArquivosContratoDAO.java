@@ -106,6 +106,15 @@ public class ArquivosContratoDAO {
 //		}
 //	}
 	
+	public static void removerPendencia(AcessoCliente contrato){
+		EntityManager em = ConnUtil.getEntity();
+		
+		em.getTransaction().begin();
+		contrato.setPendencia_upload(false);
+		em.getTransaction().commit();
+				
+	}
+	
 	public static void save2(ArquivosContrato2 fileOsp){
 		EntityManager em = ConnUtil.getEntity();
 		

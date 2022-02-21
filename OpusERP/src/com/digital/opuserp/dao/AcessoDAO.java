@@ -95,6 +95,8 @@ public class AcessoDAO {
 		EntityManager em = ConnUtil.getEntity();
 		try {
 			
+			c.setPendencia_upload(false); 
+			
 			//----nfe
 			c.setEmitir_nfe("NFE-MOD21");
 			c.setEmitir_nfe_automatico("SIM");
@@ -811,11 +813,19 @@ public class AcessoDAO {
 				em.getTransaction().begin();
 				
 				//Atualiza informações de benefíficio de adesão, comodato e instalação gratis no contrato
-				//contrato.setArquivo_upload(null); 
+				if(contrato.getArquivo_upload() != null && 
+						contrato.getArquivo_upload().equals("0")){
+					
+					contrato.setArquivo_upload(null); 
+				}
 				contrato.setPendencia_upload(true); // Cria pendencia para novo Upload
 				contrato.setValor_beneficio_adesao(Real.formatStringToDBDouble(contrato.getContrato().getValor_adesao()));
 				contrato.setValor_beneficio_comodato(Real.formatStringToDBDouble(contrato.getContrato().getValor_equipamento()));
 				contrato.setInstalacao_gratis(InstGratis);
+				
+				//Retira permissao de downgrad
+				contrato.setN_controla_vlr_plano(false);	
+				
 				
 					if(!contrato.getContrato().getTipo_contrato().equals("GRATIS")){
 						

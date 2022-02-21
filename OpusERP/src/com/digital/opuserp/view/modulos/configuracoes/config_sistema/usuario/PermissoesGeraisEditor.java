@@ -557,6 +557,7 @@ public class PermissoesGeraisEditor extends Window {
 				tbPermissao.addItem(new Object[]{"Excluir arquivo"}, new Integer(37));
 				tbPermissao.addItem(new Object[]{"Visualizar arquivo"}, new Integer(38));
 				tbPermissao.addItem(new Object[]{"Liberar Cartao Cliente"}, new Integer(39));
+				tbPermissao.addItem(new Object[]{"Remover pendencia upload"}, new Integer(40));
 			}else if(submodulo.equals("Bases")){
 				tbPermissao.addItem(new Object[]{"Cadastrar"}, new Integer(1));
 				tbPermissao.addItem(new Object[]{"Alterar"}, new Integer(2));

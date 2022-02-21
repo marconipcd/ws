@@ -20,6 +20,7 @@ import org.joda.time.Months;
 import com.digital.opuserp.OpusERP4UI;
 import com.digital.opuserp.dao.AcessoDAO;
 import com.digital.opuserp.dao.AlteracoesContratoDAO;
+import com.digital.opuserp.dao.ArquivosContratoDAO;
 import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.ContratosAcessoDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
@@ -209,6 +210,8 @@ public class ContratoAcessoView extends VerticalLayout {
 //		hlButonsAtualizar.addComponent(BuildbtAtualizar());
 		
 //		addComponent(hlButonsAtualizar);
+//		HorizontalLayout hlButtons1112 = new HorizontalLayout();
+		
 		 addComponent(new HorizontalLayout(){
 			 {
 				 setWidth("100%");				 
@@ -1243,7 +1246,7 @@ public class ContratoAcessoView extends VerticalLayout {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 					
 					container.addContainerFilter(Filters.eq("status_2", "ATIVO"));
-					container.addContainerFilter(Filters.or(Filters.isNull("arquivo_upload"), Filters.eq("arquivo_upload", 0)));
+					container.addContainerFilter(Filters.or(Filters.isNull("arquivo_upload"), Filters.eq("pendencia_upload", 1)));
 					container.addContainerFilter(Filters.or(
 							Filters.gteq("data_instalacao", sdf.parse("01/10/2021")),
 							Filters.gteq("data_alteracao_plano", sdf.parse("01/10/2021"))
@@ -4412,30 +4415,27 @@ public class ContratoAcessoView extends VerticalLayout {
 	        bt4.setPrimaryStyleName("btSubMenu"); 
 	        l.addComponent(bt4);
 			
-			//final ArquivosContrato arquivo = ArquivosContratoDAO.buscarArquivo(contrato);
-			
-//			if(arquivo != null){
-//				Button bt4 = new Button("Visualizar Arquivo", new Button.ClickListener() {
-//					
-//					@Override
-//					public void buttonClick(ClickEvent event) {
-//						try{									
-//								String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-//								File file = new File(basepath + "/WEB-INF/uploads/logo.jpeg");
-//								
-//								writeFile((byte[]) arquivo.getFile());								
-//						}catch(Exception e){							
-//							e.printStackTrace();					
-//							LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Não Conseguiu Imprimir um Termo de Beneficios"));
-//						}
-//					}
-//				});
-//		        bt4.setPrimaryStyleName("btSubMenu"); 
-//		        l.addComponent(bt4);
-//			}
-			//else{
+		
+	        Button bt5 = new Button("Remover pendência", new Button.ClickListener() {
 				
-		//	}			
+				@Override
+				public void buttonClick(ClickEvent event) {
+					if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
+							OpusERP4UI.getUsuarioLogadoUI().getId(), "Remover pendencia upload"))				
+					{	
+						EntityItem<AcessoCliente> eiContrato = (EntityItem<AcessoCliente>) tb.getItem(tb.getValue());
+						ArquivosContratoDAO.removerPendencia(eiContrato.getEntity());
+						refresh();
+						
+					}else{
+						Notify.Show("Você não Possui Permissão para Remover pendência de upload", Notify.TYPE_ERROR);
+					}
+					
+				}
+			});
+	        bt5.setPrimaryStyleName("btSubMenu"); 
+	        l.addComponent(bt5);
+	        
         }
         
     }
