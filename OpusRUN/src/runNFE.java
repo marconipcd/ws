@@ -37,7 +37,7 @@ public class runNFE {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 				
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=11268 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'CANCELADO'  and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -60,17 +60,17 @@ public class runNFE {
 				Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
 						"status_2 != 'EXCLUIDO' "+			
 					    "and n_doc REGEXP :rNova "+ 
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "+
+						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes and cr.ID=571698 "+
 						
 						"or "+
 						"status_2 != 'EXCLUIDO' "+				
 						"and n_doc REGEXP :rAntiga "+
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "+
+						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes and cr.ID=571698 "+
 						
 						"or "+
 						"status_2 != 'EXCLUIDO' "+				
 						"and n_doc REGEXP :rProrata "+
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "
+						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes and cr.ID=571698 "
 						
 						, ContasReceber.class);
 					

@@ -57,7 +57,7 @@ public class PendenciasEditor extends Window implements GenericEditor {
 	public PendenciasEditor(Item item, String title, boolean modal){
 		this.item = item;
 		
-		setWidth("848px");
+		setWidth("882px");
 		setHeight("549px");
 		
 		setCaption(title);
@@ -108,7 +108,9 @@ public class PendenciasEditor extends Window implements GenericEditor {
 	private Table buildTable(){
 		
 		tb = new Table(null, buildContainer());
-		tb.setSizeFull();
+		tb.setStyleName("listagem-plano-acao");
+		tb.setWidth("100%");
+		tb.setHeight("370px");
 		tb.setVisibleColumns(new Object[]{"pendencia", "operador","data"});
 		
 		tb.setColumnHeader("pendencia", "Pendência");
@@ -181,6 +183,9 @@ public class PendenciasEditor extends Window implements GenericEditor {
 				
 			}
 		});
+		
+		tb.setColumnWidth("x", 59);
+		
 		
 		return tb;
 	}
