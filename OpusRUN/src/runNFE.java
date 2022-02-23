@@ -97,7 +97,8 @@ public class runNFE {
 					if(contrato.getEmitir_nfe_c_boleto_aberto().equals("SIM") && contrato.getCfop_nfe() != null){
 						boolean gerado = false;
 						
-						Query q = em.createQuery("select nfe From NfeMestre nfe where nfe.contrato =:contrato and nfe.contas_receber=:boleto", NfeMestre.class);
+						Query q = em.createQuery("select nfe From NfeMestre nfe where nfe.contrato =:contrato and "
+								+ "nfe.contas_receber=:boleto", NfeMestre.class);
 						q.setParameter("contrato", contrato);
 						q.setParameter("boleto", boleto);
 						
