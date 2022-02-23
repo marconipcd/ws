@@ -37,7 +37,6 @@ public class runNFE {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 				
-
 		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id = 11268 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'CANCELADO'  and c.cfop_nfe != null", AcessoCliente.class);
@@ -58,7 +57,6 @@ public class runNFE {
 				String regexAntiga = "^"+contrato.getId().toString()+"/[0-9]{2}/[0-9]{2}";
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
-
 				boolean manual = true;
 				
 				if(!manual){
@@ -78,7 +76,6 @@ public class runNFE {
 							"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes  "
 							
 							, ContasReceber.class);
-
 						
 					qn.setParameter("rNova", regexNova);
 					qn.setParameter("rAntiga", regexAntiga);
