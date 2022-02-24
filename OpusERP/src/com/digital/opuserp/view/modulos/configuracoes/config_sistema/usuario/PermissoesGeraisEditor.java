@@ -99,9 +99,9 @@ public class PermissoesGeraisEditor extends Window {
 								
 								
 								if(cbPermitirVisualizarTodosCrms.getValue().toString().equals("SIM")){
-									u.setVisualizar_todos_crm(1);
+									u.setVisualizar_todos_crm("1");
 								}else{
-									u.setVisualizar_todos_crm(0);
+									u.setVisualizar_todos_crm("0");
 								}
 								
 								em.getTransaction().begin();
@@ -116,10 +116,10 @@ public class PermissoesGeraisEditor extends Window {
 							}
 						});
 						
-						if(u.getVisualizar_todos_crm() == 1){
+						if(u.getVisualizar_todos_crm().equals("1")){
 							cbPermitirVisualizarTodosCrms.select("SIM");
 						}
-						if(u.getVisualizar_todos_crm() == 0){
+						if(u.getVisualizar_todos_crm().equals("0")){
 							cbPermitirVisualizarTodosCrms.select("NAO");
 						}
 						

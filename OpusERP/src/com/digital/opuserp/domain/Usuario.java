@@ -14,7 +14,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.GenericGenerator;
+
+import com.digital.opuserp.util.StringUtil;
 
 /**
  *
@@ -37,9 +40,18 @@ public class Usuario {
     @Column(name="FUNCAO", nullable=false,unique=false, length=20)
     private String funcao;
     
-    @Column(name="VISUALIZAR_TODOS_CRMS", nullable=true)
-    private Integer visualizar_todos_crm;
+    @Column(name="SETOR", nullable=true)
+    private String setor;
     
+    @Column(name="EMAIL", nullable=true)
+    private String email;
+    
+    @Column(name="VISUALIZAR_TODOS_CRMS", nullable=true)
+    private String visualizar_todos_crm;
+    
+    @Column(name="STATUS")
+    private String status;
+        
     @OneToMany(mappedBy="usuario")   
     private List<EmpresasUsuario> empresas;
     
@@ -94,7 +106,11 @@ public class Usuario {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+    	
+    	if(this.password != null && !this.password.equals(password)){
+    		this.password = StringUtil.md5(password);
+    	}
+    	
     }
 
         public String getFuncao() {
@@ -105,12 +121,46 @@ public class Usuario {
         this.funcao = funcao;
     }
 
-	public Integer getVisualizar_todos_crm() {
-		return visualizar_todos_crm;
+	public String getVisualizar_todos_crm() {
+		
+		if(visualizar_todos_crm != null && visualizar_todos_crm.equals("0")){
+			return  "NAO";
+		}else{
+			return "SIM";
+		}
 	}
 
-	public void setVisualizar_todos_crm(Integer visualizar_todos_crm) {
-		this.visualizar_todos_crm = visualizar_todos_crm;
+	public void setVisualizar_todos_crm(String visualizar_todos_crm) {
+		
+		if(visualizar_todos_crm != null && visualizar_todos_crm.equals("SIM")){
+			this.visualizar_todos_crm = "1";
+		}else{
+			this.visualizar_todos_crm = "0";
+		}
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getSetor() {
+		return setor;
+	}
+
+	public void setSetor(String setor) {
+		this.setor = setor;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	

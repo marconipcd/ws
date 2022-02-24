@@ -3,20 +3,13 @@ package com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import com.digital.opuserp.OpusERP4UI;
-import com.digital.opuserp.dao.LoginDAO;
+import com.digital.opuserp.interfaces.GenericEditor;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
-import com.digital.opuserp.util.StringUtil;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioCancelEvent.UsuarioCancelListener;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioSalveEvent.UsuarioSalvedListener;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.event.FieldEvents.BlurEvent;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.Alignment;
@@ -26,70 +19,46 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class UsuarioEditor extends Window{
-
+public class UsuarioEditor extends Window implements GenericEditor {
 	
-	private Item usuarioItem;
-//	private Form usuarioForm;
-	private FieldGroup fgUsuario;
-	private Button btSalvar;
-	private Button btCancelar;
-	private String tipo;
-	private String usuarioCadastrado;
-	private Boolean validarUser;
-	private VerticalLayout vlRoot;
+	Item item;
+	Button btSalvar;
+	Button btCancelar;
+	FormLayout flPrincipal;
+	FieldGroup fieldGroup;
+	VerticalLayout vlRoot;
 	
-	private String width_user;
-	private String width_senha;
-	private String width_funcao;
 
+	ComboBox cb;
+	ComboBox cbStatus;
 	
-	private String novoUsuario;
-
-	public UsuarioEditor(Item item, String titulo) {
+	
+	public UsuarioEditor(Item item, String title, boolean modal){
+		this.item = item;
 		
-		configLayout();
-		
-		
-		configLayout();
+		setCaption(title);
+		setModal(modal);
 		setResizable(false);
 		setClosable(false);
 		center();
 		
-		usuarioItem = item;
-		tipo = titulo;
-		setCaption(titulo);	
-		
-		btSalvar = buildBtSalvar();
-		btCancelar = buildBtCancelar();
-		vlRoot = buildVlRoot();
-		
-		setContent(vlRoot);	
-		
-		
-		setClosable(false);
-		
-		if(tipo.equals("Editar Usuario")){
-			validarUser = true;
-		}else{
-			validarUser = false;
-		}
+		vlRoot = new VerticalLayout();	
+		vlRoot.setWidth("100%");
+		vlRoot.setMargin(true);
+		vlRoot.addStyleName("border-form");
 		
 		setContent(new VerticalLayout(){
 			{
 				setWidth("100%");
 				setMargin(true);
 				addComponent(vlRoot);
-				
-				
+								
 				HorizontalLayout hlButtons = new HorizontalLayout();
-				hlButtons.setStyleName("hl_buttons_bottom");
 				hlButtons.setSpacing(true);
 				hlButtons.setMargin(true);
 				hlButtons.addComponent(buildBtCancelar());
@@ -99,268 +68,247 @@ public class UsuarioEditor extends Window{
 				setComponentAlignment(hlButtons, Alignment.BOTTOM_RIGHT);
 			}
 		});
-			
+				
+		buildLayout();
 	}
-		
+	
+	
+	
+	
 	private void configLayout(){
 		//1366x768
 		//if(OpusERP4UI.browser.getScreenWidth() >= 1024 && OpusERP4UI.browser.getScreenHeight() >= 768){
-				setWidth("310px");
-				setHeight("200px");
-			
-				 width_user = "150px";
-				 width_senha = "150px";
-				 width_funcao = "150px";
-			
+				setWidth("832px");
+				setHeight("430px");		
 		//}
 	}
 	
-	
-	private VerticalLayout buildVlRoot(){
+	public void buildLayout(){
 		
-		
-		vlRoot = new VerticalLayout();
-		vlRoot.setWidth("100%");
-		vlRoot.setMargin(true);
-		vlRoot.setStyleName("border-form");	 
-		fgUsuario = new FieldGroup(usuarioItem);
-		
-//		vlRoot.addComponent(new FormLayout(){
-//			{
-//				addComponent(fgUsuario.buildAndBind("Usuario", "username"));
-//				((TextField)fgUsuario.getField("username")).setStyleName("user");
-//				((TextField)fgUsuario.getField("username")).setEnabled(true);
-//				((TextField)fgUsuario.getField("username")).setRequired(true);
-//			}	
-//		});
-
-		final TextField tfUser = new TextField();
-		fgUsuario.bind(tfUser, "username");
-		tfUser.setCaption("Usuario");
-		tfUser.setRequired(true);
-		tfUser.setNullRepresentation("");
-		tfUser.focus();
-		tfUser.setWidth(width_user);
-		
-		tfUser.setStyleName("caption-geral");
-	tfUser.addListener(new FieldEvents.TextChangeListener() {
+		fieldGroup = new FieldGroup(item);
 			
-			@Override
-			public void textChange(TextChangeEvent event) {
-				usuarioCadastrado = event.getText();
-				usuarioCadastrado.replaceAll(" ",""); 
-								
-				LoginDAO log = new LoginDAO();
-				
-				 if(!event.getText().isEmpty()){
-						if(log.validarUsuario(event.getText()) == true){
-							event.getComponent().setStyleName("textfield-valid-usuario");
-							validarUser = true;					
-							tfUser.setValue(event.getText());		
-							
-						}else{
-							event.getComponent().setStyleName("textfield-invalid-usuario");
-							validarUser = false;					
-							tfUser.setValue(event.getText());				
-						}	
-				}else{
-//					lbInfo.setStyleName("lbInicial");				
+		vlRoot.addComponent(new FormLayout(){					
+				{
+					
+					setMargin(true);
+					setSpacing(true);
+					addStyleName("form-cutom");						
+									
+					TextField txtUsuario = (TextField)fieldGroup.buildAndBind("Usuário", "username");				
+					txtUsuario.setWidth("200px");				
+					txtUsuario.addStyleName("caption-align-planos");
+					txtUsuario.setNullRepresentation("");					
+					txtUsuario.setRequired(true);
+											
+					addComponent(txtUsuario); 
+									
 				}
+			});
+
+		vlRoot.addComponent(new FormLayout(){					
+				{
+					
+					setMargin(true);
+					setSpacing(true);
+					addStyleName("form-cutom");						
+									
+					PasswordField txtSenha = new PasswordField("Senha");				
+					txtSenha.setWidth("200px");				
+					txtSenha.addStyleName("caption-align-planos");
+					txtSenha.setNullRepresentation("");					
+					txtSenha.setRequired(true);
+											
+					addComponent(txtSenha);
+					
+					fieldGroup.bind(txtSenha, "password");			
+									
+				}
+			});
+		
+		vlRoot.addComponent(new FormLayout(){					
+					{						
+						setMargin(true);
+						setSpacing(true);
+						addStyleName("form-cutom");						
+						
+						ComboBox cbFuncao = new ComboBox("Função");		
+						cbFuncao.setTextInputAllowed(false);
+						cbFuncao.addStyleName("caption-align-planos");				
+						cbFuncao.addStyleName("align-currency");
+						cbFuncao.setNullSelectionAllowed(false);
+						cbFuncao.setRequired(true);
+						cbFuncao.addItem("admin");
+						cbFuncao.addItem("operador");
+						cbFuncao.addItem("tecnico");
+						
+						addComponent(cbFuncao);
+												
+						fieldGroup.bind(cbFuncao, "funcao");						
+					}
+		});
+		
+		vlRoot.addComponent(new FormLayout(){					
+			{						
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+				
+				ComboBox cbSetor = new ComboBox("Setor");	
+				cbSetor.setTextInputAllowed(false);
+				cbSetor.addStyleName("caption-align-planos");				
+				cbSetor.addStyleName("align-currency");
+				cbSetor.setNullSelectionAllowed(false);
+				cbSetor.setRequired(true);
+				cbSetor.addItem("DIRETORIA");
+				cbSetor.addItem("FINANCEIRO");
+				cbSetor.addItem("COMERCIAL");
+				cbSetor.addItem("SUPORTE");
+				cbSetor.addItem("DESENVOLVIMENTO");
+				
+				addComponent(cbSetor);
+										
+				fieldGroup.bind(cbSetor, "setor");						
+			}
+		});
+		
+		vlRoot.addComponent(	new FormLayout(){					
+			{
+				
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+				
+				TextField txtEmail = new TextField("Email");	
+				
+				txtEmail.setWidth("245px");
+				txtEmail.setNullRepresentation("");		
+				txtEmail.addStyleName("caption-align-planos");						
+				txtEmail.setRequired(true);					
+				addComponent(txtEmail);
+				setExpandRatio(txtEmail, 2);
+				
+				fieldGroup.bind(txtEmail, "email");
+				
 			}
 		});
 	
-		tfUser.addListener(new FieldEvents.BlurListener() {
-			
-					@Override
-					public void blur(BlurEvent event) {
-						if(validarUser == false){
-							Notify.Show("Usuario Já Cadastrado!", Notify.TYPE_ERROR);
-						}						
+		vlRoot.addComponent(	new FormLayout(){					
+			{
+				
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+				
+				ComboBox cbVisualizaTodosCrms = new ComboBox("Visualizar Todos os Crms");				
+				cbVisualizaTodosCrms.setTextInputAllowed(false);
+				cbVisualizaTodosCrms.addStyleName("caption-align-planos");				
+				cbVisualizaTodosCrms.addStyleName("align-currency");
+				cbVisualizaTodosCrms.setNullSelectionAllowed(false);
+				cbVisualizaTodosCrms.setRequired(true);
+				cbVisualizaTodosCrms.addItem("SIM");
+				cbVisualizaTodosCrms.addItem("NAO");				
+				addComponent(cbVisualizaTodosCrms);
+				
+				
+				fieldGroup.bind(cbVisualizaTodosCrms, "visualizar_todos_crm");
+				
+			}
+		});
+		
+		vlRoot.addComponent(	new FormLayout(){					
+					{
+						
+						setMargin(true);
+						setSpacing(true);
+						addStyleName("form-cutom");						
+						
+						cbStatus = new ComboBox("Status");	
+						cbStatus.setTextInputAllowed(false);
+						cbStatus.addStyleName("caption-align-planos");				
+						cbStatus.addStyleName("align-currency");
+						cbStatus.setNullSelectionAllowed(false);
+						cbStatus.setRequired(true);
+						cbStatus.addItem("ATIVO");
+						cbStatus.addItem("INATIVO");
+						cbStatus.select("ATIVO");
+						addComponent(cbStatus);
+						setExpandRatio(cbStatus, 2);
+						
+						fieldGroup.bind(cbStatus, "status");
+						
 					}
 				});
 		
-//		tfUser.addListener(new FieldEvents.TextChangeListener() {
-//			
-//			@Override
-//			public void textChange(TextChangeEvent event) {
-//				usuarioCadastrado = event.getText();
-//				usuarioCadastrado.replaceAll(" ",""); 
-//								
-//				Login log = new Login();
-//				if(log.validarUsuario(event.getText()) == true && !usuarioCadastrado.isEmpty()){							
-//					lbInfo.setValue("Disponivel!");
-//					lbInfo.setStyleName("verde");
-//					validarUser = true;	
-//					tfUser.setValue(event.getText());		
-//				}else {
-//					lbInfo.setValue("Indisponivel!");
-//					validarUser = false;
-//					lbInfo.setStyleName("vermelho");
-//					tfUser.setValue(event.getText());
-//				}				
-//			}
-//		});
-		
-		HorizontalLayout hlValidarUser = new HorizontalLayout();
-		hlValidarUser.addComponent(new FormLayout(){
-			{
-				setStyleName("form-cutom");
-				addComponent(tfUser);
-			}
-		});
-//		hlValidarUser.addComponent(new FormLayout(){
-//			{
-//				setStyleName("lbInfo");
-//				addComponent(lbInfo);
-//			}
-//		});
-		
-		vlRoot.addComponent(hlValidarUser);
-				
-		final PasswordField  senha = new PasswordField();
-		fgUsuario.bind(senha, "password");
-		senha.setCaption("Senha");
-		senha.setRequired(true);
-		senha.setWidth(width_senha);
-		
-		senha.setNullRepresentation("");
-		senha.setStyleName("caption-geral");
-		
-		vlRoot.addComponent(new FormLayout(){
-			{
-				setStyleName("form-cutom");
-				addComponent(senha);			
-			}	
-			
-		});
-		
-		final ComboBox boxFuncao = new ComboBox();
-		fgUsuario.bind(boxFuncao, "funcao");
-		boxFuncao.setRequired(true);
-		boxFuncao.setNullSelectionItemId(false);
-		boxFuncao.addItem("Operador");
-		boxFuncao.addItem("Gerente");
-		boxFuncao.addItem("tecnico");
-		boxFuncao.setCaption("Função");
-		boxFuncao.setStyleName("caption-geral");
-		boxFuncao.setWidth(width_funcao);
-		vlRoot.addComponent(new FormLayout(){
-			{
-				setStyleName("form-cutom");
-				addComponent(boxFuncao);
-			}
-		});	
-		
-		return vlRoot;	
 	}
-	
 
-	private Button buildBtSalvar(){
-		btSalvar = new Button("Salvar", new Button.ClickListener() {
+	@Override
+	public Button buildBtSalvar() {
+		btSalvar = new Button("OK", new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-	 
-				 if(tipo.equals("Cadastro de usuario")){					 
-					  if(fgUsuario.isValid() && validarUser == true ){
-						  try {
-							fgUsuario.commit();
-							usuarioItem.getItemProperty("password").setValue(StringUtil.md5(fgUsuario.getField("password").getValue().toString()));
-							
-							fireEvent(new UsuarioSalveEvent(getUI(), usuarioItem));
-							  Notify.Show("Usuario Cadastrado com sucesso!", Notify.TYPE_ERROR);
-							  close();
-						} catch (CommitException e) {
-							e.printStackTrace();
-						}
-						  
-					  }else{
-						  Notify.Show_Invalid_Submit_Form();
-					  }
-	
-					 }else if(tipo.equals("Editar Usuario")){	
-						 								 	
-							 if(fgUsuario.isValid() && validarUser == true ){						  							  
-								 try {
-						
-									 fgUsuario.commit();
-									 usuarioItem.getItemProperty("password").setValue(StringUtil.md5(fgUsuario.getField("password").getValue().toString()));									 
-									 
-									 fireEvent(new UsuarioSalveEvent(getUI(), usuarioItem));
+				if(fieldGroup.isValid()){
+						salvar();					
+				}else{					
+					Notify.Show_Invalid_Submit_Form();
+				}
+				
+			}
 
-									   Notify.Show("Usuario Alterado com sucesso!", Notify.TYPE_ERROR);
-									   
-									   close();
-								} catch (CommitException e) {
-									e.printStackTrace();
-									System.out.println("Erro ao cadastrar ou alterar : "+e.getMessage()+".\n Causado por: "+e.getCause());
-									Notify.Show("Não foi Possivel Salvar as Alterações!", Notify.TYPE_ERROR);
-								}
-								  
-							 }else{
-								 Notify.Show_Invalid_Submit_Form();
-								 fgUsuario.discard();	 
-							}
-					 }		 
-			}	 
+			
 		});
-		btSalvar.addStyleName("default");
-		return btSalvar;		
-	}
 		
-	private Button buildBtCancelar(){
-		btCancelar = new Button("Cancelar", new Button.ClickListener() {
-					
+		ShortcutListener clTb = new ShortcutListener("Salvar", ShortcutAction.KeyCode.ENTER, null) {
+			
 			@Override
-			public void buttonClick(ClickEvent event) {	
-				if(fgUsuario.isModified() ){
-					
-					final GenericDialog gDialog = new GenericDialog("Confirme para Continuar!", "Deseja Salvar as Informações Alteradas?", true, true);
+			public void handleAction(Object sender, Object target) {
+				btSalvar.click();
+			}
+		};
+		btSalvar.addShortcutListener(clTb);
+		btSalvar.setStyleName("default");
+		return btSalvar;
+	}
+	
+	private void salvar() {
+		try {						
+			fieldGroup.commit();				
+			fireEvent(new UsuarioEvent(getUI(), item, true));						
+			close();
+		} catch (CommitException e) {						
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public Button buildBtCancelar() {
+		btCancelar = new Button("Cancelar", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				if(!fieldGroup.isModified()){
+					fieldGroup.discard();				
+					fireEvent(new UsuarioEvent(getUI(), item, false));
+					close();
+				}else{
+					GenericDialog gDialog = new GenericDialog("Confirme para Continuar!", "Deseja Salvar as Informações Alteradas?", true, true);
 					gDialog.setCaptionCANCEL("Sair sem Salvar!");
 					gDialog.setCaptionOK("Salvar");
 					
 					gDialog.addListerner(new GenericDialog.DialogListerner() {
 						
 						@Override
-						public void onClose(DialogEvent event) {									
-							if(event.isConfirm()){
-								
-								if(fgUsuario.isValid() && validarUser == true){
-									try {
-										fgUsuario.commit();
-										fireEvent(new UsuarioSalveEvent(getUI(), usuarioItem));
-										
-										if(usuarioItem.getItemProperty("id").getValue() == null){
-											Notify.Show("Usuario Cadastrado com Sucesso!", Notify.TYPE_SUCCESS);
-										}else{
-											Notify.Show("Usuario Alterado com Sucesso!", Notify.TYPE_SUCCESS);
-										}
-										
-										close();
-									} catch (Exception e) {
-										e.printStackTrace();
-										System.out.println("Erro ao cadastrar ou alterar : "+e.getMessage()+".\n Causado por: "+e.getCause());
-										Notify.Show("Não foi Possivel Salvar as Alterações!", Notify.TYPE_ERROR);
-									}								
-								}else{
-									Notify.Show_Invalid_Submit_Form();
-								}
-						
-							}else{
-								fgUsuario.discard();	
-								fireEvent(new UsuarioCancelEvent(getUI(), usuarioItem));
-								gDialog.close();
-								close();
-
-							}
+						public void onClose(DialogEvent event) {
+								if(event.isConfirm()){
+									salvar();
+								}							
 						}
-					});
+					});					
+					
 					getUI().addWindow(gDialog);
 					
-				}else{
-					close();
-					fgUsuario.discard();
-				}
+				}				
 			}
 		});
 		
@@ -374,177 +322,41 @@ public class UsuarioEditor extends Window{
 		btCancelar.addShortcutListener(clTb);
 		
 		return btCancelar;
-			
 	}
 	
-//	private Form buildForm(){
-//				
-//		
-//		usuarioForm = new Form();		
-//		usuarioForm.setImmediate(true);
-//		usuarioForm.getFooter().addComponent(btSalvar);
-//		usuarioForm.getFooter().addComponent(btCancelar);
-//		usuarioForm.setSizeUndefined();
-//		usuarioForm.setFormFieldFactory(new FormFieldFactory() {
-//			
-//			
-//			
-//			@Override
-//			public Field createField(Item item, Object propertyId,
-//					Component uiContext) {
-//				if("password".equals(propertyId)){
-//					PasswordField passField = new PasswordField();
-//					passField.setRequired(true);
-//					passField.setNullRepresentation("");
-//					passField.setCaption("Senha");	
-//					
-//					return passField;
-//				}else if("funcao".equals(propertyId)){
-//					ComboBox boxFuncao = new ComboBox();
-//					boxFuncao.setRequired(true);
-//					boxFuncao.setNullSelectionItemId(false);
-//					boxFuncao.addItem("admin");
-//					boxFuncao.addItem("gerente");
-//					boxFuncao.addItem("tecnico");
-//					boxFuncao.addItem("vendedor");
-//					boxFuncao.addItem("supervisor");
-//					boxFuncao.addItem("caixa");
-//					boxFuncao.setCaption("Função");
-//
-//					
-//					return boxFuncao;							
-//				}else{
-//					return buildUsername();
-//				}
-//				
-//			}
-//		});
-//		usuarioForm.setItemDataSource(usuarioItem, Arrays.asList("username","password","funcao"));//tambem binda os item da tabela com formulario de edi��o
-//		return usuarioForm;		
-//	}	
 	
-	
-	
-//	private CustomField<String> buildUsername(){
-//		 CustomField<String> username = new CustomField<String>() {
-//
-//			@Override
-//			protected Component initContent() {
-//				HorizontalLayout hlUsername = new HorizontalLayout();
-//				final Label lbInfo = new Label();
-//				final Label requerido = new Label("*");
-//				requerido.setStyleName("requerido");
-//				final Label usuario = new Label("Usuario");	
-//				final TextField tfUsername = new TextField();
-//				tfUsername.setStyleName("ftUser");
-//				tfUsername.setValue(usuarioItem.getItemProperty("username").toString());
-//				tfUsername.setNullRepresentation("");
-//				setCaption("Usuario");
-//				
-//				tfUsername.addListener(new FieldEvents.TextChangeListener() {
-//					
-//					@Override
-//					public void textChange(TextChangeEvent event) {
-//						usuarioCadastrado = event.getText();
-//						usuarioCadastrado.replaceAll(" ",""); 
-//						
-//												
-//						Login log = new Login();
-//						if(log.validarUsuario(event.getText()) == true && !usuarioCadastrado.isEmpty()){							
-//							lbInfo.setValue("Disponivel!");
-//							lbInfo.setStyleName("verde");
-//							validarUser = true;	
-//							setValue(event.getText());			
-//						}else {
-//							lbInfo.setValue("Indisponivel!");
-//							validarUser = false;
-//							lbInfo.setStyleName("vermelho");
-//							setValue(event.getText());
-//						}
-//						
-//						
-//					}
-//				});		
-//			//	hlUsername.addComponent(usuario);
-//				hlUsername.addComponent(requerido);
-//				hlUsername.addComponent(tfUsername);
-//				hlUsername.addComponent(lbInfo);			
-//				return hlUsername;
-//			}
-//
-//			@Override
-//			public Class getType() {
-//				return String.class;
-//			}			
-//		};	
-//		return username;		
-//	}
-
-	
-	
-	public void addListerner(UsuarioSalvedListener listerner) {
+	public void addListerner(UsuarioListerner target){
 		try {
-			Method method = UsuarioSalvedListener.class.getDeclaredMethod("usuarioSalvo",
-					new Class[]{UsuarioSalveEvent.class});
-			addListener(UsuarioSalveEvent.class, listerner, method);	
+			Method method = UsuarioListerner.class.getDeclaredMethod("onClose", UsuarioEvent.class);
+			addListener(UsuarioEvent.class, target, method);
 		} catch (Exception e) {
-			System.out.println("ERRO METHOD NAO ENCONTRADO!");
+			System.out.println("Método não Encontrado!");
 		}
 	}
-	
-	public void removerListerner() {
-		
+	public void removeListerner(UsuarioListerner target){
+		removeListener(UsuarioEvent.class, target);
 	}
-	
-	public static class UsuarioSalveEvent extends Event{
+	public static class UsuarioEvent extends Event{
 		
-		private Item usuarioItem;
+		private Item item;
+		private boolean confirm;
+		
+		public UsuarioEvent(Component source, Item item, boolean confirm) {
+			super(source);
+			this.item = item;
+			this.confirm = confirm;			
+		}
 
-		public UsuarioSalveEvent(Component arg0,Item usuarioItem) {
-			super(arg0);
-			this.usuarioItem = usuarioItem;			
-		}
-		
-		public Item getUsuarioItem() {
-			return usuarioItem;			
-		}
-			
-		
-	public interface UsuarioSalvedListener extends Serializable{
-		public void usuarioSalvo(UsuarioSalveEvent event);
-	}	
-}
-	
-	public void addListener(UsuarioCancelListener listener){
-		try {
-			Method method = UsuarioCancelListener.class.getDeclaredMethod("cancelarAlteracao",
-				new Class[]{UsuarioCancelEvent.class});
-			addListener(UsuarioCancelEvent.class, listener, method);
-		} catch (Exception e) {
-			System.out.println("ERRO METHOD NAO ENCONTRADO!");
+		public Item getItem() {
+			return item;
+		}	
+
+		public boolean isConfirm() {
+			return confirm;
 		}		
 	}
-	
-	public static class UsuarioCancelEvent extends Event{
-		
-		private Item usuarioItem;
-		
-		public UsuarioCancelEvent(Component arg0,Item usuarioItem) {
-			super(arg0);
-			this.usuarioItem = usuarioItem;			
-		}
-
-		public Item getUsuarioItem() {
-			return usuarioItem;
-		}
-	
-	public interface UsuarioCancelListener extends Serializable{
-		public void cancelarAlteracao(UsuarioCancelEvent event);
+	public interface UsuarioListerner extends Serializable{
+		public void onClose(UsuarioEvent event);
 	}
-  }
-	
-	
-	
-	
 	
 }
