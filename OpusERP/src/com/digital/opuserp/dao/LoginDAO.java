@@ -1,14 +1,5 @@
 package com.digital.opuserp.dao;
 
-import com.digital.opuserp.OpusERP4UI;
-import com.digital.opuserp.domain.Empresa;
-import com.digital.opuserp.domain.EmpresasUsuario;
-import com.digital.opuserp.domain.ModuloUsuario;
-import com.digital.opuserp.domain.SubModuloUsuario;
-import com.digital.opuserp.domain.Usuario;
-import com.digital.opuserp.util.ConnUtil;
-import com.digital.opuserp.util.StringUtil;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,34 +9,36 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import com.digital.opuserp.domain.Empresa;
+import com.digital.opuserp.domain.EmpresasUsuario;
+import com.digital.opuserp.domain.ModuloUsuario;
+import com.digital.opuserp.domain.SubModuloUsuario;
+import com.digital.opuserp.domain.Usuario;
+import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.StringUtil;
+
 /**
  *
  * @author Marconi
  */
 public class LoginDAO {
     
-    
-    
-    
-    
     public static Usuario fazerLogin(Usuario u){
     	EntityManager em = ConnUtil.getEntity();
         try{             
             
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<Usuario> c = cb.createQuery(Usuario.class);
-            Root<Usuario> venda = c.from(Usuario.class);
-            c.where(cb.and(
-                    cb.equal(venda.get("username"),cb.parameter(String.class, "username")),
-                    cb.equal(venda.get("password"),cb.parameter(String.class, "funcao"))
-                    ));
+            Query q = em.createQuery("select u from Usuario u where "
+            		+ "u.username=:usuario AND "
+            		+ "u.password=:senha AND "
+            		+ "u.status='ATIVO'", Usuario.class);
+            q.setParameter("usuario", u.getUsername());
+            q.setParameter("senha", StringUtil.md5(u.getPassword()));
             
+            if(q.getResultList().size() == 1){
+            	return (Usuario) q.getSingleResult();
+            }
             
-            TypedQuery q = em.createQuery(c);
-            q.setParameter("username", u.getUsername());
-            q.setParameter("funcao",StringUtil.md5(u.getPassword()));
-            //em.close();
-            return (Usuario) q.getSingleResult();
+            return null;
          
         }catch(Exception e){
         	e.printStackTrace();
@@ -140,17 +133,8 @@ public class LoginDAO {
 		} catch (Exception e) {
 			System.out.println("Erro ao Logar!");
 			return false;
-		} 
-          	
+		}           	
     	
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
 }

@@ -52,10 +52,11 @@ public class FileUploadUtilOse extends Window {
 	
 	String pasta;
 	
-	
-	
-	public FileUploadUtilOse(String title, boolean modal, String pasta){
+	String cod_ose;
 		
+	public FileUploadUtilOse(String title, boolean modal, String pasta, String cod_ose){
+		
+		this.cod_ose = cod_ose;
 		this.pasta = pasta;
 		setWidth("426px");
 		setHeight("152px");		
@@ -231,24 +232,26 @@ public class FileUploadUtilOse extends Window {
 	public class ImageUploader implements Receiver, SucceededListener{
 						
 		@Override
-		public OutputStream receiveUpload(String filename, String mimeType) {
+		public OutputStream receiveUpload(String filename, 
+				String mimeType) {
 			
 			boolean check = true;
 			FileOutputStream fos = null;
-			
+			boolean valid_nomeclatura = true;
 			
 				try {
-
 						
 						String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 						
 						file = new File(basepath + "/WEB-INF/uploads/" + filename);		
 						fos = new FileOutputStream(file);
 						
-						
+						if(!filename.contains(cod_ose)){
+							valid_nomeclatura = false;
+						}
 						
 							
-					if(mimeType.equals("application/pdf") && check ){
+					if(mimeType.equals("application/pdf") && check && valid_nomeclatura){
 						return fos;
 					}else{
 						
@@ -260,8 +263,8 @@ public class FileUploadUtilOse extends Window {
 							Notify.Show("Não é possível fazer upload de arquivos maiores de 2 Mb", Notify.TYPE_ERROR);
 						}
 						
-						if(!filename.contains(file.getName())){
-							Notify.Show("Não é possível fazer upload de arquivos que não são deste contrato!", Notify.TYPE_ERROR);
+						if(!valid_nomeclatura){
+							Notify.Show("Não é possível fazer upload de arquivos que não são desta ordem de serviço!", Notify.TYPE_ERROR);
 						}
 						
 						return null;

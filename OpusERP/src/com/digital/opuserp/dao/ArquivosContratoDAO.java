@@ -111,6 +111,8 @@ public class ArquivosContratoDAO {
 		
 		em.getTransaction().begin();
 		contrato.setPendencia_upload(false);
+		contrato.setArquivo_upload("0");
+		em.merge(contrato);
 		em.getTransaction().commit();
 				
 	}

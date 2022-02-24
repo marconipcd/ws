@@ -791,6 +791,18 @@ public class ContratoAcessoView extends VerticalLayout {
 					}					
 				}
 				
+				if(colId.equals("data_alteracao_plano")){
+					
+					if(tb.getItem(rowId).getItemProperty("data_alteracao_plano").getValue() == null){						
+						return "";				
+					}else{
+						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+						sdf.format(tb.getItem(rowId).getItemProperty("data_alteracao_plano").getValue());
+						
+						return sdf.format(tb.getItem(rowId).getItemProperty("data_alteracao_plano").getValue());
+					}
+				}
+				
 				if(colId.equals("data_venc_contrato")){
 					
 					try{					
@@ -867,7 +879,7 @@ public class ContratoAcessoView extends VerticalLayout {
 				tb.setColumnCollapsed(colum.toString(),false);
 			}
 		}
-		
+		tb.setColumnCollapsed("data_alteracao_plano", true);
 		tb.setColumnCollapsible("cliente.nome_razao",false);	
 		tb.setColumnHeader("id", "Nº");
 		tb.setColumnHeader("codigo_cartao", "Código cartão");
@@ -896,7 +908,8 @@ public class ContratoAcessoView extends VerticalLayout {
 
 		tb.setColumnCollapsed("swith.olt", true);
 		
-		tb.setColumnHeader("data_instalacao", "Data Instalação");		
+		tb.setColumnHeader("data_instalacao", "Data Instalação");
+		tb.setColumnHeader("data_alteracao_plano", "Data Alteração Plano");
 		
 		tb.setCellStyleGenerator(new Table.CellStyleGenerator() {
 
@@ -920,7 +933,8 @@ public class ContratoAcessoView extends VerticalLayout {
 	                }else if(status.equals("ENCERRADO")){
 	                	return "row-header-encerrado"; // Will not actually be visible	               
 	                }else{	                	
-	                	if(item.getItemProperty("tem_pendencia").getValue() != null && item.getItemProperty("tem_pendencia").getValue().toString().equals("SIM")){	                		
+	                	if(item.getItemProperty("tem_pendencia").getValue() != null && 
+	                			item.getItemProperty("tem_pendencia").getValue().toString().equals("SIM")){	                		
 	                		return "row-header-pendente";
 	                	}else{
 	                		return "row-header-default";	                		
@@ -1003,7 +1017,7 @@ public class ContratoAcessoView extends VerticalLayout {
 		tb.setVisibleColumns(new Object[] {
 				"id","Up","codigo_cartao","cliente.nome_razao","plano.nome","contrato.nome","regime","Carência","data_venc_contrato",
 				"base.identificacao","interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
-				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia"});
+				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia","data_alteracao_plano"});
 		
 		tb.setImmediate(true);
 		tb.addValueChangeListener(new Property.ValueChangeListener() {
@@ -1144,7 +1158,6 @@ public class ContratoAcessoView extends VerticalLayout {
 					e.printStackTrace();
 				}
 			}
-			
 			
 			if(carencia){ 
 				try{
@@ -4423,9 +4436,23 @@ public class ContratoAcessoView extends VerticalLayout {
 					if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
 							OpusERP4UI.getUsuarioLogadoUI().getId(), "Remover pendencia upload"))				
 					{	
-						EntityItem<AcessoCliente> eiContrato = (EntityItem<AcessoCliente>) tb.getItem(tb.getValue());
-						ArquivosContratoDAO.removerPendencia(eiContrato.getEntity());
-						refresh();
+						
+						GenericDialog gd = new GenericDialog("Confirme para Continuar", 
+								"Você deseja realmente remover as pendências deste contrato ?", true, true);
+						
+						gd.addListerner(new GenericDialog.DialogListerner() {
+							
+							@Override
+							public void onClose(DialogEvent event) {
+								if(event.isConfirm()){
+									EntityItem<AcessoCliente> eiContrato = (EntityItem<AcessoCliente>) tb.getItem(tb.getValue());
+									ArquivosContratoDAO.removerPendencia(eiContrato.getEntity());
+									refresh();									
+								}
+							}
+						});
+						
+						getUI().addWindow(gd); 
 						
 					}else{
 						Notify.Show("Você não Possui Permissão para Remover pendência de upload", Notify.TYPE_ERROR);
