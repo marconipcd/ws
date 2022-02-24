@@ -238,10 +238,8 @@ public class FileUploadUtil extends Window {
 			boolean check = true;
 			FileOutputStream fos = null;
 			boolean valid_nomeclatura = true;
-			
-			
+						
 				try {
-
 						
 						String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 						

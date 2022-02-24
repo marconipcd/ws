@@ -143,7 +143,7 @@ public class RoteirizacaoView extends VerticalLayout {
 			//hlButons.addComponent(BuildbtConcluir());
 			hlButons.addComponent(BuildbtSubFechar());
 			hlButons.addComponent(BuildbtVisualizar());
-			hlButons.addComponent(BuildbtImprimir());
+			hlButons.addComponent(BuildbtDocumentos());
 			hlButons.addComponent(BuildbtHistorico());
 			hlButons.addComponent(BuildbtExcluir());
 			//hlButons.addComponent(BuildbtMateriais());
@@ -688,7 +688,7 @@ public class RoteirizacaoView extends VerticalLayout {
 		                	return "row-header-osi-encaminhado";    
 		                }else if(status.equals("ARQUIVADO")){
 		                	return "row-header-osi-entregue";       
-		                }else if(status.equals("FECHADA")){
+		                }else if(status.equals("FECHADO")){
 		                	return "row-header-atrasado";     
 		                }else if(status.equals("CONCLUIDO")){
 		                	 return "row-header-osi-fechado";
@@ -1611,7 +1611,7 @@ public class RoteirizacaoView extends VerticalLayout {
 	}
 	
 	
-	public Button BuildbtImprimir(){
+	public Button BuildbtDocumentos(){
 		btDocumentos = new Button("Documentos", new Button.ClickListener() {
 			
 			

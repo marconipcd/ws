@@ -29,6 +29,32 @@ EntityManager em;
 		
 		return q.getResultList();
 	}
+	
+	
+	
+	public static boolean save(Usuario usuario){
+		
+		try{
+			EntityManager em  = ConnUtil.getEntity();
+			
+			em.getTransaction().begin();
+			
+					
+			if(usuario.getId() != null){
+				em.merge(usuario);
+			}else{
+				em.persist(usuario); 
+			}
+			
+			em.getTransaction().commit();
+			
+			return true;
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
 
 	public boolean allowRemove(Integer codSetor, Integer codEmpresa){
 			

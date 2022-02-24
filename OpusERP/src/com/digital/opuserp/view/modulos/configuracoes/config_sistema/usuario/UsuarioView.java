@@ -1,18 +1,18 @@
 package com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import com.digital.opuserp.dao.UsuarioDAO;
 import com.digital.opuserp.domain.Usuario;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
-import com.digital.opuserp.util.StringUtil;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioCancelEvent;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioSalveEvent;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioCancelEvent.UsuarioCancelListener;
-import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioSalveEvent.UsuarioSalvedListener;
+import com.digital.opuserp.view.modulos.configuracoes.config_sistema.usuario.UsuarioEditor.UsuarioEvent;
 import com.digital.opuserp.view.util.Notify;
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
@@ -20,15 +20,17 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.filter.Compare.Greater;
+import com.vaadin.data.util.filter.Compare.Less;
 import com.vaadin.data.util.filter.Like;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -40,7 +42,7 @@ import com.vaadin.ui.Window.CloseEvent;
 
 public class UsuarioView extends VerticalLayout{
 	//
-		JPAContainer<Usuario> containerUsuario;
+	JPAContainer<Usuario> container;
 
 	Button btNovo;
 	Button btEditar;
@@ -57,6 +59,8 @@ public class UsuarioView extends VerticalLayout{
 	
 	ShortcutListener slNovo;
 	ShortcutListener slEditar;
+	
+	ComboBox cbStatus;
 	
 	public UsuarioView(boolean act) {
 		
@@ -93,7 +97,25 @@ public class UsuarioView extends VerticalLayout{
 		//configurando o layout do tfBUsca
 		HorizontalLayout hlBusca = new HorizontalLayout();
 		hlBusca.setWidth("100%");		
+		
+		cbStatus = new ComboBox();
+		cbStatus.setTextInputAllowed(false);
+		cbStatus.setNullSelectionAllowed(false); 
+		cbStatus.addItem("ATIVO");
+		cbStatus.addItem("INATIVO");
+		cbStatus.select("ATIVO");
+		
+		cbStatus.addValueChangeListener(new Property.ValueChangeListener() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				addFilter(tfBusca.getValue(), cbStatus.getValue().toString());
+			}
+		});
+		
+		hlBusca.addComponent(cbStatus);
 		hlBusca.addComponent(tfBusca);
+		hlBusca.setExpandRatio(tfBusca, 1f);
 
 			
 		hlTableUser = new HorizontalLayout();
@@ -130,10 +152,9 @@ public class UsuarioView extends VerticalLayout{
 	}
 	
 	private Label buildLbRegistros(){
-		lbRegistros = new Label(String.valueOf(containerUsuario.size()) + " Registros Encontrados");
+		lbRegistros = new Label(String.valueOf(container.size()) + " Registros Encontrados");
 		return lbRegistros;
 	}
-	
 	
 	public void buildShortcurEvents(Component c){
 		
@@ -172,22 +193,81 @@ public class UsuarioView extends VerticalLayout{
 		return slEditar;
 	}
 	
-	private void addFilter(String s){
-		containerUsuario.removeAllContainerFilters();		
-		containerUsuario.addContainerFilter(Filters.not(Filters.eq("username", "admin")));		
-		Object[] collums = tbUsuario.getVisibleColumns();		
-		List<Filter> filtros = new ArrayList<Filter>();		
+	public void addFilter(String s, String status) {
+		container.removeAllContainerFilters();
+		container.getEntityProvider().setQueryModifierDelegate(null);
+		container.setApplyFiltersImmediately(false);
 		
-		for(Object c:collums){		 
+		container.addContainerFilter(Filters.eq("status", status));		
+		container.sort(new String[] {"username"}, new boolean[]{true});
+		
+		if(s != null && !s.equals("") && !s.isEmpty()){
+
+			Object[] collums = tbUsuario.getVisibleColumns();	
+		
+			List<Filter> filtros = new ArrayList<Filter>();		
 			
-			if(!tbUsuario.isColumnCollapsed(c.toString()) && containerUsuario.getType(c.toString()) == String.class){					   	
-				filtros.add(new Like(c.toString(), "%"+s+"%", false));
-			}			
-		}
+			
+			try {
+				Integer cod = Integer.valueOf(s);			
+				
+					for(Object c:collums){		 			
+						if(!tbUsuario.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == Integer.class){					   	
+							filtros.add(new Like(c.toString(), "%"+cod+"%", false));
+						}			
+						if(!tbUsuario.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == String.class){					   	
+							filtros.add(new Like(c.toString(), "%"+s+"%", false));
+						}		
 		
-		containerUsuario.addContainerFilter(Filters.or(filtros));
-		containerUsuario.applyFilters();
-		hlFloat.replaceComponent(lbRegistros, buildLbRegistros());
+					}
+				
+				
+			} catch (Exception e) {
+			
+
+					try {				
+					
+						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+						SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+						
+						Date date1 = sdf.parse(s+" 00:01:00");
+						Date date2 = sdf.parse(s+" 23:59:00");
+						
+							for(Object c:collums){		 
+									if(!tbUsuario.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == Date.class){
+										
+										if(!c.toString().equals("data_nascimento")){
+											filtros.add(Filters.and( new Greater(c.toString(), date1),new Less(c.toString(), date2)));
+										}else{
+											Date date = sdf2.parse(s);
+											filtros.add(Filters.eq(c.toString(), date));
+										}
+									
+								}
+							}	
+						
+						
+					} catch (Exception e2) {
+						for(Object c:collums){		 
+							
+							if(!tbUsuario.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == String.class){					   	
+								filtros.add(new Like(c.toString(), "%"+s+"%", false));
+							}	
+						}
+					}
+				}
+//			}
+			
+			container.addContainerFilter(Filters.or(filtros));
+		
+		}
+				
+		container.applyFilters();
+		container.sort(new String[] {"username"}, new boolean[]{true});
+		
+		if(lbRegistros != null){
+			hlFloat.replaceComponent(lbRegistros, buildLbRegistros());
+		}
 	}
 	
 	private Button buildBtNovo(){
@@ -195,31 +275,27 @@ public class UsuarioView extends VerticalLayout{
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				final BeanItem <Usuario> novoUsuario = new BeanItem <Usuario>(new Usuario());
+				final BeanItem <Usuario> item = new BeanItem <Usuario>(new Usuario());
 				
-				UsuarioEditor usuarioEditor = new UsuarioEditor(novoUsuario, "Cadastro de usuario");
-				usuarioEditor.addListerner(new UsuarioSalvedListener() {
+				UsuarioEditor usuarioEditor = new UsuarioEditor(item, "Cadastro de usuário",true);
+				usuarioEditor.addListerner(new UsuarioEditor.UsuarioListerner() {
 					
 					@Override
-					public void usuarioSalvo(UsuarioSalveEvent event) {
-						Usuario user = novoUsuario.getBean();
-						user.setPassword(StringUtil.md5(user.getPassword()));
-						
-						containerUsuario = JPAContainerFactory.make(Usuario.class, "OpusERP4");
-						containerUsuario.addEntity(user);			
-						hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
-						tbUsuario.focus();
+					public void onClose(UsuarioEvent event) {
+						if(event.isConfirm()){
+							
+							Usuario u_novo = item.getBean();							
+							boolean check = UsuarioDAO.save(u_novo);
+							
+							if(check){
+								Notify.Show("Usuário cadastrado com sucesso!", Notify.TYPE_SUCCESS);
+								refresh();
+							}
+							
+						}
 					}
 				});
 				
-				usuarioEditor.addCloseListener(new Window.CloseListener() {
-					
-					@Override
-					public void windowClose(CloseEvent e) {
-						tbUsuario.focus();
-						refresh();
-					}
-				});
 				
 				getUI().addWindow(usuarioEditor);
 				usuarioEditor.center();
@@ -237,40 +313,26 @@ public class UsuarioView extends VerticalLayout{
 			@Override
 			public void buttonClick(ClickEvent event) {
 				if(tbUsuario.getValue() != null){
-					UsuarioEditor usuarioEditor = new UsuarioEditor(tbUsuario.getItem(tbUsuario.getValue()), "Editar Usuario");
-					
-					usuarioEditor.addListener(new UsuarioCancelListener() {
-						
-						public void cancelarAlteracao(UsuarioCancelEvent event) {
-							containerUsuario.discard();
-							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
-							tbUsuario.focus();
-						}
-					});
-					
-					usuarioEditor.addListerner(new UsuarioSalvedListener() {
+					UsuarioEditor usuarioEditor = new UsuarioEditor(tbUsuario.getItem(tbUsuario.getValue()), "Editar usuário",true);
+					usuarioEditor.addListerner(new UsuarioEditor.UsuarioListerner() {
 						
 						@Override
-						public void usuarioSalvo(UsuarioSalveEvent event) {		
-									 
-							containerUsuario.commit();		
-							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
-							tbUsuario.focus();
+						public void onClose(UsuarioEvent event) {
+							if(event.isConfirm()){
+								EntityItem<Usuario> entityItemUsuario = (EntityItem<Usuario>)event.getItem();
+								Usuario u = entityItemUsuario.getEntity();
+								
+								boolean check = UsuarioDAO.save(u);
+								
+								if(check){
+									Notify.Show("Usuário alterado com sucesso", Notify.TYPE_SUCCESS);
+									refresh();
+								}
+							}
 						}
 					});
-					
-					usuarioEditor.addCloseListener(new Window.CloseListener() {
-						
-						@Override
-						public void windowClose(CloseEvent e) {
-							tbUsuario.focus();
-							refresh();
-						}
-					});
-					
-					getUI().addWindow(usuarioEditor);
-					usuarioEditor.center();
-					usuarioEditor.setModal(true);	
+															
+					getUI().addWindow(usuarioEditor);						
 				}			
 			}
 		});
@@ -293,19 +355,10 @@ public class UsuarioView extends VerticalLayout{
 						@Override
 						public void onClose(DialogEvent event) {
 							if(event.isConfirm()){
-								containerUsuario.removeItem(tbUsuario.getValue());
-								containerUsuario.commit();
-								Notify.Show("Usuario excluido com sucesso!", Notify.TYPE_SUCCESS);
-								tbUsuario.focus();
-//								final Set selecionado = (Set) tbUsuario.getValue();
-//								for(final Iterator i = selecionado.iterator(); i.hasNext();){
-//									final Object id = i.next();
-//									if(tbUsuario.containsId(id)){
-//										tbUsuario.removeItem(id);
-//										containerUsuario.commit();						
-//										Notification.show("Usuario excluido com sucesso!");
-//									}
-//								}
+								
+								Notify.Show("Ainda não é possível remover um usuário! ", Notify.TYPE_WARNING);
+								//refresh();
+
 							}
 						}
 					});
@@ -365,20 +418,9 @@ public class UsuarioView extends VerticalLayout{
 			public void buttonClick(ClickEvent event) {
 				if(tbUsuario.getValue()!= null){
 					
-					Integer cod = Integer.parseInt(tbUsuario.getItem(tbUsuario.getValue()).getItemProperty("id").toString());
-					String username = tbUsuario.getItem(tbUsuario.getValue()).getItemProperty("username").toString();
-					String password= tbUsuario.getItem(tbUsuario.getValue()).getItemProperty("password").toString();
-					String funcao = tbUsuario.getItem(tbUsuario.getValue()).getItemProperty("funcao").toString();
-					Integer exibir = Integer.parseInt(tbUsuario.getItem(tbUsuario.getValue()).getItemProperty("visualizar_todos_crm").getValue().toString());		
-					
-					Usuario u = new Usuario();
-					u.setId(cod);					
-					u.setUsername(username);
-					u.setPassword(password);
-					u.setFuncao(funcao);
-					u.setVisualizar_todos_crm(exibir); 
+					EntityItem<Usuario> entityItemUsuario = (EntityItem<Usuario>)tbUsuario.getItem(tbUsuario.getValue()); 
 
-					PermissoesGeraisEditor modulos = new PermissoesGeraisEditor("Permissões Gerais", true,u);
+					PermissoesGeraisEditor modulos = new PermissoesGeraisEditor("Permissões Gerais", true,entityItemUsuario.getEntity());
 					
 					modulos.addCloseListener(new Window.CloseListener() {
 						
@@ -409,36 +451,56 @@ public class UsuarioView extends VerticalLayout{
 		tfBusca.setWidth("100%");
 		tfBusca.setInputPrompt("Buscar...");
 		
-		tfBusca.addListener(new FieldEvents.TextChangeListener() {
+		tfBusca.addTextChangeListener(new FieldEvents.TextChangeListener() {
 			
 			@Override
 			public void textChange(TextChangeEvent event) {
-				addFilter(event.getText());			
+				addFilter(event.getText(), cbStatus.getValue().toString());			
 			}
 		});
 		
 		return tfBusca;
 	}
 	
+	
+	public JPAContainer<Usuario> buildContainer(){
+		container = new JPAContainerFactory().makeBatchable(Usuario.class, ConnUtil.getEntity());
+		
+		if(tfBusca != null && tfBusca.getValue() != null && !tfBusca.getValue().equals("")){
+			addFilter(tfBusca.getValue(), cbStatus.getValue().toString());	
+		}else{
+			container.setAutoCommit(false);
+			container.removeAllContainerFilters();
+			container.setApplyFiltersImmediately(false);
+			container.addContainerFilter(Filters.eq("status", "ATIVO"));			
+			container.applyFilters();
+			
+			container.sort(new String[] {"username"}, new boolean[]{true});
+		}
+		
+		
+		return container;
+	}
 
 	private Table buildTbUsuario(){
-		containerUsuario = JPAContainerFactory.makeBatchable(Usuario.class, ConnUtil.getEntity());
-		containerUsuario.setAutoCommit(false);
-		containerUsuario.addContainerFilter(Filters.not(Filters.eq("username", "admin")));
-		containerUsuario.applyFilters();
-		
-		tbUsuario = new Table();
-		tbUsuario.setSizeFull();
-		tbUsuario.setContainerDataSource(containerUsuario);
-		tbUsuario.setVisibleColumns(new Object[]{"id","username","funcao"});
+				
+		tbUsuario = new Table(null,buildContainer());
+		tbUsuario.setSizeFull();		
+		tbUsuario.setVisibleColumns(new Object[]{"id","username","funcao","email","setor","visualizar_todos_crm","status"});
+		tbUsuario.setColumnHeader("visualizar_todos_crm","Visualiza todos Crms");
+		tbUsuario.setColumnHeader("setor","Setor");
+		tbUsuario.setColumnHeader("email","E-mail");
 		tbUsuario.setColumnHeader("username","Nome");
 		tbUsuario.setColumnHeader("funcao","Função");
+		tbUsuario.setColumnHeader("status","Status");
 		tbUsuario.setColumnHeader("id","ID");
 		tbUsuario.setSelectable(true);	 
 //		tbUsuario.setMultiSelect(true);	 
 		tbUsuario.setColumnCollapsingAllowed(true);
 		tbUsuario.setColumnCollapsed("id",true);
 		tbUsuario.setColumnCollapsible("username",false);
+
+		//tbUsuario.setColumnExpandRatio("funcao", 1f);
 		
 		
 		
@@ -463,46 +525,46 @@ public class UsuarioView extends VerticalLayout{
 			}
 		});
 		
-		tbUsuario.addListener(new ItemClickEvent.ItemClickListener() {
-			
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if(event.isDoubleClick()){
-					
-					UsuarioEditor usuarioEditor = new UsuarioEditor(tbUsuario.getItem(tbUsuario.getValue()), "Editar Usuario");					
-					usuarioEditor.addListener(new UsuarioCancelListener() {
-						
-						public void cancelarAlteracao(UsuarioCancelEvent event) {
-							containerUsuario.discard();
-							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
-							tbUsuario.focus();
-						}
-					});				
-					usuarioEditor.addListerner(new UsuarioSalvedListener() {
-						
-						@Override
-						public void usuarioSalvo(UsuarioSalveEvent event) {		
-									 
-							containerUsuario.commit();		
-							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
-							tbUsuario.focus();
-						}
-					});
-					
-					usuarioEditor.addCloseListener(new Window.CloseListener() {
-						
-						@Override
-						public void windowClose(CloseEvent e) {
-							tbUsuario.focus();
-						}
-					});
-					
-					getUI().addWindow(usuarioEditor);
-					usuarioEditor.center();
-					usuarioEditor.setModal(true);	
-				}
-			}
-		});		
+//		tbUsuario.addListener(new ItemClickEvent.ItemClickListener() {
+//			
+//			@Override
+//			public void itemClick(ItemClickEvent event) {
+//				if(event.isDoubleClick()){
+//					
+//					UsuarioEditor usuarioEditor = new UsuarioEditor(tbUsuario.getItem(tbUsuario.getValue()), "Editar Usuario");					
+//					usuarioEditor.addListener(new UsuarioCancelListener() {
+//						
+//						public void cancelarAlteracao(UsuarioCancelEvent event) {
+//							container.discard();
+//							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
+//							tbUsuario.focus();
+//						}
+//					});				
+//					usuarioEditor.addListerner(new UsuarioSalvedListener() {
+//						
+//						@Override
+//						public void usuarioSalvo(UsuarioSalveEvent event) {		
+//									 
+//							container.commit();		
+//							hlTableUser.replaceComponent(tbUsuario, buildTbUsuario());
+//							tbUsuario.focus();
+//						}
+//					});
+//					
+//					usuarioEditor.addCloseListener(new Window.CloseListener() {
+//						
+//						@Override
+//						public void windowClose(CloseEvent e) {
+//							tbUsuario.focus();
+//						}
+//					});
+//					
+//					getUI().addWindow(usuarioEditor);
+//					usuarioEditor.center();
+//					usuarioEditor.setModal(true);	
+//				}
+//			}
+//		});		
 		return tbUsuario;
 	}
 	

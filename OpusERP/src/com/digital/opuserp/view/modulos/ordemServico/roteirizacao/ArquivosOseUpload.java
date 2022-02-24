@@ -105,11 +105,9 @@ public class ArquivosOseUpload extends Window {
 	
 	private void uploadNovoArquivo(){
 			
-		final FileUploadUtilOse imgUtil = new FileUploadUtilOse("Upload de Arquivo", true,"ordens_servico");
+		final FileUploadUtilOse imgUtil = new FileUploadUtilOse("Upload de Arquivo", true,"ordens_servico", ose.getId().toString());
 		imgUtil.addListerner(new FileUploadUtilOse.FileUploadUtilListerner() {
 			
-			
-
 			@Override
 			public void onClose(
 					com.digital.opuserp.view.util.FileUploadUtilOse.FileUploadUtilEvent event) {

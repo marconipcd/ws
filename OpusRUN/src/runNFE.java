@@ -37,7 +37,8 @@ public class runNFE {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 				
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where "
+
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id = 11268 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'CANCELADO'  and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -47,7 +48,7 @@ public class runNFE {
 		int i = 1;
 		for (AcessoCliente contrato : lista_de_contratos) {
 
-			if(i <= 2647){
+			if(i <= 2747){
 				
 				System.out.println(contrato.getId());
 				SimpleDateFormat sdfAnoMes = new SimpleDateFormat("yyMM");
@@ -57,33 +58,42 @@ public class runNFE {
 				String regexAntiga = "^"+contrato.getId().toString()+"/[0-9]{2}/[0-9]{2}";
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
-				Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
-						"status_2 != 'EXCLUIDO' "+			
-					    "and n_doc REGEXP :rNova "+ 
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "+
-						
-						"or "+
-						"status_2 != 'EXCLUIDO' "+				
-						"and n_doc REGEXP :rAntiga "+
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "+
-						
-						"or "+
-						"status_2 != 'EXCLUIDO' "+				
-						"and n_doc REGEXP :rProrata "+
-						"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "
-						
-						, ContasReceber.class);
-					
-				qn.setParameter("rNova", regexNova);
-				qn.setParameter("rAntiga", regexAntiga);
-				qn.setParameter("rProrata", regexProrata);
-				qn.setParameter("anoMes", "2202");
+
+				boolean manual = true;
 				
-				if(qn.getResultList().size()  == 1){
-					boleto = (ContasReceber)qn.getSingleResult();					
+				if(!manual){
+					Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
+							"status_2 != 'EXCLUIDO' "+			
+						    "and n_doc REGEXP :rNova "+ 
+							"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes "+
+							
+							"or "+
+							"status_2 != 'EXCLUIDO' "+				
+							"and n_doc REGEXP :rAntiga "+
+							"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes  "+
+							
+							"or "+
+							"status_2 != 'EXCLUIDO' "+				
+							"and n_doc REGEXP :rProrata "+
+							"and DATE_FORMAT(data_vencimento, '%y%m') =:anoMes  "
+							
+							, ContasReceber.class);
+
+						
+					qn.setParameter("rNova", regexNova);
+					qn.setParameter("rAntiga", regexAntiga);
+					qn.setParameter("rProrata", regexProrata);
+					qn.setParameter("anoMes", "2112");
+					
+					if(qn.getResultList().size()  == 1){
+						boleto = (ContasReceber)qn.getSingleResult();					
+					}
+				}else{
+					boleto = em.find(ContasReceber.class, 571704);
 				}
 				
-				if(boleto != null && boleto.getStatus().equals("ABERTO")){
+				//&& boleto.getStatus().equals("ABERTO")
+				if(boleto != null ){
 					if(contrato.getEmitir_nfe_c_boleto_aberto().equals("SIM") && contrato.getCfop_nfe() != null){
 						boolean gerado = false;
 						
@@ -97,7 +107,8 @@ public class runNFE {
 						
 						if(!gerado){
 							
-								if(boleto != null && boleto.getValor_titulo() != null && boleto.getBloqueado() == null || !boleto.getBloqueado().equals("S")){
+							//&& boleto.getBloqueado() == null || !boleto.getBloqueado().equals("S")
+								if(boleto != null && boleto.getValor_titulo() != null ){
 								
 										Cfop cfop = new Cfop();
 										if(contrato != null && contrato.getCfop_nfe() != null){
