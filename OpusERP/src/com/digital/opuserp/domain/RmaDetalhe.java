@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
@@ -21,8 +22,9 @@ public class RmaDetalhe {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	
-	@Column(name="RMA_MESTRE_ID")
-	private Integer rma_mestre_id;
+	@OneToOne
+	@JoinColumn(name="RMA_MESTRE_ID")
+	private RmaMestre rma_mestre_id;
 	
 	@Column(name="EMPRESA_ID", nullable=false)
 	private Integer empresa_id;
@@ -43,6 +45,13 @@ public class RmaDetalhe {
 	private String status;
 	@Column(name="DATA_MUDANCA_STATUS", nullable=false)
 	private Date data_mudanca_status;
+	
+	@Transient
+	private String coluna;
+	@Transient
+	private Date coluna_date;
+	@Transient
+	private Long qtd;
 	
 
 	public RmaDetalhe(){
@@ -113,13 +122,31 @@ public class RmaDetalhe {
 	public void setData_mudanca_status(Date data_mudanca_status) {
 		this.data_mudanca_status = data_mudanca_status;
 	}
-	public Integer getRma_mestre_id() {
+	public RmaMestre getRma_mestre_id() {
 		return rma_mestre_id;
 	}
-	public void setRma_mestre_id(Integer rma_mestre_id) {
+	public void setRma_mestre_id(RmaMestre rma_mestre_id) {
 		this.rma_mestre_id = rma_mestre_id;
 	}
 	
+	public String getColuna() {
+		return coluna;
+	}
+	public void setColuna(String coluna) {
+		this.coluna = coluna;
+	}
+	public Date getColuna_date() {
+		return coluna_date;
+	}
+	public void setColuna_date(Date coluna_date) {
+		this.coluna_date = coluna_date;
+	}
+	public Long getQtd() {
+		return qtd;
+	}
+	public void setQtd(Long qtd) {
+		this.qtd = qtd;
+	}
 	
 	
 }

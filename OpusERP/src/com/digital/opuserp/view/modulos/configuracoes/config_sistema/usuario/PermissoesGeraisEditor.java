@@ -756,6 +756,9 @@ public class PermissoesGeraisEditor extends Window {
 			}else if(submodulo.equals("Relatórios de CRM")){
 				tbPermissao.addItem(new Object[]{"Gerar PDF"}, new Integer(1));
 				tbPermissao.addItem(new Object[]{"Gerar Grafico"}, new Integer(2));	
+			}else if(submodulo.equals("Relatórios de Rma")){
+				tbPermissao.addItem(new Object[]{"Gerar PDF"}, new Integer(1));
+				tbPermissao.addItem(new Object[]{"Gerar Grafico"}, new Integer(2));	
 			}else if(submodulo.equals("Relatórios de Pesquisa")){
 				tbPermissao.addItem(new Object[]{"Gerar PDF"}, new Integer(1));
 				tbPermissao.addItem(new Object[]{"Gerar Grafico"}, new Integer(2));	

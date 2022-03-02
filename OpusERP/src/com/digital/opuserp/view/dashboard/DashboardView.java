@@ -76,6 +76,7 @@ import com.digital.opuserp.view.modulos.relatorio.Pedido.RelatorioPedidoView;
 import com.digital.opuserp.view.modulos.relatorio.Pesquisa.RelatorioPesquisaView;
 import com.digital.opuserp.view.modulos.relatorio.Producao.RelatorioOspView;
 import com.digital.opuserp.view.modulos.relatorio.Produto.RelatorioProdutoView;
+import com.digital.opuserp.view.modulos.relatorio.Rma.RelatorioRmaView;
 import com.digital.opuserp.view.modulos.relatorio.Roterizacao.RelatorioOseRelRepInsView;
 import com.digital.opuserp.view.modulos.relatorio.Roterizacao.RelatorioOseView;
 import com.vaadin.ui.Component;
@@ -149,6 +150,7 @@ public class DashboardView extends VerticalLayout{
 	RelatorioProdutoView relaProdutoView = new RelatorioProdutoView(false);
 	RelatorioOseRelRepInsView relaRoteirizacaoRepInstView = new RelatorioOseRelRepInsView(false);
 	RelatorioAcessoLogView relaAcessoLogView = new RelatorioAcessoLogView(false);
+	RelatorioRmaView relaRmaView = new RelatorioRmaView(false);
 		
 	//View Modulo Pedido
 	ComprasView comprasView = new ComprasView(false);
@@ -235,6 +237,7 @@ public class DashboardView extends VerticalLayout{
 					relaAcessoView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
 					relaProdutoView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
 					relaAcessoLogView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
+					relaRmaView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
 					
 					contatoView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
 					servicoView.buildShortcurEvents(event.getTabSheet().getSelectedTab());
@@ -462,6 +465,10 @@ public class DashboardView extends VerticalLayout{
 	    	t = ts_principal.addTab(relaAcessoLogView, s);
 	    	relaAcessoLogView.setCodSubModulo(SubModuloDAO.findToId(s));
 
+	    }else if(s.equals("Relatórios de Rma")){
+	    	relaRmaView = new RelatorioRmaView(true);
+	    	t = ts_principal.addTab(relaRmaView, s);
+	    	relaRmaView.setCodSubModulo(SubModuloDAO.findToId(s));
 	    }
         
         
