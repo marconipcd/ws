@@ -1157,13 +1157,18 @@ public class RoteirizacaoView extends VerticalLayout {
 			
 			public void buttonClick(ClickEvent event) {
 				closeAllWindows();
-				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Fechar"))				
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, 
+						OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Fechar"))				
 				{
+					
 					final Set<Object> selecteds = (Set<Object>)tb.getValue();
 					
 					if(selecteds.size() == 1){
 
 						Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
+						
+					if(ose.getOperadorUltimoUp() != null && 
+							ose.getOperadorUltimoUp().equals(OpusERP4UI.getUsuarioLogadoUI().getUsername())){
 						
 						final FecharEditor fecharEditor = new FecharEditor("Fechar OS", true, ose);
 						fecharEditor.addListerner(new FecharEditor.FecharRoteirizacaoListerner() {
@@ -1211,6 +1216,12 @@ public class RoteirizacaoView extends VerticalLayout {
 						});
 						
 						getUI().addWindow(fecharEditor);
+						
+					}else{
+						Notify.Show("É necessário fazer upload de arquivo antes de fechar",Notify.TYPE_ERROR);		
+					}
+						
+						
 					}
 				}else{				
 					Notify.Show("Você não Possui Permissão para Fechar OS",Notify.TYPE_ERROR);				
