@@ -149,6 +149,9 @@ public class Ose {
 	@Column(name="ARQUIVO_UPLOAD")
 	private String arquivo_upload;
 	
+	@Column(name="OPERADOR_ULTIMO_UP")
+	private String operador_ultimo_up;
+	
 	public Ose(){
 		
 	}
@@ -719,6 +722,12 @@ public class Ose {
 	}
 
 
+	public String getOperadorUltimoUp(){
+		return operador_ultimo_up;
+	}
+	public void setOperadorUltimoUp(String operador_ultimo_up){
+		this.operador_ultimo_up = operador_ultimo_up;
+	}
 
 	
 	

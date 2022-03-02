@@ -58,13 +58,7 @@ public class ArquivosOse2 {
 		this.id = id;
 	}
 
-	public Integer getContrato() {
-		return ose;
-	}
-
-	public void setContrato(Integer contrato) {
-		this.ose = contrato;
-	}
+	
 	
 	public Date getData() {
 		return data;
@@ -96,6 +90,14 @@ public class ArquivosOse2 {
 
 	public void setLink(String link) {
 		this.link = link;
+	}
+
+	public Integer getOse() {
+		return ose;
+	}
+
+	public void setOse(Integer ose) {
+		this.ose = ose;
 	}
 	
 	

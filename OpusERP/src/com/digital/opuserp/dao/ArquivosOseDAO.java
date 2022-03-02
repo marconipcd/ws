@@ -134,7 +134,11 @@ public class ArquivosOseDAO {
 		
 			fileOsp.setUsuario(OpusERP4UI.getUsuarioLogadoUI().getUsername());
 			
-			//em.merge(ac);
+			//grava o operador que fez o ultimo upload
+			Ose os = em.find(Ose.class, fileOsp.getOse());
+			os.setOperadorUltimoUp(OpusERP4UI.getUsuarioLogadoUI().getUsername());
+			em.merge(os);
+			
 			em.persist(fileOsp);
 			
 			em.getTransaction().commit();
