@@ -25,6 +25,7 @@ import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.modulos.pedido.rma.RmaNew.RmaNewEvent;
 import com.digital.opuserp.view.util.Notify;
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
@@ -317,7 +318,7 @@ public class RmaView extends VerticalLayout {
 			
 													
 					q = em.createQuery("select r from RmaDetalhe r where r.rma_mestre_id =:mestre", RmaDetalhe.class);
-					q.setParameter("mestre", c.getId());
+					q.setParameter("mestre", c);
 					result = q.getResultList();
 					
 					if(q.getResultList().size() > 0){
@@ -419,7 +420,7 @@ public class RmaView extends VerticalLayout {
 								RmaDAO.saveMestre(rmaM);
 								
 								for (RmaDetalhe item :itens) {
-									item.setRma_mestre_id(rmaM.getId());
+									item.setRma_mestre_id(rmaM);
 									RmaDAO.save(item);
 									
 									Cliente cliente = ClienteDAO.findByCpf(OpusERP4UI.getEmpresa().getCnpj());			
@@ -514,6 +515,7 @@ public class RmaView extends VerticalLayout {
 				if(tb.getItem(tb.getValue()).getItemProperty("Produto").getValue() == null){
 						
 						final Integer id_rma = (Integer)tb.getItem(tb.getValue()).getItemProperty("Cod").getValue();
+						final EntityItem<RmaMestre> entityItemRmaMeste = (EntityItem<RmaMestre>) tb.getItem(tb.getValue()); 
 					
 						final RmaNew rma = new RmaNew("Editar RMA",true, true, id_rma);
 						rma.addListerner(new RmaNew.RmaNewListerner() {
@@ -525,7 +527,7 @@ public class RmaView extends VerticalLayout {
 								
 								if(itens != null){
 									for (RmaDetalhe item : itens) {
-										item.setRma_mestre_id(id_rma);
+										item.setRma_mestre_id(entityItemRmaMeste.getEntity());
 										RmaDAO.save(item);		
 										
 										Cliente cliente = ClienteDAO.findByCpf(OpusERP4UI.getEmpresa().getCnpj());			
