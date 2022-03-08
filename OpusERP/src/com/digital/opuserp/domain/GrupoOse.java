@@ -52,6 +52,8 @@ public class GrupoOse {
 	@Column(name="STATUS")
 	private String status;
 	
+	@Column(name="UPLOAD_OBRIGATORIO")
+	private boolean upload_obrigatorio;
 		
 	public GrupoOse(){
 		
@@ -163,6 +165,14 @@ public class GrupoOse {
 
 	public void setBaixa_material(String baixa_material) {
 		this.baixa_material = baixa_material;
+	}
+
+	public boolean isUpload_obrigatorio() {
+		return upload_obrigatorio;
+	}
+
+	public void setUpload_obrigatorio(boolean upload_obrigatorio) {
+		this.upload_obrigatorio = upload_obrigatorio;
 	}
 	
 	

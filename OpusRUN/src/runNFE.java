@@ -38,7 +38,7 @@ public class runNFE {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 		
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where  "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=12082 and  "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'ENCERRADO' and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -48,7 +48,7 @@ public class runNFE {
 		int i = 1;
 		for (AcessoCliente contrato : lista_de_contratos) {
 
-			if(i <= 2686){
+			if(i <= 1){
 				
 				System.out.println(contrato.getId());
 				SimpleDateFormat sdfAnoMes = new SimpleDateFormat("yyMM");
@@ -59,7 +59,7 @@ public class runNFE {
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
 
-				boolean manual = false;
+				boolean manual = true;
 				
 				if(!manual){
 					Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
@@ -89,7 +89,8 @@ public class runNFE {
 						boleto = (ContasReceber)qn.getSingleResult();					
 					}
 				}else{
-					boleto = em.find(ContasReceber.class, 571704);
+					//557413->128684 - 582019 - 632154
+					boleto = em.find(ContasReceber.class, 646423);
 				}
 				
 				//&& boleto.getStatus().equals("ABERTO")
@@ -153,6 +154,7 @@ public class runNFE {
 					
 					if(q.getResultList().size() > 0){
 						gerado=  true;
+						
 					}
 					
 					if(!gerado){

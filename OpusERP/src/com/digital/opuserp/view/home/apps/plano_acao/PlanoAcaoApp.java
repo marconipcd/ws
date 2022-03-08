@@ -842,7 +842,6 @@ public class PlanoAcaoApp  extends CssLayout{
 		hl_barra.setExpandRatio(txtBusca, 1f);
 		
 		
-		
 		tb = new Table(null, buildContainer()){
 			@Override
 			protected String formatPropertyValue(Object rowId, Object colId,

@@ -3,22 +3,11 @@ package com.digital.opuserp.view.modulos.configuracoes.config_ordemServico;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import com.digital.opuserp.OpusERP4UI;
-import com.digital.opuserp.domain.CrmAssunto;
-import com.digital.opuserp.domain.CrmFormasContato;
-import com.digital.opuserp.domain.Setores;
 import com.digital.opuserp.interfaces.GenericEditor;
-import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.view.util.Notify;
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.JPAContainerFactory;
-import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
-import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -30,7 +19,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -43,6 +31,8 @@ public class GrupoEditor extends Window implements GenericEditor {
 	FormLayout flPrincipal;
 	FieldGroup fieldGroup;
 	VerticalLayout vlRoot;
+	ComboBox cbUploadObrigatorio;
+	
 	
 	public GrupoEditor(Item item, String title, boolean modal){
 		this.item = item;
@@ -113,6 +103,7 @@ public class GrupoEditor extends Window implements GenericEditor {
 														
 					ComboBox cbStatus = new ComboBox("Status");
 					cbStatus.setNullSelectionAllowed(false);
+					cbStatus.setTextInputAllowed(false);	
 					cbStatus.setRequired(true);
 					cbStatus.addItem("ATIVO");
 					cbStatus.addItem("INATIVO");
@@ -151,6 +142,41 @@ public class GrupoEditor extends Window implements GenericEditor {
 				}
 			});
 		
+		
+		vlRoot.addComponent(
+				new FormLayout(){					
+				{
+					setStyleName("form-cutom");
+					setMargin(true);
+					setSpacing(true);
+					
+					cbUploadObrigatorio = new ComboBox("Upload Obrigatório");	
+					cbUploadObrigatorio.setId("cbUploadObrigatorio");
+					cbUploadObrigatorio.addStyleName("txtSetor");
+					cbUploadObrigatorio.setStyleName("caption-align");
+					cbUploadObrigatorio.setNullSelectionAllowed(false);
+					cbUploadObrigatorio.setTextInputAllowed(false);									
+					
+					cbUploadObrigatorio.addItem("SIM");
+					cbUploadObrigatorio.addItem("NAO");
+					
+					if(item != null && item.getItemProperty("upload_obrigatorio").getValue() != null){
+						boolean check_obrigatorio = (boolean)item.getItemProperty("upload_obrigatorio").getValue();
+						if(check_obrigatorio){
+							cbUploadObrigatorio.select("SIM");
+						}else{
+							cbUploadObrigatorio.select("NAO");
+						}
+					}
+					
+					
+					addComponent(cbUploadObrigatorio);	
+					//fieldGroup.bind(cbUploadObrigatorio, "baixa_material");
+					
+				}
+			});
+		
+		
 	}
 
 	@Override
@@ -162,6 +188,19 @@ public class GrupoEditor extends Window implements GenericEditor {
 			public void buttonClick(ClickEvent event) {
 				if(fieldGroup.isValid()){
 					try {				
+						
+						if(cbUploadObrigatorio.getValue() != null){
+							
+							boolean check_upload_obrigatorio = false;
+							if(cbUploadObrigatorio.getValue().toString().equals("SIM")){
+								check_upload_obrigatorio = true;
+							}else{
+								check_upload_obrigatorio = false;
+							}
+														
+							item.getItemProperty("upload_obrigatorio").setValue(check_upload_obrigatorio);
+						}
+						
 						fieldGroup.commit();				
 						fireEvent(new GrupoEvent(getUI(), item, true));					
 												

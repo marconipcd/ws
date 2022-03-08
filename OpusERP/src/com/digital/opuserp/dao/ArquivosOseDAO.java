@@ -12,9 +12,20 @@ import com.digital.opuserp.util.ConnUtil;
 
 public class ArquivosOseDAO {
 
+	public static boolean checkExist(String fileName){
+		EntityManager em = ConnUtil.getEntity();
 		
+		Query q = em.createQuery("select a from ArquivosOse2 a where a.nome like:file_name", ArquivosOse2.class);
+		q.setParameter("file_name", fileName);
+		
+		if(q.getResultList().size() > 0){
+			return true;
+		}
+		
+		return false;
+	}
 	
-		public static boolean excluir(ArquivosOse2 ar){
+	public static boolean excluir(ArquivosOse2 ar){
 		EntityManager em = ConnUtil.getEntity();
 		
 		try {

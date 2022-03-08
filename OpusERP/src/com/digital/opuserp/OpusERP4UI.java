@@ -58,10 +58,12 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.DefaultErrorHandler;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -69,6 +71,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
@@ -138,9 +141,17 @@ public class OpusERP4UI extends UI implements BroadcastListener {
     
     public static String ENDERECO_SAMBA = "192.168.21.13";
     public static String SENHA_SAMBA = "managerdigi_SB@18";
+    
+    public static boolean mobile = false;
         	
 	@Override
 	protected void init(VaadinRequest request) {		
+		
+		System.out.println(request.getHeader("User-Agent"));
+		if(request.getHeader("User-Agent").contains("Mobi")){
+			mobile = true;
+		}
+		
 		//request.
 		//browser = getPage().getWebBrowser();
         setLocale(new Locale("pt", "BR"));
@@ -179,7 +190,31 @@ public class OpusERP4UI extends UI implements BroadcastListener {
 	}
 	
 	private void buildLoginView(boolean exit) {
-        if (exit) {
+       // if(!mobile){
+        	loginViewNormal(exit);
+      //  }else{
+      //  	loginViewMobile(exit);
+        	
+        	
+      //  }
+    }
+	
+	private void loginViewMobile(boolean exit){
+		
+		ExternalResource er = new ExternalResource("http://localhost/OpusERP");
+		
+		Embedded emb = new Embedded(null,er);
+        emb.setType(Embedded.TYPE_BROWSER);
+        //emb.setSizeUndefined();
+        emb.setSizeFull();
+        emb.addStyleName("login-layout");
+        
+        root.addComponent(emb);
+                
+	}
+		
+	private void loginViewNormal(boolean exit){
+		if (exit) {
             root.removeAllComponents();            
         }
         
@@ -269,35 +304,36 @@ public class OpusERP4UI extends UI implements BroadcastListener {
             @Override
             public void handleAction(Object sender, Object target) {
                 signin2.click();
-            }
+            } 
         }; 
 
         signin2.addShortcutListener(enter);
         loginPanel.addComponent(fields);
         loginLayout.addComponent(loginPanel);
         loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
-    }
-	
-	private void testarBoletoFacil(){
-		BoletoFacil boletoFacil = new BoletoFacil(BoletoFacilEnvironment.SANDBOX, "38FEAE574CEAF9144008D17AA64C0BE806E3901AEC67B38D90B5BC05D4F04DDA");
-		
-		Payer payer = new Payer();
-		payer.setName("Marconi Pagador");
-		payer.setCpfCnpj("05872109407");
-
-		Charge charge = new Charge();
-		charge.setDescription("Cobrança teste gerada pelo SDK Java");
-		charge.setAmount(BigDecimal.valueOf(49.00));
-		charge.setPayer(payer);
-		charge.setInstallments(12);
-
-		ChargeResponse response = boletoFacil.issueCharge(charge);
-		//if (response.) {
-			for (Charge c : response.getData().getCharges()) {
-				System.out.println(c);
-			}
-		//}
 	}
+	
+	
+//	private void testarBoletoFacil(){
+//		BoletoFacil boletoFacil = new BoletoFacil(BoletoFacilEnvironment.SANDBOX, "38FEAE574CEAF9144008D17AA64C0BE806E3901AEC67B38D90B5BC05D4F04DDA");
+//		
+//		Payer payer = new Payer();
+//		payer.setName("Marconi Pagador");
+//		payer.setCpfCnpj("05872109407");
+//
+//		Charge charge = new Charge();
+//		charge.setDescription("Cobrança teste gerada pelo SDK Java");
+//		charge.setAmount(BigDecimal.valueOf(49.00));
+//		charge.setPayer(payer);
+//		charge.setInstallments(12);
+//
+//		ChargeResponse response = boletoFacil.issueCharge(charge);
+//		//if (response.) {
+//			for (Charge c : response.getData().getCharges()) {
+//				System.out.println(c);
+//			}
+//		//}
+//	}
 	
 	private void buildMainSelecEmpresas(){
 	       
@@ -818,8 +854,6 @@ public class OpusERP4UI extends UI implements BroadcastListener {
 	private void initMenuPrincipal(){
 	    	//RotinaDAO.RefreshPendencias();
 	    	
-	       
-	        
 	        Item item = null;
 	        int itemId = 0;  
 	        int itemRoot = 0;

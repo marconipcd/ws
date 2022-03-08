@@ -375,6 +375,9 @@ public class AssistenciaTecnicaView extends VerticalLayout{
 					if(tb.getItem(tb.getValue()).getItemProperty("status").getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status").getValue().equals("ABERTO")){						
 						//btDiagnostico.setEnabled(true); 
 					}					
+					if(tb.getItem(tb.getValue()).getItemProperty("status").getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status").getValue().equals("FECHADO")){						
+						btOcorrencia.setEnabled(true);					
+					}
 					if(tb.getItem(tb.getValue()).getItemProperty("status").getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status").getValue().equals("ENCAMINHADO")){						
 						btOcorrencia.setEnabled(true);					
 					}
@@ -727,6 +730,9 @@ public class AssistenciaTecnicaView extends VerticalLayout{
 				{
 				
 					final InformarOcorrenciaEditor informarOcorrenciaEditor = new InformarOcorrenciaEditor(tb.getItem(tb.getValue()), "Ocorrência", true,(Integer)tb.getItem(tb.getValue()).getItemProperty("id").getValue());
+					informarOcorrenciaEditor.setResizable(true);
+					informarOcorrenciaEditor.setWidth("780px");
+					
 					informarOcorrenciaEditor.addListerner(new InformarOcorrenciaEditor.OcorrenciaOsiListerner() {
 						
 						

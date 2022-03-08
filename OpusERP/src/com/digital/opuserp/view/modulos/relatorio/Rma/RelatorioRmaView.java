@@ -167,7 +167,7 @@ public class RelatorioRmaView extends VerticalLayout{
 	
 	public void buildShortcurEvents(Component c){
 		
-		if(c instanceof RelatorioPedidoView)
+		if(c instanceof RelatorioRmaView)
 		{
 			btNovo.addShortcutListener(buildShortCutNovo());
 			btImprimir.addShortcutListener(buildShortCutImprimir());

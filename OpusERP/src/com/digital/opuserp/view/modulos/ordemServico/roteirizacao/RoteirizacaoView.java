@@ -1167,8 +1167,19 @@ public class RoteirizacaoView extends VerticalLayout {
 
 						Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
 						
+					boolean check_ultimo_operador = false;
+					
 					if(ose.getOperadorUltimoUp() != null && 
 							ose.getOperadorUltimoUp().equals(OpusERP4UI.getUsuarioLogadoUI().getUsername())){
+						check_ultimo_operador = true;
+					}
+					
+					if(!ose.getGrupo().isUpload_obrigatorio()){
+						check_ultimo_operador = true;
+					}
+					
+					
+					if(check_ultimo_operador){
 						
 						final FecharEditor fecharEditor = new FecharEditor("Fechar OS", true, ose);
 						fecharEditor.addListerner(new FecharEditor.FecharRoteirizacaoListerner() {
@@ -1218,7 +1229,7 @@ public class RoteirizacaoView extends VerticalLayout {
 						getUI().addWindow(fecharEditor);
 						
 					}else{
-						Notify.Show("É necessário fazer upload de arquivo antes de fechar",Notify.TYPE_ERROR);		
+						Notify.Show("O fechamento desta OS só pode ser realizado pelo operador que realizou o upload do Documento",Notify.TYPE_ERROR);		
 					}
 						
 						
@@ -1233,8 +1244,7 @@ public class RoteirizacaoView extends VerticalLayout {
 		btSubFechar.setPrimaryStyleName("btSubMenu");
 		
 		Button btSubArquivar = new Button("Arquivar", new Button.ClickListener() {
-			
-			
+						
 			public void buttonClick(ClickEvent event) {
 				closeAllWindows();
 				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
@@ -1249,16 +1259,19 @@ public class RoteirizacaoView extends VerticalLayout {
 						EntityItem<Ose> eiOse = (EntityItem<Ose>)tb.getItem(selecteds.toArray()[0]);
 						os_selecionada = eiOse.getEntity();
 						
-						if(os_selecionada != null){						
-							List<ArquivosOse2> arquivos = ArquivosOseDAO.listarArquivos2(os_selecionada);
-							
-							if(arquivos != null && arquivos.size() > 0){
-								tem_arquivos = true;
-							}
-						}						
+						if(os_selecionada.getGrupo().isUpload_obrigatorio()){
+							if(os_selecionada != null){						
+								List<ArquivosOse2> arquivos = ArquivosOseDAO.listarArquivos2(os_selecionada);
+								
+								if(arquivos != null && arquivos.size() > 0){
+									tem_arquivos = true;
+								}
+							}	
+						}else{
+							tem_arquivos = true;
+						}
+						
 					}
-					
-					
 					
 					if(tem_arquivos){
 						

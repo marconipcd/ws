@@ -383,7 +383,10 @@ public class ClienteEdicaoRapida extends Window implements GenericEditor{
 						txtUrlLocalizacao.setWidth("530px");						
 						txtUrlLocalizacao.addStyleName("lowercase");
 
-						if(c.getEndereco_principal().getLocalizacao() != null && !c.getEndereco_principal().getLocalizacao().equals("")){
+						if(c.getEndereco_principal() != null && 
+								c.getEndereco_principal().getLocalizacao() != null && 
+								!c.getEndereco_principal().getLocalizacao().equals("")){
+							
 							txtUrlLocalizacao.setValue(c.getEndereco_principal().getLocalizacao());
 						}
 						

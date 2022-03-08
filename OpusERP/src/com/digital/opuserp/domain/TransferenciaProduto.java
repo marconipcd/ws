@@ -59,8 +59,7 @@ public class TransferenciaProduto {
 
 	public TransferenciaProduto(Integer id, Produto produto, Float qtd,
 			Date data_inicio_transferencia, String usuario_transferencia,
-			Date data_conclusao_transferencia,
-			String usuario_aceitou_transferencia, String status) {
+			Date data_conclusao_transferencia, String usuario_aceitou_transferencia, String status) {
 		
 		this.id = id;
 		this.produto = produto;

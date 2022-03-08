@@ -190,6 +190,7 @@ public class InformarOcorrenciaEditor extends Window implements GenericEditor {
 	Table tbAlteracoes;
 	public Table buildTbChamados(){
 		tbAlteracoes = new Table(null, buildJpaContainer());
+		tbAlteracoes.setStyleName("listagem-plano-acao");
 		tbAlteracoes.setWidth("100%");
 		tbAlteracoes.setHeight("230px");
 		tbAlteracoes.setSelectable(true);

@@ -18,6 +18,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import com.digital.opuserp.dao.ArquivosOseDAO;
+import com.digital.opuserp.view.modulos.ordemServico.roteirizacao.ArquivosOseUpload;
 import com.digital.opuserp.view.util.UploadImagemUtil.UploadImagemEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.event.ShortcutAction;
@@ -238,6 +240,7 @@ public class FileUploadUtilOse extends Window {
 			boolean check = true;
 			FileOutputStream fos = null;
 			boolean valid_nomeclatura = true;
+			boolean valid_duplicate = true;
 			
 				try {
 						
@@ -250,8 +253,12 @@ public class FileUploadUtilOse extends Window {
 							valid_nomeclatura = false;
 						}
 						
+						if(ArquivosOseDAO.checkExist(filename)){
+							valid_duplicate = false;
+						}
+						
 							
-					if(mimeType.equals("application/pdf") && check && valid_nomeclatura){
+					if(mimeType.equals("application/pdf") && check && valid_nomeclatura && valid_duplicate){
 						return fos;
 					}else{
 						
@@ -265,6 +272,10 @@ public class FileUploadUtilOse extends Window {
 						
 						if(!valid_nomeclatura){
 							Notify.Show("Não é possível fazer upload de arquivos que não são desta ordem de serviço!", Notify.TYPE_ERROR);
+						}
+						
+						if(!valid_duplicate){
+							Notify.Show("Arquivo já existe !", Notify.TYPE_ERROR);
 						}
 						
 						return null;

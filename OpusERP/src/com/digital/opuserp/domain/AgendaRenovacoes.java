@@ -13,8 +13,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.jcabi.aspects.Timeable;
-
 @Entity
 @Table(name="agenda_renovacoes")
 public class AgendaRenovacoes {
