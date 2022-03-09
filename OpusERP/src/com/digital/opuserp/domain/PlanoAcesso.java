@@ -87,6 +87,10 @@ public class PlanoAcesso {
 	@Column(name="PLANO_ITTV")
 	private String plano_ittv;
 	
+	@OneToOne
+	@JoinColumn(name="PLANO_BLOQUEIO")
+	private PlanoAcesso plano_bloqueio;
+			
 	public PlanoAcesso(){
 		
 	}
@@ -318,6 +322,14 @@ public class PlanoAcesso {
 
 	public void setPermitir_servico_manutencao(String permitir_servico_manutencao) {
 		this.permitir_servico_manutencao = permitir_servico_manutencao;
+	}
+
+	public PlanoAcesso getPlano_bloqueio() {
+		return plano_bloqueio;
+	}
+
+	public void setPlano_bloqueio(PlanoAcesso plano_bloqueio) {
+		this.plano_bloqueio = plano_bloqueio;
 	}
 	
 	
