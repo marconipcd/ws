@@ -149,7 +149,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 		
 		public JPAContainer<Swith> buildContainer(){
 			container = JPAContainerFactory.makeBatchable(Swith.class, ConnUtil.getEntity());
-			container.setAutoCommit(false);
+			//container.setAutoCommit(false);
 			container.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
 			container.addNestedContainerProperty("concentrador.identificacao");
 			container.addNestedContainerProperty("contrato_monitoramento.id");
@@ -445,7 +445,9 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 								@Override
 								public void onClose(SwithEvent event) {
 									if(event.isConfirm()){
-										container.commit();
+//										container.commit();
+										EntityItem<Swith> entityItem = (EntityItem<Swith>)event.getItem();
+										SwithDAO.atualizar(entityItem.getEntity());
 										
 										if(event.getItem().getItemProperty("contrato_monitoramento").getValue() != null &&
 												event.getItem().getItemProperty("ip_monitoramento").getValue() != null){
@@ -465,7 +467,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 										
 										hlFloat.replaceComponent(lbRegistros, buildLbRegistros());
 										
-										LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Editou Uma Caixa de Atendimento"));
+										//LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Editou Uma Caixa de Atendimento"));
 									}else{
 										LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Cancelou uma Edição de uma Caixa de Atendimento"));
 									}

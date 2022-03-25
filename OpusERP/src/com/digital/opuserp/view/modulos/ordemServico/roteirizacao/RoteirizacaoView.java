@@ -1170,78 +1170,91 @@ public class RoteirizacaoView extends VerticalLayout {
 					
 					if(selecteds.size() == 1){
 
-						Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
-						
-					boolean check_ultimo_operador = false;
-					
-					if(ose.getOperadorUltimoUp() != null && 
-							ose.getOperadorUltimoUp().equals(OpusERP4UI.getUsuarioLogadoUI().getUsername())){
-						check_ultimo_operador = true;
-					}
-					
-					if(!ose.getGrupo().isUpload_obrigatorio()){
-						check_ultimo_operador = true;
-					}
-					
-					
-					if(check_ultimo_operador){
-						
-						final FecharEditor fecharEditor = new FecharEditor("Fechar OS", true, ose);
-						fecharEditor.addListerner(new FecharEditor.FecharRoteirizacaoListerner() {
+							Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
+								
+							boolean check_ultimo_operador = false;
 							
+							if(ose.getOperadorUltimoUp() != null && 
+									ose.getOperadorUltimoUp().equals(OpusERP4UI.getUsuarioLogadoUI().getUsername())){
+								check_ultimo_operador = true;
+							}
 							
-							public void onClose(FecharRoteirizacaoEvent event) {
-								if(event.isConfirm()){
-									Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
-									ose.setConclusao(event.getConclusao());
-									ose.setProblema(event.getProblema());
-									ose.setStatus("FECHADO");
-									ose.setData_fechamento(new Date());
-									ose.setOperador(OpusERP4UI.getUsuarioLogadoUI().getUsername());
+							if(!ose.getGrupo().isUpload_obrigatorio()){
+								check_ultimo_operador = true;
+							}
+					
+							
+							boolean check_pendencia_upload_contrato = true;
+							if(ose.getContrato() != null && ose.getContrato().isPendencia_upload()){
+								check_pendencia_upload_contrato = false;
+							}
+					
+					
+							if(check_ultimo_operador && check_pendencia_upload_contrato){
+								
+								final FecharEditor fecharEditor = new FecharEditor("Fechar OS", true, ose);
+								fecharEditor.addListerner(new FecharEditor.FecharRoteirizacaoListerner() {
 									
-									OseDAO.save(ose);				
-									if(ose.getSubgrupo().getGerar_crm() != null && ose.getSubgrupo().getGerar_crm().equals("SIM") && ose.getCliente().getAgendar_crm().equals("SIM")){
-										Crm crm = CrmDAO.saveCrm(new Crm(null, OpusERP4UI.getEmpresa().getId(), ose.getSubgrupo().getSetor(), ose.getCliente(), ose.getSubgrupo().getCrm_assunto(), ose.getSubgrupo().getCrm_forma_contato(), ose.getCliente().getContato(), "ROTINA", 
-												ose.getSubgrupo().getCrm_assunto().getConteudo()+"\n\nOS Nº: "+ose.getId().toString()+"\nOBSERVAÇÃO: "+ose.getObs()+" \nCONCLUSÃO: "+ose.getConclusao(), 
-												new DateTime().plusDays(1).toDate(), null, new Date(), null, "AGENDADO", "OpusERP4", ose,"NIVEL I"));
-										Usuario opus = ConnUtil.getEntity().find(Usuario.class, 100);									 
-										AlteracoesCrmDAO.save(new AlteracoesCrm(null, "CADASTRO DE CRM", crm, opus, new Date()));
+									
+									public void onClose(FecharRoteirizacaoEvent event) {
+										if(event.isConfirm()){
+											Ose ose = OseDAO.find((Integer)tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue());
+											ose.setConclusao(event.getConclusao());
+											ose.setProblema(event.getProblema());
+											ose.setStatus("FECHADO");
+											ose.setData_fechamento(new Date());
+											ose.setOperador(OpusERP4UI.getUsuarioLogadoUI().getUsername());
+											
+											OseDAO.save(ose);				
+											if(ose.getSubgrupo().getGerar_crm() != null && ose.getSubgrupo().getGerar_crm().equals("SIM") && ose.getCliente().getAgendar_crm().equals("SIM")){
+												Crm crm = CrmDAO.saveCrm(new Crm(null, OpusERP4UI.getEmpresa().getId(), ose.getSubgrupo().getSetor(), ose.getCliente(), ose.getSubgrupo().getCrm_assunto(), ose.getSubgrupo().getCrm_forma_contato(), ose.getCliente().getContato(), "ROTINA", 
+														ose.getSubgrupo().getCrm_assunto().getConteudo()+"\n\nOS Nº: "+ose.getId().toString()+"\nOBSERVAÇÃO: "+ose.getObs()+" \nCONCLUSÃO: "+ose.getConclusao(), 
+														new DateTime().plusDays(1).toDate(), null, new Date(), null, "AGENDADO", "OpusERP4", ose,"NIVEL I"));
+												Usuario opus = ConnUtil.getEntity().find(Usuario.class, 100);									 
+												AlteracoesCrmDAO.save(new AlteracoesCrm(null, "CADASTRO DE CRM", crm, opus, new Date()));
+											}
+											
+											//Vincular Produto com OS
+											OseDAO.vincularProduto(ose,event.getItens());
+																			
+											AlteracoesOseDAO.add(new AlteracoesOse(null, "FECHADA", ose, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+											
+											refresh();
+											
+											Notify.Show("OS FECHADA com Sucesso!", Notify.TYPE_SUCCESS);
+											fecharEditor.close();
+											
+											refresh_qtd();
+										}						
 									}
+								});
+								
+								fecharEditor.addCloseListener(new Window.CloseListener() {
 									
-									//Vincular Produto com OS
-									OseDAO.vincularProduto(ose,event.getItens());
-																	
-									AlteracoesOseDAO.add(new AlteracoesOse(null, "FECHADA", ose, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
 									
-									refresh();
-									
-									Notify.Show("OS FECHADA com Sucesso!", Notify.TYPE_SUCCESS);
-									fecharEditor.close();
-									
-									refresh_qtd();
-								}						
+									public void windowClose(CloseEvent e) {
+										tb.focus();
+									}
+								});
+								
+								getUI().addWindow(fecharEditor);
+								
+							}else{
+								
+								if(!check_ultimo_operador){
+									Notify.Show("O fechamento desta OS só pode ser realizado pelo operador que realizou o upload do Documento",Notify.TYPE_ERROR);
+								}
+								
+								if(!check_pendencia_upload_contrato){
+									Notify.Show("O Contrato vinculado a está Os tem pendência de upload !",Notify.TYPE_ERROR);
+								}
 							}
-						});
-						
-						fecharEditor.addCloseListener(new Window.CloseListener() {
-							
-							
-							public void windowClose(CloseEvent e) {
-								tb.focus();
+								
+								
 							}
-						});
-						
-						getUI().addWindow(fecharEditor);
-						
-					}else{
-						Notify.Show("O fechamento desta OS só pode ser realizado pelo operador que realizou o upload do Documento",Notify.TYPE_ERROR);		
-					}
-						
-						
-					}
-				}else{				
-					Notify.Show("Você não Possui Permissão para Fechar OS",Notify.TYPE_ERROR);				
-				}
+						}else{				
+							Notify.Show("Você não Possui Permissão para Fechar OS",Notify.TYPE_ERROR);				
+						}
 				
 			}
 		});		

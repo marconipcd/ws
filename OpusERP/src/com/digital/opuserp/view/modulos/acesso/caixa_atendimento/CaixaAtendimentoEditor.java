@@ -462,7 +462,9 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 						}else{
 							txtNomeClienteContrato.setReadOnly(false);
 							txtNomeClienteContrato.setValue("");
-							txtNomeClienteContrato.setReadOnly(true);								
+							txtNomeClienteContrato.setReadOnly(true);	
+							
+							contratoSelecionado = null;
 						}
 					}
 				});
@@ -480,11 +482,11 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 					contratoAntigo = contratoSelecionado;
 					
 					if(contratoSelecionado != null){
-						tfCodContrato.setValue(contratoSelecionado.getId().toString());
+						tfCodContrato.setValue(contratoSelecionado != null ? contratoSelecionado.getId().toString() : "");
 						tfCodContrato.setReadOnly(false);
 						
 						txtNomeClienteContrato.setReadOnly(false);
-						txtNomeClienteContrato.setValue(contratoSelecionado.getCliente().getNome_razao());
+						txtNomeClienteContrato.setValue(contratoSelecionado != null ? contratoSelecionado.getCliente().getNome_razao() : "");
 						txtNomeClienteContrato.setReadOnly(true);
 					}
 				}
@@ -661,6 +663,9 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 						if(contratoSelecionado != null){
 							item.getItemProperty("contrato_monitoramento").setValue(contratoSelecionado); 
 							item.getItemProperty("ip_monitoramento").setValue(txtIpMonitoramento.getValue()); 
+						}else{
+							item.getItemProperty("contrato_monitoramento").setValue(null); 
+							item.getItemProperty("ip_monitoramento").setValue(null);
 						}
 						
 						item.getItemProperty("olt").setValue(cbOlt.getItem(cbOlt.getValue()).getItemProperty("identificacao").getValue().toString());
