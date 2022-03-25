@@ -482,55 +482,8 @@ public class FichaCegaView extends VerticalLayout {
 					
 					final BeanItem<Produto> newItem = new BeanItem<Produto>(new Produto());
 									
-					final ProdutoEditor cEditor = new ProdutoEditor(newItem, "Cadastrar Produto", true,false,false,false,null);
-					cEditor.addListerner(new ProdutoEditor.ProdutoListerner() {
-						
-						@Override
-						public void onClose(ProdutoEvent event) {
-							if(event.isConfirm()){
-								
-								try {
-									Produto cAdd = newItem.getBean();									
-									cAdd.setEmpresaId(OpusERP4UI.getEmpresa());
-									ProdutoDAO.insertProduto(cAdd);
-									tb.focus();
-									//refresh();
-									
-									LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Cadastrou um Produto"));								
-									Notify.Show("Produto Cadastrado Com Sucesso!", Notify.TYPE_SUCCESS);									
-									AlteracoesProdutoDAO.save(new AlteracoesProduto(null, "CADASTRO DE PRODUTO", cAdd,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
-									
-									Icms icms = event.getIcms();
-									Ipi ipi = event.getIpi();
-									Pis pis = event.getPis();
-									Cofins cofins = event.getCofins();
-																		
-									icms.setProduto(cAdd);
-									ipi.setProduto(cAdd);
-									pis.setProduto(cAdd);
-									cofins.setProduto(cAdd);
-									
-									refresh();
-								
-								} catch (Exception e) {
-									e.printStackTrace();															
-									Notify.Show("ERRO: "+e.getLocalizedMessage(), Notify.TYPE_ERROR);								
-								}
-							}
-						}
-
-						
-					});
-					
-					cEditor.addCloseListener(new Window.CloseListener() {
-						
-						@Override
-						public void windowClose(CloseEvent e) {
-							tfBusca.focus();		
-						}
-					});
-					
-					getUI().addWindow(cEditor);
+					FichaCegaEditor ficha_cega = new FichaCegaEditor();
+					getUI().addWindow(ficha_cega);
 				
 				}else{					
 					Notify.Show("Você não Possui Permissão para Cadastrar um Produto", Notify.TYPE_ERROR);
