@@ -804,26 +804,59 @@ public class ClientesView extends VerticalLayout implements GenericView {
 	Button btEdicoes;	
 	
 	private Component BuildbtEdicoes() {
-		btEdicoes = new Button("Consultar", new Button.ClickListener() {
+		btEdicoes = new Button("Alterar", new Button.ClickListener() {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				 if (winSubMenuEdicoes != null && winSubMenuEdicoes.getUI() != null)
-					 winSubMenuEdicoes.close();
-	             else {
-	            	buildSubMenuEdicoes(event);
-				     
-					 getUI().addWindow(winSubMenuEdicoes);
-					 winSubMenuEdicoes.focus();
-	                 ((CssLayout) getUI().getContent()).addLayoutClickListener(new LayoutClickListener() {
-	                             
-	               			@Override
-	                        public void layoutClick(LayoutClickEvent event) {
-	               				winSubMenuEdicoes.close();
-	                            ((CssLayout) getUI().getContent()).removeLayoutClickListener(this);
-	                        }
-	                 });
-	             }					
+//				 if (winSubMenuEdicoes != null && winSubMenuEdicoes.getUI() != null)
+//					 winSubMenuEdicoes.close();
+//	             else {
+//	            	buildSubMenuEdicoes(event);
+//				     
+//					 getUI().addWindow(winSubMenuEdicoes);
+//					 winSubMenuEdicoes.focus();
+//	                 ((CssLayout) getUI().getContent()).addLayoutClickListener(new LayoutClickListener() {
+//	                             
+//	               			@Override
+//	                        public void layoutClick(LayoutClickEvent event) {
+//	               				winSubMenuEdicoes.close();
+//	                            ((CssLayout) getUI().getContent()).removeLayoutClickListener(this);
+//	                        }
+//	                 });
+//	             }			
+				
+				final BeanItem<Cliente> clienteItem = new BeanItem<Cliente>(ClienteDAO.find(Integer.parseInt(tbGeneric.getItem(tbGeneric.getValue()).getItemProperty("id").getValue().toString())));			
+				ClienteEdicaoReadOnly editor = new ClienteEdicaoReadOnly(clienteItem, "Dados do cliente", true, null,codSubModulo, true);
+				
+				// CLIENTE
+				editor.addListerner(new ClienteEdicaoReadOnly.ClienteEdicaoReadOnlyListerner() {
+
+					@Override
+					public void onClose(ClienteEdicaoReadOnlyEvent event) {
+							if(event.isConfirm()){							
+								
+								Cliente addCliente = clienteItem.getBean();
+								ClienteDAO.saveCliente(addCliente,event.getEnderecos());											
+								LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Editou um Cliente"));
+
+								refresh();
+					
+							}
+					}
+				});
+								
+				editor.addCloseListener(new Window.CloseListener() {
+					
+					@Override
+					public void windowClose(CloseEvent e) {
+						tbGeneric.focus();
+					}
+				});
+				
+				getUI().addWindow(editor);
+		
+				
+				
 			}
 		});
 		btEdicoes.setEnabled(false);
@@ -931,8 +964,52 @@ public class ClientesView extends VerticalLayout implements GenericView {
 		});
         bt2.setPrimaryStyleName("btSubMenu");
         
+//        Button bt3 = new Button("Alterar Localização",new Button.ClickListener() {
+//			
+//			@Override
+//			public void buttonClick(ClickEvent event) {
+//				
+//				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Edicao Rapida"))					
+//				{				
+//					final BeanItem<Cliente> clienteItem = new BeanItem<Cliente>(ClienteDAO.find(Integer.parseInt(tbGeneric.getItem(tbGeneric.getValue()).getItemProperty("id").getValue().toString())));			
+//					final ClienteEdicaoRapida editor = new ClienteEdicaoRapida(clienteItem, "Edição Rápida", true,codSubModulo);
+//					
+//					editor.addListerner(new ClienteEdicaoRapida.ClienteEdicaoRapidaListerner() {
+//	
+//						@Override
+//						public void onClose(ClienteEdicaoRapidaEvent event) {
+//								if(event.isConfirm()){							
+//									
+//									Cliente addCliente = clienteItem.getBean();
+//									ClienteDAO.saveCliente(addCliente);											
+//									LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Editou um Cliente"));
+//
+//									refresh();
+//									editor.close();
+//								}
+//						}
+//					});
+//									
+//					editor.addCloseListener(new Window.CloseListener() {
+//						
+//						@Override
+//						public void windowClose(CloseEvent e) {
+//							tbGeneric.focus();
+//						}
+//					});
+//					
+//					getUI().addWindow(editor);		
+//				}else{
+//					Notification.show("Atenção", "Você não Possui Permissão para Utilizar a Edição Rápida", Type.ERROR_MESSAGE);
+//				}
+//				
+//			}
+//		});
+//        bt3.setPrimaryStyleName("btSubMenu");
+        
         l.addComponent(bt1);
         l.addComponent(bt2); 
+        //l.addComponent(bt3);
 	}
 
 

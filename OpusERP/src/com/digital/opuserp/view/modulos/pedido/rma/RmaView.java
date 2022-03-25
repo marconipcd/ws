@@ -515,9 +515,10 @@ public class RmaView extends VerticalLayout {
 				if(tb.getItem(tb.getValue()).getItemProperty("Produto").getValue() == null){
 						
 						final Integer id_rma = (Integer)tb.getItem(tb.getValue()).getItemProperty("Cod").getValue();
-						final EntityItem<RmaMestre> entityItemRmaMeste = (EntityItem<RmaMestre>) tb.getItem(tb.getValue()); 
+						final RmaMestre rma1 = RmaDAO.findRMA(id_rma);
+						//final EntityItem<RmaMestre> entityItemRmaMeste = (EntityItem<RmaMestre>) tb.getItem(tb.getValue()); 
 					
-						final RmaNew rma = new RmaNew("Editar RMA",true, true, id_rma);
+						final RmaNew rma = new RmaNew("Editar RMA",true, true, rma1);
 						rma.addListerner(new RmaNew.RmaNewListerner() {
 							
 							@Override
@@ -527,7 +528,7 @@ public class RmaView extends VerticalLayout {
 								
 								if(itens != null){
 									for (RmaDetalhe item : itens) {
-										item.setRma_mestre_id(entityItemRmaMeste.getEntity());
+										item.setRma_mestre_id(rma1);
 										RmaDAO.save(item);		
 										
 										Cliente cliente = ClienteDAO.findByCpf(OpusERP4UI.getEmpresa().getCnpj());			

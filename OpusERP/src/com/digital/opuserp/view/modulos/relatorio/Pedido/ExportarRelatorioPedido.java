@@ -724,6 +724,8 @@ public class ExportarRelatorioPedido implements StreamSource {
 			double totalAserPago = 0;	
 			double boleto = 0;
 			double nenhuma = 0;
+			double pix_loja = 0;
+			
 			int totalGeral = 0;
 			
 			Integer reg= 0;
@@ -870,6 +872,10 @@ public class ExportarRelatorioPedido implements StreamSource {
 							}	
 							if(forma.equals("MERCADO LIVRE")){
 								mercadoLivre = mercadoLivre + formasPgtoItem.getValor();
+								totalGeral = totalGeral+1;
+							}	
+							if(forma.equals("PIX LOJA")){
+								pix_loja = pix_loja + formasPgtoItem.getValor();
 								totalGeral = totalGeral+1;
 							}	
 									
@@ -1286,6 +1292,10 @@ public class ExportarRelatorioPedido implements StreamSource {
 										}	
 										if(formaPgto.getNome().equals("MERCADO LIVRE")){
 											mercadoLivre = mercadoLivre + pedido.getValor();
+											totalGeral  = totalGeral+1;
+										}	
+										if(formaPgto.getNome().equals("PIX LOJA")){
+											pix_loja = pix_loja + pedido.getValor();
 											totalGeral  = totalGeral+1;
 										}	
 									}
@@ -2058,6 +2068,9 @@ public class ExportarRelatorioPedido implements StreamSource {
 					}else if(c.getColuna().equals("MERCADO LIVRE")){
 						pResumoVazioPgt = new Paragraph(Real.formatDbToString(String.valueOf(mercadoLivre)),fCaptionsBold);					
 						pResumoVazioPgt.setAlignment(Element.ALIGN_RIGHT);
+					}else if(c.getColuna().equals("PIX LOJA")){
+						pResumoVazioPgt = new Paragraph(Real.formatDbToString(String.valueOf(pix_loja)),fCaptionsBold);					
+						pResumoVazioPgt.setAlignment(Element.ALIGN_RIGHT);
 					}
 				}
 						
@@ -2206,6 +2219,9 @@ public class ExportarRelatorioPedido implements StreamSource {
 								pResumoVazioPgt.setAlignment(Element.ALIGN_RIGHT);
 							}else if(nomeFormaPgto.equals("MERCADO LIVRE")){
 								pResumoVazioPgt = new Paragraph(Real.formatDbToString(String.valueOf(mercadoLivre)),fCaptionsBold);					
+								pResumoVazioPgt.setAlignment(Element.ALIGN_RIGHT);
+							}else if(nomeFormaPgto.equals("PIX LOJA")){
+								pResumoVazioPgt = new Paragraph(Real.formatDbToString(String.valueOf(pix_loja)),fCaptionsBold);					
 								pResumoVazioPgt.setAlignment(Element.ALIGN_RIGHT);
 							}else{
 								pResumoVazioPgt = new Paragraph(Real.formatDbToString(String.valueOf(haver)),fCaptionsBold);					

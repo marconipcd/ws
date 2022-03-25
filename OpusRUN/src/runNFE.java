@@ -33,12 +33,13 @@ public class runNFE {
 	//11426 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
 	//8892 - SINDICATO DOS TRABALHADORES RURAIS DE B. JARDIM
 	//11268 - 
+	//12053 - KATHARYNE RAYLLE BEZERRA DA SILVA
 
 	public static void main(String[] args) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 		
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=12082 and  "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=12053 and  "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'ENCERRADO' and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -90,7 +91,7 @@ public class runNFE {
 					}
 				}else{
 					//557413->128684 - 582019 - 632154
-					boleto = em.find(ContasReceber.class, 646423);
+					boleto = em.find(ContasReceber.class, 640296);
 				}
 				
 				//&& boleto.getStatus().equals("ABERTO")

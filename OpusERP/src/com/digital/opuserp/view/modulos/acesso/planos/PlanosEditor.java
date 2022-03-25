@@ -318,9 +318,7 @@ public class PlanosEditor extends Window implements GenericEditor {
 								if(validarNone == false){									
 									Notify.Show("Nome Já Cadastrado", Notify.TYPE_ERROR);
 								}						
-							}
-							
-							
+							}							
 						}
 					});
 					

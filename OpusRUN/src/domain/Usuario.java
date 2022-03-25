@@ -23,6 +23,15 @@ public class Usuario {
     private String password;
     @Column(name="FUNCAO", nullable=false,unique=false, length=20)
     private String funcao;
+    
+    @Column(name="EMAIL", nullable=true)
+    private String email;
+    
+    @Column(name="VISUALIZAR_TODOS_CRMS", nullable=true)
+    private String visualizar_todos_crm;
+    
+    @Column(name="STATUS")
+    private String status;
    
     
     public Usuario() {
@@ -79,7 +88,32 @@ public class Usuario {
         this.funcao = funcao;
     }
 
+	public String getEmail() {
+		return email;
+	}
 
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getVisualizar_todos_crm() {
+		return visualizar_todos_crm;
+	}
+
+	public void setVisualizar_todos_crm(String visualizar_todos_crm) {
+		this.visualizar_todos_crm = visualizar_todos_crm;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+	
 //	public List<EmpresasUsuario> getEmpresas() {
 //		return empresas;
 //	}

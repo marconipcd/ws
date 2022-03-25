@@ -1320,7 +1320,9 @@ public class ImprimirContrato implements StreamSource{
 	        pCellpPlanoGarantiaVazio.addElement(pPlanoGarantiaVazio);
 	        pCellpPlanoGarantiaVazio.setBorderWidth(0);
 	        
-	        PdfPTable tbTipoPlano = new PdfPTable(new float[] {0.05f,0.12f,0.39f,0.42f, 0.12f});
+	        float [] tamanho_coluna_plano = new float[] {0.05f,0.40f,0.15f,0.30f, 0.12f};
+	        
+	        PdfPTable tbTipoPlano = new PdfPTable(tamanho_coluna_plano);
 	        tbTipoPlano.setWidthPercentage(100f);		
 	        tbTipoPlano.setSpacingBefore(3);
 	        tbTipoPlano.addCell(pCellpPlanoGarantiaVazio);			
@@ -1377,7 +1379,7 @@ public class ImprimirContrato implements StreamSource{
 	        pCellpPlanoGarantiaVazioVl.setPaddingTop(0);
 	        //pCellpPlanoGarantiaVazioVl.setPaddingBottom(10);
 	        
-	        PdfPTable tbTipoPlanoVl = new PdfPTable(new float[] {0.05f,0.12f,0.39f,0.42f, 0.12f});
+	        PdfPTable tbTipoPlanoVl = new PdfPTable(tamanho_coluna_plano);
 	        tbTipoPlanoVl.setWidthPercentage(100f);		
 	        tbTipoPlanoVl.addCell(pCellpPlanoGarantiaVazioVl);			
 	        tbTipoPlanoVl.addCell(pCellpPlanoVl);

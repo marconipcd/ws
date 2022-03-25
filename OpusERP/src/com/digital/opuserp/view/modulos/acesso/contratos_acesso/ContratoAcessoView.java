@@ -2652,6 +2652,15 @@ public class ContratoAcessoView extends VerticalLayout {
 								
 								//Retirado experimentalmente o bloqueio de alteração de 
 								
+								//else if(ContasReceberDAO.getBoletosAcessoAdiantadosPorContrato(contrato_selecionado.getId()) == true ){									
+								//	 Notify.Show("Contrato Possui Boletos Adiantados!", Notify.TYPE_ERROR);									
+								//}
+								
+								boolean possui_boletos_adiantados = false;
+								if(ContasReceberDAO.getBoletosAcessoAdiantadosPorContrato(contrato_selecionado.getId()) == true ){
+									possui_boletos_adiantados = true;
+								}
+								
 								
 								final NfeMestre nfe = AcessoDAO.verificaBoletosNfeAllow(contrato_selecionado.getId());
 								
@@ -2663,18 +2672,17 @@ public class ContratoAcessoView extends VerticalLayout {
 									 Notify.Show("Contrato Possui Boletos Vencidos!", Notify.TYPE_ERROR);									
 								}else if(contrato_selecionado.getContrato().getTipo_contrato().equals("PRE-PAGO")){									 
 									 Notify.Show("Cliente Possui Contrato PRE-PAGO!", Notify.TYPE_ERROR);
-								}else if(ContasReceberDAO.getBoletosAcessoAdiantadosPorContrato(contrato_selecionado.getId()) == true ){									
-									 Notify.Show("Contrato Possui Boletos Adiantados!", Notify.TYPE_ERROR);									
 								}else{
 									janelaAtiva = true;
-									final MudancaPlanoEditor rpae = new MudancaPlanoEditor(entityItem, "Alterar Plano Acesso", true);
+									final MudancaPlanoEditor rpae = new MudancaPlanoEditor(entityItem, "Alterar Plano Acesso", true, possui_boletos_adiantados);
 									rpae.addListerner(new MudancaPlanoEditor.RenovarPlanoAcessoListerner() {
 										
 										@Override
 										public void onClose(RenovarPlanoAcessoEvent event) {
 											if(event.isConfirm()){
 																									
-													boolean check  = AcessoDAO.alteraPlano(contrato_selecionado,event.getPlanoNovo(), nfe, event.getInstGratis());
+													boolean check  = AcessoDAO.alteraPlano(contrato_selecionado,event.getPlanoNovo(), 
+															nfe, event.getInstGratis(),event.isBoletoAdiantado());
 													
 													if(check){
 														rpae.close();
@@ -3817,39 +3825,39 @@ public class ContratoAcessoView extends VerticalLayout {
         }
         
         //---------TESTE
-        Button btMigrarPlanosClientesCabo = new Button("Migrar Planos", new Button.ClickListener() {
-			
-			@Override
-			public void buttonClick(ClickEvent event) {
-				
-				
-				EntityManager em = ConnUtil.getEntity();
-
-				PlanoAcesso planoAntigo = PlanoAcessoDAO.find(143);
-				PlanoAcesso planoNovo = PlanoAcessoDAO.find(251);
-				
-				if(planoAntigo != null && planoNovo != null){
-						
-						Query q1 = em.createQuery("select ac from AcessoCliente ac where "
-								+ "ac.status_2!='ENCERRADO' AND "
-								+ "ac.status_2 != 'PENDENTE_INSTALACAO' AND "
-								+ "ac.plano=:p AND "
-								+ "ac.base !=:c1 AND ac.base !=:c2", AcessoCliente.class);
-						
-						q1.setParameter("p", planoAntigo);
-						q1.setParameter("c1", new Concentrador(105));
-						q1.setParameter("c2", new Concentrador(132));
-						
-						
-						for (AcessoCliente ac : (List<AcessoCliente>)q1.getResultList()) {
-							System.out.println(ac.getCliente().getNome_razao());
-							boolean check  = AcessoDAO.alteraPlano(ac,planoNovo, null, ac.getInstalacao_gratis());
-						}
-						
-				}
-				
-			}
-		}); 
+//        Button btMigrarPlanosClientesCabo = new Button("Migrar Planos", new Button.ClickListener() {
+//			
+//			@Override
+//			public void buttonClick(ClickEvent event) {
+//				
+//				
+//				EntityManager em = ConnUtil.getEntity();
+//
+//				PlanoAcesso planoAntigo = PlanoAcessoDAO.find(143);
+//				PlanoAcesso planoNovo = PlanoAcessoDAO.find(251);
+//				
+//				if(planoAntigo != null && planoNovo != null){
+//						
+//						Query q1 = em.createQuery("select ac from AcessoCliente ac where "
+//								+ "ac.status_2!='ENCERRADO' AND "
+//								+ "ac.status_2 != 'PENDENTE_INSTALACAO' AND "
+//								+ "ac.plano=:p AND "
+//								+ "ac.base !=:c1 AND ac.base !=:c2", AcessoCliente.class);
+//						
+//						q1.setParameter("p", planoAntigo);
+//						q1.setParameter("c1", new Concentrador(105));
+//						q1.setParameter("c2", new Concentrador(132));
+//						
+//						
+//						for (AcessoCliente ac : (List<AcessoCliente>)q1.getResultList()) {
+//							System.out.println(ac.getCliente().getNome_razao());
+//							boolean check  = AcessoDAO.alteraPlano(ac,planoNovo, null, ac.getInstalacao_gratis());
+//						}
+//						
+//				}
+//				
+//			}
+//		}); 
         //  l.addComponent(btMigrarPlanosClientesCabo);
        //---------TESTE
         

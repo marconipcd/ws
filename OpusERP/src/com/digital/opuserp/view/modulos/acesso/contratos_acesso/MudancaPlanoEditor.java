@@ -63,12 +63,13 @@ public class MudancaPlanoEditor extends Window implements GenericEditor{
 	TextField tfInfoValorPlano;
 	TextField tfInfoValorPrimeiroBoleto;
 	
+	boolean possui_boletos_adiantados;
 	
-	public MudancaPlanoEditor(Item item, String title, boolean modal){
+	
+	public MudancaPlanoEditor(Item item, String title, boolean modal, boolean possui_boletos_adiantados){
 		this.item = item;
-		
-		
-		
+		this.possui_boletos_adiantados = possui_boletos_adiantados;
+				
 		setWidth("640px");
 		setHeight("537px");
 		
@@ -522,12 +523,25 @@ public class MudancaPlanoEditor extends Window implements GenericEditor{
 	}
 	private void concluirAlteracaoPlano(){
 		
-		
+			EntityItem<AcessoCliente> entityItem_acesso_plano = (EntityItem<AcessoCliente>)item;
+			String vlr_plano_novo = entityItem_acesso_plano.getEntity().getPlano().getValor();
+					
 			if(cbPlanos.getValue() != null && validarContrato && cbInstGratis.getValue() != null){
+				
 				try {										
 					
-					EntityItem<PlanoAcesso> entityItem = (EntityItem<PlanoAcesso>)cbPlanos.getItem(cbPlanos.getValue()); 
-					fireEvent(new RenovarPlanoAcessoEvent(getUI(),true,	entityItem.getEntity(), cbInstGratis.getValue().toString()));			
+					EntityItem<PlanoAcesso> entityItem = (EntityItem<PlanoAcesso>)cbPlanos.getItem(cbPlanos.getValue());
+					
+					if(possui_boletos_adiantados){
+						if(vlr_plano_novo.equals(entityItem.getEntity().getValor())){
+							
+							fireEvent(new RenovarPlanoAcessoEvent(getUI(),true,	entityItem.getEntity(), cbInstGratis.getValue().toString(), true));	
+						}else{
+							Notify.Show("Contrato Possui Boletos Adiantados, não é possível continuar!", Notify.TYPE_ERROR);	
+						}
+					}else{					
+						fireEvent(new RenovarPlanoAcessoEvent(getUI(),true,	entityItem.getEntity(), cbInstGratis.getValue().toString(),false));
+					}
 					
 				} catch (Exception e) {
 					e.printStackTrace();					
@@ -577,7 +591,7 @@ public class MudancaPlanoEditor extends Window implements GenericEditor{
 			public void buttonClick(ClickEvent event) {
 				
 				if(!cbPlanos.isModified()){									
-					fireEvent(new RenovarPlanoAcessoEvent(getUI(),false,null,null));	
+					fireEvent(new RenovarPlanoAcessoEvent(getUI(),false,null,null,false));	
 				}else{
 					GenericDialog gDialog = new GenericDialog("Confirme para Continuar!", "Deseja Salvar as Informações Alteradas?", true, true);
 					gDialog.setCaptionCANCEL("Sair sem Salvar!");
@@ -590,7 +604,7 @@ public class MudancaPlanoEditor extends Window implements GenericEditor{
 							if(event.isConfirm()){							
 								concluirAlteracaoPlano();
 							}else{										
-								fireEvent(new RenovarPlanoAcessoEvent(getUI(), false, null,null));									
+								fireEvent(new RenovarPlanoAcessoEvent(getUI(), false, null,null,false));									
 							}
 						}	
 					});					
@@ -634,16 +648,21 @@ public class MudancaPlanoEditor extends Window implements GenericEditor{
 		private Date dataPrimeiroBoleto;		
 		private PlanoAcesso plano;
 		private String InstGratis;
+		private boolean boleto_adiantado;
 		
-		public RenovarPlanoAcessoEvent(Component source,boolean confirm, PlanoAcesso plano, String InstGratis ) {
+		public RenovarPlanoAcessoEvent(Component source,boolean confirm, PlanoAcesso plano, String InstGratis,
+				boolean boleto_adiantado ) {
 			super(source);
 			
 			this.plano = plano;
 			this.confirm = confirm;
 			this.InstGratis = InstGratis;
-			
+			this.boleto_adiantado = boleto_adiantado;
 		}
 
+		public boolean isBoletoAdiantado(){
+			return boleto_adiantado;
+		}
 		public String getInstGratis(){
 			return InstGratis;
 		}
