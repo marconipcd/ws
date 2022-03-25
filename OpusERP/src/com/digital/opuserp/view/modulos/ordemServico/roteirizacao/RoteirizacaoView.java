@@ -1219,11 +1219,20 @@ public class RoteirizacaoView extends VerticalLayout {
 																			
 											AlteracoesOseDAO.add(new AlteracoesOse(null, "FECHADA", ose, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
 											
-											refresh();
-											
 											Notify.Show("OS FECHADA com Sucesso!", Notify.TYPE_SUCCESS);
 											fecharEditor.close();
 											
+											
+											if(!ose.getGrupo().isUpload_obrigatorio()){
+																
+												ose.setStatus("ARQUIVADO");																								
+												OseDAO.save(ose);		
+												
+												Notify.Show("OS Arquivada com Sucesso!", Notify.TYPE_SUCCESS);												
+												AlteracoesOseDAO.add(new AlteracoesOse(null, "ARQUIVADA", ose, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+											}
+																					
+											refresh();
 											refresh_qtd();
 										}						
 									}
