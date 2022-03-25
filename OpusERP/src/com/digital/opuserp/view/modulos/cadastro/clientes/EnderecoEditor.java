@@ -10,12 +10,10 @@ import javax.persistence.Query;
 
 import org.vaadin.suggestfield.SuggestField;
 import org.vaadin.suggestfield.SuggestField.SuggestionHandler;
-import org.vaadin.suggestfield.client.SuggestFieldSuggestion;
 
 import com.digital.opuserp.domain.Ceps;
 import com.digital.opuserp.interfaces.GenericEditor;
 import com.digital.opuserp.util.CepUtil;
-import com.digital.opuserp.util.ChecarCidadeUtil;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
@@ -24,8 +22,6 @@ import com.digital.opuserp.view.util.MunicipiosUtil;
 import com.digital.opuserp.view.util.MunicipiosUtil.MunicipioEvent;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents;

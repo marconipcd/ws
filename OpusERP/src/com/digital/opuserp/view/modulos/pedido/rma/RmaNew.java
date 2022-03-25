@@ -69,18 +69,17 @@ public class RmaNew extends Window implements GenericEditor {
 	RmaMestre rma;
 	
 	boolean editor;
-	public RmaNew(String title, boolean modal, final boolean editor, final Integer id_rma){
+	public RmaNew(String title, boolean modal, final boolean editor, final RmaMestre rma){
 		
 		setWidth("892px");
 		
-		if(id_rma != null){
-			rma = RmaDAO.findRMA(id_rma);
+		if(rma != null){
+			this.rma = rma;
 			FornecedorSelecionado = rma.getFornecedor();
 		}
 		
 		this.editor = editor;
-		this.id_rma = id_rma;
-		
+				
 		setCaption(title);
 		setModal(modal);
 		setResizable(true);
@@ -344,7 +343,7 @@ public class RmaNew extends Window implements GenericEditor {
 		vlRoot.addComponent(tbItens); 
 		
 		if(rma != null){
-			itens = RmaDAO.getItensRma(rma.getId());
+			itens = RmaDAO.getItensRma(rma);
 			for (RmaDetalhe rmaDetalhe : itens) {
 				
 				tbItens.addItem(new Object[]{rmaDetalhe.getId(), rmaDetalhe.getProduto().getNome(), rmaDetalhe.getNf_compra(), rmaDetalhe.getDefeito(), rmaDetalhe.getVenc(), rmaDetalhe.getStatus()}, tbItens.getItemIds().size()+1);

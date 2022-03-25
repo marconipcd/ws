@@ -492,29 +492,32 @@ public class RoteirizacaoChart extends CssLayout {
 				
 				if(cbTipos != null && cbTipos.getValue() != null){
 					q = em.createNativeQuery("SELECT (SELECT NOME FROM tipos_subgrupo WHERE tipos_subgrupo.ID=TIPO_SUBGRUPO_ID) AS TIPOSUB, COUNT(TIPO_SUBGRUPO_ID) AS QTD, DATE_FORMAT( DATA_CONCLUSAO,  '%m/%Y' ) as DATA FROM  `ose` WHERE   "
-							+ "  DATE_FORMAT(DATA_CONCLUSAO,  '%Y-%m' ) >=  :data1  AND EMPRESA_ID =:codEmpresa and ose.GRUPO_ID =:grupo GROUP BY TIPOSUB");
+							+ "DATA_CONCLUSAO >=  :data1  AND EMPRESA_ID =:codEmpresa and ose.GRUPO_ID =:grupo GROUP BY TIPOSUB");
 					q.setParameter("grupo", cbTipos.getItem(cbTipos.getValue()).getItemProperty("id").getValue());
 				}else{					
 					q = em.createNativeQuery("SELECT (SELECT NOME FROM tipos_ose WHERE tipos_ose.ID=GRUPO_ID) AS TIPO, COUNT(GRUPO_ID) AS QTD, DATE_FORMAT( DATA_CONCLUSAO,  '%m/%Y' ) as DATA FROM  `ose` WHERE  "
-							+ "DATE_FORMAT(DATA_CONCLUSAO,  '%Y-%m' ) >=  :data1  AND EMPRESA_ID =:codEmpresa GROUP BY GRUPO_ID");
+							+ "DATA_CONCLUSAO >=  :data1  AND EMPRESA_ID =:codEmpresa GROUP BY GRUPO_ID");
 				}
 				
 			}else{
 				
 				if(cbTipos != null && cbTipos.getValue() != null){
 					q = em.createNativeQuery("SELECT (SELECT NOME FROM tipos_subgrupo WHERE tipos_subgrupo.ID=TIPO_SUBGRUPO_ID) AS TIPOSUB, COUNT(TIPO_SUBGRUPO_ID) AS QTD, DATE_FORMAT( DATA_ABERTURA,  '%m/%Y' ) as DATA FROM  `ose` WHERE   "
-							+ "  DATE_FORMAT(DATA_ABERTURA,  '%Y-%m' ) >=  :data1  AND EMPRESA_ID =:codEmpresa and ose.GRUPO_ID =:grupo GROUP BY TIPOSUB");
+							+ "  DATA_ABERTURA >=  :data1  AND EMPRESA_ID =:codEmpresa and ose.GRUPO_ID =:grupo GROUP BY TIPOSUB");
 					q.setParameter("grupo", cbTipos.getItem(cbTipos.getValue()).getItemProperty("id").getValue());
 				}else{
 					q = em.createNativeQuery("SELECT (SELECT NOME FROM tipos_ose WHERE tipos_ose.ID=GRUPO_ID) AS TIPO, COUNT(GRUPO_ID) AS QTD, DATE_FORMAT( DATA_ABERTURA,  '%m/%Y' ) as DATA FROM  `ose` WHERE  "
-		        			+ "DATE_FORMAT(DATA_ABERTURA,  '%Y-%m' ) >=  :data1  AND EMPRESA_ID =:codEmpresa GROUP BY GRUPO_ID");
+		        			+ "DATA_ABERTURA >=  :data1  AND EMPRESA_ID =:codEmpresa GROUP BY GRUPO_ID");
 				}
 			}
         	q.setParameter("codEmpresa", OpusERP4UI.getEmpresa().getId());
                 
+        	SimpleDateFormat sdf0 = new SimpleDateFormat("yyyy-MM-dd");
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        	
+        	String data1 = sdf.format(new DateTime().toDate())+"-01 01:00:00";
     		
-        	q.setParameter("data1", sdf.format(new DateTime().toDate()));
+        	q.setParameter("data1", data1);
 
         	//Lists.reverse(
         	List<Object[]> result = q.getResultList();

@@ -29,6 +29,7 @@ import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.util.ValidarCPF;
 import com.digital.opuserp.view.modulos.cadastro.clientes.EnderecoEditor.CepEvent;
+import com.digital.opuserp.view.modulos.cadastro.clientes.EnderecoLocalizacaoEditor.LocalizacaoEvent;
 import com.digital.opuserp.view.util.ClienteUtil;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -129,6 +130,7 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 	
 
 	Button btEditar;
+	Button btEditarLocalizacao;
 	Button btInativar;
 	Button btPrincipal;
 	
@@ -595,7 +597,7 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 						
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setId("txtRg");
 						
-						JavaScript.getCurrent().execute("$('#txtRg').mask('00000000000000')");
+						//JavaScript.getCurrent().execute("$('#txtRg').mask('00000000000000')");
 						
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).addListener(new FieldEvents.BlurListener() {
 							
@@ -2068,6 +2070,28 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 				});
 				btEditar.setEnabled(false);
 				
+				btEditarLocalizacao = new Button("Editar localização", new Button.ClickListener() {
+					
+					@Override
+					public void buttonClick(ClickEvent event) {
+						
+														
+								EnderecoLocalizacaoEditor endLocalizacao = new EnderecoLocalizacaoEditor(tbEnderecos.getItem(itemId), "Editar localização", true);
+								endLocalizacao.addListerner(new EnderecoLocalizacaoEditor.LocalizacaoListerner() {
+									
+									@Override
+									public void onClose(LocalizacaoEvent event) {
+										if(event.isConfirm()){
+											containerEnderecos.commit();
+										}
+									}
+								});								
+								
+								getUI().addWindow(endLocalizacao);							
+					}
+				});
+				btEditarLocalizacao.setEnabled(false);
+				
 				btInativar = new Button("Ativar/Inativar", new Button.ClickListener() {
 					
 					@Override
@@ -2136,7 +2160,8 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 				HorizontalLayout hlButtonsEndereco = new HorizontalLayout(){
 					{										
 						addComponent(btAdicionar);									
-						addComponent(btEditar);									
+						addComponent(btEditar);
+						addComponent(btEditarLocalizacao);		
 						addComponent(btInativar);
 						addComponent(btPrincipal);
 						
@@ -2236,11 +2261,14 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 					if(ClienteItem.getItemProperty("id").getValue() != null){
 						if(tbEnderecos.getItem(itemId).getItemProperty("status").getValue().toString().equals("ATIVO")){
 							btEditar.setEnabled(true);
+							btEditarLocalizacao.setEnabled(true);
 						}else{
 							btEditar.setEnabled(false);
+							btEditarLocalizacao.setEnabled(false);
 						}
 					}else{
 						btEditar.setEnabled(false);
+						btEditarLocalizacao.setEnabled(false);
 					}
 					
 							
@@ -2259,6 +2287,7 @@ public class ClienteEdicaoReadOnly extends Window implements GenericEditor {
 					
 				}else{
 					btEditar.setEnabled(false);
+					btEditarLocalizacao.setEnabled(false);
 					btInativar.setEnabled(false);
 					btPrincipal.setEnabled(false); 
 				}

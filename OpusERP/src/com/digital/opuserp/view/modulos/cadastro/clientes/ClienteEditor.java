@@ -564,10 +564,11 @@ public class ClienteEditor extends Window implements GenericEditor {
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setNullRepresentation("");
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setWidth("177px");
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setMaxLength(50);
+						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setRequired(true); 
 						
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).setId("txtRg");
 						
-						JavaScript.getCurrent().execute("$('#txtRg').mask('00000000000000')");
+						//JavaScript.getCurrent().execute("$('#txtRg').mask('00000000000000')");
 						
 						((TextField) fieldGroup.getField("doc_rg_insc_estadual")).addListener(new FieldEvents.BlurListener() {
 							

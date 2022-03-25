@@ -68,6 +68,8 @@ public class PlanosEditor extends Window implements GenericEditor {
 	String planoAtual;
 	
 	JPAContainer<PlanoAcesso> container_plano;
+	JPAContainer<PlanoAcesso> container_plano_bloqueio;
+	
 	public PlanosEditor(Item item, String title, boolean modal){
 		this.item = item;
 		
@@ -316,9 +318,7 @@ public class PlanosEditor extends Window implements GenericEditor {
 								if(validarNone == false){									
 									Notify.Show("Nome Já Cadastrado", Notify.TYPE_ERROR);
 								}						
-							}
-							
-							
+							}							
 						}
 					});
 					
@@ -664,6 +664,33 @@ public class PlanosEditor extends Window implements GenericEditor {
 						fieldGroup.bind(cbPlanoRenovacao, "plano_Renovacao");						
 					}
 		});
+		
+		vlRoot.addComponent(	new FormLayout(){					
+			{						
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");				
+				
+				container_plano_bloqueio = JPAContainerFactory.makeBatchable(PlanoAcesso.class, ConnUtil.getEntity());
+				container_plano_bloqueio.addContainerFilter(Filters.eq("status", "ATIVO"));
+								
+				ComboBox cbPlanoBloqueio = new ComboBox("Plano de Bloqueio",container_plano_bloqueio);
+				cbPlanoBloqueio.setRequired(true); 
+				cbPlanoBloqueio.addStyleName("caption-align-planos");				
+				cbPlanoBloqueio.addStyleName("align-currency");
+				cbPlanoBloqueio.setNullSelectionAllowed(false);						
+				cbPlanoBloqueio.setItemCaptionPropertyId("nome");
+				cbPlanoBloqueio.setConverter(new SingleSelectConverter(cbPlanoBloqueio));
+										
+				addComponent(cbPlanoBloqueio);
+										
+				fieldGroup.bind(cbPlanoBloqueio, "plano_bloqueio");						
+			}
+		});
+		
+		
+		
+		
 		vlRoot.addComponent(	new FormLayout(){					
 					{
 						
@@ -803,8 +830,7 @@ public class PlanosEditor extends Window implements GenericEditor {
 			public void buttonClick(ClickEvent event) {
 				if(fieldGroup.isValid() && rateValid == true && sTimeOutValid == true && kTimeOutValid == true && iTimeOutValid == true && validarNone == true){
 					try {
-						//item.getItemProperty("contrato_acesso").setValue(new ContratosAcesso(Integer.parseInt(
-						//		cb.getItem(cb.getValue()).getItemProperty("id").getValue().toString())));
+						
 						fieldGroup.commit();				
 						fireEvent(new PlanoEvent(getUI(), item, true));
 						

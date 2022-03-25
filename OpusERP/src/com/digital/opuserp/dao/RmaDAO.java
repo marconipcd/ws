@@ -40,7 +40,8 @@ public class RmaDAO {
 	
 	public static void removeItensRma(Integer rma){
 		try{
-			List<RmaDetalhe> itens = getItensRma(rma);
+			RmaMestre rma1 = findRMA(rma);
+			List<RmaDetalhe> itens = getItensRma(rma1);
 			
 			EntityManager em = ConnUtil.getEntity();
 			
@@ -239,7 +240,7 @@ public class RmaDAO {
 		}		
 	}
 	
-	public static List<RmaDetalhe> getItensRma(Integer rma){
+	public static List<RmaDetalhe> getItensRma(RmaMestre rma){
 		EntityManager em = ConnUtil.getEntity();
 		
 		Query q = em.createQuery("select r from RmaDetalhe r where r.rma_mestre_id =:rma", RmaDetalhe.class);

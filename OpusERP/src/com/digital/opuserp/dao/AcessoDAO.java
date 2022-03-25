@@ -778,7 +778,7 @@ public class AcessoDAO {
 	 * 	8- Desconecta cliente do concentrador
 	 * 	9- Gera logs
 	 */
-	public static boolean alteraPlano(AcessoCliente contrato, PlanoAcesso planoNovo, NfeMestre nfe, String InstGratis){
+	public static boolean alteraPlano(AcessoCliente contrato, PlanoAcesso planoNovo, NfeMestre nfe, String InstGratis, boolean isBoletoAdiantado){
 		
 		EntityManager em = ConnUtil.getEntity();
 		Date dataNfe;
@@ -799,6 +799,11 @@ public class AcessoDAO {
 				if(planoNovo.getId() != planoAntigo.getId()){
 					apagarBoletos = true;
 				}
+				
+				//Condição de boleto adiantado com planos de mesmo valor
+				//if(!recalcular_boletos){
+				//	apagarBoletos = false;
+				//}
 														
 				String excluirBoletosExistentes = null;
 				if(apagarBoletos){
@@ -825,12 +830,17 @@ public class AcessoDAO {
 				
 				//Retira permissao de downgrad
 				contrato.setN_controla_vlr_plano(false);	
-				
-				
+								
 					if(!contrato.getContrato().getTipo_contrato().equals("GRATIS")){
 						
 						List<ContasReceber> resConta = ContasReceberDAO.buscarTitulosNaoVencidosDeAcessoPorContrato(contrato.getId());		
-						ContasReceber proximoBoleto = resConta.get(0);
+						ContasReceber proximoBoleto = null;
+						
+						if(isBoletoAdiantado){
+							proximoBoleto = resConta.get(1);
+						}else{
+							proximoBoleto = resConta.get(0);
+						}
 												
 						DateTime dtProx = new DateTime(proximoBoleto.getData_vencimento()).plusMonths(1);
 						Date dtVencimentoBoleto = dtProx.toDate();
@@ -846,8 +856,8 @@ public class AcessoDAO {
 						String valorBoleto = "";			
 						valorBoleto = CredenciaisAcessoDAO.calcDiferencaValorPlano(contrato.getId(), planoNovo.getId());	
 				
+						List<ContasReceber> boletosAbertosNaoVencidos = ContasReceberDAO.buscarTitulosAbertosNaoVencidosDeAcessoPorContrato(contrato.getId());
 						if(excluirBoletosExistentes != null && excluirBoletosExistentes.equals("SIM")){							
-							List<ContasReceber> boletosAbertosNaoVencidos = ContasReceberDAO.buscarTitulosAbertosNaoVencidosDeAcessoPorContrato(contrato.getId());
 							
 							if(boletosAbertosNaoVencidos != null){
 								Integer i = 1;
@@ -891,10 +901,20 @@ public class AcessoDAO {
 									i++;
 								}
 							}						
+						}else{
+//							if(!recalcular_boletos){
+//								for (ContasReceber contasReceber : boletosAbertosNaoVencidos) {
+//									contasReceber.setPlano_contrato(planoNovo.getId());
+//									em.merge(contasReceber);
+//								}
+//							}
 						}
 												
 						contrato.setData_venc_contrato(CredenciaisAcessoDAO.calcularDataVencContrato(contrato.getContrato().getId(), dtVencimentoBoleto));				
-						CredenciaisAcessoDAO.gerarBoletosAcesso(contrato.getCliente().getId(),contrato, contrato.getContrato(), planoNovo, dtVencimentoBoleto, valorBoleto,"ALTERAR_PLANO");	
+						
+						//if(recalcular_boletos){
+						CredenciaisAcessoDAO.gerarBoletosAcesso(contrato.getCliente().getId(),contrato, contrato.getContrato(), planoNovo, dtVencimentoBoleto, valorBoleto,"ALTERAR_PLANO");
+						//}
 					}
 					
 					String carencia = "";

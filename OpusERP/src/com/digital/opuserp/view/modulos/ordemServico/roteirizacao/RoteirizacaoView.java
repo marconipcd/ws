@@ -521,19 +521,23 @@ public class RoteirizacaoView extends VerticalLayout {
 			@Override
 			public Object generateCell(Table source, Object itemId, Object columnId) {
 
-				//Image img = new Image(null, new ThemeResource("icons/check-32-inative.png"));
+				EntityItem<Ose> entityItem_ose = (EntityItem<Ose>)source.getItem(itemId);
+				if(entityItem_ose != null && entityItem_ose.getEntity() != null && entityItem_ose.getEntity().getGrupo() != null && 
+						entityItem_ose.getEntity().getGrupo().isUpload_obrigatorio()){
 				
-				if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue() != null){		
-					
-					if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString().equals("0")){
-						return "";
+					if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue() != null){		
+						
+						if(source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString().equals("0")){
+							return "";
+						}else{					
+							return source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString();
+						}
 					}else{					
-						return source.getItem(itemId).getItemProperty("arquivo_upload").getValue().toString();
+						return new Label("<div style='text-align:center;width: 100%;color: red;font-size: 14px;font-weight: bold;'>!</div>",ContentMode.HTML);					
 					}
-				}else{					
-					return new Label("<div style='text-align:center;width: 100%;color: red;font-size: 14px;font-weight: bold;'>!</div>",ContentMode.HTML);					
+				}else{
+					return "";
 				}
-				
 			}
 		});
 		
@@ -569,6 +573,7 @@ public class RoteirizacaoView extends VerticalLayout {
 		tb.setVisibleColumns(new Object[] {"id","Up","P","data_ex","turno","grupo.nome","subgrupo.nome","tipo_subgrupo.nome","cto.identificacao","cliente.nome_razao","end.cidade","end.bairro",
 				"equipe","tecnico","veiculo_id.cod_veiculo","obs","concentrador","base","plano","material","valor","status","data_conclusao","tempo_atendimento","tempo_total_atendimento","contrato.regime"});
 		
+		//tb.setVisi
 			
 		tb.setColumnHeader("id", "OS");
 		tb.setColumnHeader("contrato.regime", "Regime");		

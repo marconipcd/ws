@@ -31,7 +31,6 @@ import com.digital.opuserp.view.modulos.relatorio.SearchParameters;
 import com.digital.opuserp.view.modulos.relatorio.Pedido.NovoRelatorioPedido.AddFiltroPedidoEvent;
 import com.digital.opuserp.view.modulos.relatorio.Pedido.NovoRelatorioPedido.RelatorioPedidoEvent;
 import com.digital.opuserp.view.modulos.relatorio.Pedido.SalvarRelatorioPedidoEditor.SalvarRelatorioPedidoEvent;
-import com.digital.opuserp.view.modulos.relatorio.Rma.NovoRelatorioRma.AddFiltroRmaEvent;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Cursor;
