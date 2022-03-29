@@ -538,9 +538,7 @@ public class FichaCegaView extends VerticalLayout {
 									
 									if(cod_loja == null && OpusERP4UI.getEmpresa().getId() != 6&& OpusERP4UI.getEmpresa().getId() != 4){
 										
-										String cod = itemProduto.getEntity().getId().toString();
-																			
-										
+										String cod = itemProduto.getEntity().getId().toString();															
 									}
 									
 
