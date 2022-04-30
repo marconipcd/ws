@@ -4455,7 +4455,9 @@ public class ContratoAcessoView extends VerticalLayout {
 								if(event.isConfirm()){
 									EntityItem<AcessoCliente> eiContrato = (EntityItem<AcessoCliente>) tb.getItem(tb.getValue());
 									ArquivosContratoDAO.removerPendencia(eiContrato.getEntity());
-									refresh();									
+									refresh();		
+									
+									AlteracoesContratoDAO.save(new AlteracoesContrato(null, "REMOCAO DE PENDÊNCIAS", eiContrato.getEntity(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
 								}
 							}
 						});

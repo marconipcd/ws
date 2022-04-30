@@ -1797,14 +1797,17 @@ public class FichaCliente implements StreamSource {
 				tbform.setSpacingAfter(10);
 				
 				doc.add(tbform);
-				
-						
+										
 				float vlBoletoAberto = 0;
 				float vlBoletoPago = 0;
 				float vlBoletoVencido = 0;
+				float vlBoletoaVencer = 0;
+				
 				Integer boletosAbertos = 0;
 				Integer boletosFechado = 0;
 				Integer boletosVencido = 0;
+				Integer boletosNegativado = 0;
+				
 				Integer diasEmAtrazo   = 0;
 				Float mediaDiasATZ = null;		
 				Integer dias1 = 0;
@@ -1997,15 +2000,15 @@ public class FichaCliente implements StreamSource {
 							 boletosFechado ++;	
 						 }
 		 
-						 if(contRe.getStatus().equals("ABERTO")){
-							 boletosAbertos ++;		
-							 vlBoletoAberto = vlBoletoAberto+Float.parseFloat(Real.formatStringToDB(contRe.getValor_titulo()));	
-						 }
-						 
 						 DateTime dt1 = new DateTime(contRe.getData_vencimento());
 						 DateTime dt2 = new DateTime(contRe.getData_pagamento());
 						 
-						 if(new DateTime(new Date()).compareTo(dt1) > 0 && contRe.getStatus().equals("ABERTO")){
+						 if(contRe.getStatus().equals("ABERTO") && new DateTime(new Date()).compareTo(dt1) <= 0){
+							 boletosAbertos ++;		
+							 vlBoletoaVencer = vlBoletoaVencer+Float.parseFloat(Real.formatStringToDB(contRe.getValor_titulo()));	
+						 }
+						 
+						 if(new DateTime(new Date()).compareTo(dt1) > 0 && contRe.getStatus().equals("ABERTO") || contRe.getStatus().equals("NEGATIVADO")){
 							 boletosVencido++;
 							 vlBoletoVencido = vlBoletoVencido+Float.parseFloat(Real.formatStringToDB(contRe.getValor_titulo()));	
 						 }
@@ -2210,9 +2213,16 @@ public class FichaCliente implements StreamSource {
 					StringBuilder Sbresumo= new StringBuilder();
 					StringBuilder Sbresumovl= new StringBuilder();
 					
-					Sbresumo.append("BOLETOS A RECEBER (R$):"+"\n"+"BOLETOS PAGOS (R$):"+"\n"+"BOLETOS VENCIDOS (R$):"+"\n"+"MÉDIAS DE DIAS EM ATRAZO:");			
-					Sbresumovl.append(Real.formatDbToString(String.valueOf(vlBoletoAberto))+"\n"+Real.formatDbToString(String.valueOf(vlBoletoPago))+"\n"+
-					Real.formatDbToString(String.valueOf(vlBoletoVencido))+"\n"+Real.formatDbToString(String.valueOf(mediaDiasAT)));
+					
+					Sbresumo.append(							
+						    "BOLETOS PAGOS (R$):"+"\n"+
+							"BOLETOS A VENCER (R$):"+"\n"+
+							"BOLETOS VENCIDOS (R$):");		
+					
+					Sbresumovl.append(							
+							Real.formatDbToString(String.valueOf(vlBoletoPago))+"\n"+					
+					        Real.formatDbToString(String.valueOf(vlBoletoaVencer))+"\n"+
+					        Real.formatDbToString(String.valueOf(vlBoletoVencido)));
 					
 					Paragraph resumo = new Paragraph(Sbresumo.toString(),fCab);
 					resumo.setAlignment(Element.ALIGN_LEFT);

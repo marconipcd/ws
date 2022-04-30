@@ -705,6 +705,7 @@ public class PermissoesGeraisEditor extends Window {
 				tbPermissao.addItem(new Object[]{"Excluir arquivo"}, new Integer(15));
 				tbPermissao.addItem(new Object[]{"Visualizar arquivo"}, new Integer(16));
 				tbPermissao.addItem(new Object[]{"Arquivar"}, new Integer(17));
+				tbPermissao.addItem(new Object[]{"Solicitar Mudanca Endereco"}, new Integer(18));
 			}else if(submodulo.equals("Planos de Manutenção")){
 				tbPermissao.addItem(new Object[]{"Cadastrar"}, new Integer(1));
 				tbPermissao.addItem(new Object[]{"Editar"}, new Integer(2));			

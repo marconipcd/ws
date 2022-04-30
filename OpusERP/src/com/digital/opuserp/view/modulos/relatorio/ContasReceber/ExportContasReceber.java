@@ -1115,6 +1115,8 @@ public class ExportContasReceber implements StreamSource {
 			filtro = "NOSSO N.";			
 		}else if(s.equals("n_numero_sicred")){
 			filtro = "NOSSO N. SICRED";			
+		}else if(s.equals("transacao_gerencianet")){
+			filtro = "TRANSACAO GERENCIANET";			
 		}else if(s.equals("valor_titulo")){
 			filtro = "VALOR R$";			
 		}else if(s.equals("valor_pagamento")){
@@ -1173,6 +1175,8 @@ public class ExportContasReceber implements StreamSource {
 			filtro = "NOSSO NÚMERO";			
 		}else if(s.equals("n_numero_sicred")){
 			filtro = "NOSSO NÚMERO SICRED";			
+		}else if(s.equals("transacao_gerencianet")){
+			filtro = "TRANSACAO GERENCIANET";			
 		}else if(s.equals("valor_titulo")){
 			filtro = "VALOR R$";			
 		}else if(s.equals("valor_pagamento")){
@@ -1234,6 +1238,8 @@ public class ExportContasReceber implements StreamSource {
 			filtro = "n_numero";			
 		}else if(s.equals("Nosso Número Sicred")){
 			filtro = "n_numero_sicred";			
+		}else if(s.equals("Transacao GerenciaNet")){
+			filtro = "transacao_gerencianet";			
 		}else if(s.equals("Valor do Título")){
 			filtro = "valor_titulo";			
 		}else if(s.equals("Valor Título")){

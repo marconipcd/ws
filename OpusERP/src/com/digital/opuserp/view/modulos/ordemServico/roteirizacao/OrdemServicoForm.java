@@ -129,6 +129,7 @@ public class OrdemServicoForm implements StreamSource {
 			Font fConteudoBold = new Font(FontFamily.HELVETICA, 7, Font.BOLD);
 			Font fTitulo  = new Font(FontFamily.HELVETICA, 12, Font.BOLD);
 			Font fSubTitulo  = new Font(FontFamily.HELVETICA, 10, Font.BOLD);
+			Font fSubTituloSemBold  = new Font(FontFamily.HELVETICA, 10);
 			Font fCab = new Font(FontFamily.HELVETICA, 8);
 			
 			
@@ -2302,8 +2303,6 @@ public class OrdemServicoForm implements StreamSource {
 			tbInfoAdd.addCell(pCell_logo); 
 			tbInfoAdd.addCell(getPdfCell3("INFORMAÇÕES ADICIONAIS", Element.ALIGN_CENTER, fTitulo, false, 5));
 			
-			
-			
 			PdfPCell pCell_Foto1 = new PdfPCell();
 			pCell_Foto1.setPadding(20);
 			pCell_Foto1.addElement(new Paragraph("Anexo1\n\n\n\n\n\n\n\n"));
@@ -2337,14 +2336,58 @@ public class OrdemServicoForm implements StreamSource {
 					fCampo, false, 5,20));
 			
 			
-			
-			
-			
 			doc.newPage();
 			doc.add(tbOrdemServicoTitulo);
 			doc.add(tbInfoAdd);
 			doc.add(tbUtiEsp);
 			doc.add(tbAssinatura1);
+			
+			
+			///////-------------------QUARTA---PÁGINA----------
+			Image imgLogo4 = Image.getInstance(logo);
+			PdfPCell pCell_logo4 = new PdfPCell();
+			pCell_logo4.setBorderWidthLeft(0);
+			pCell_logo4.addElement(imgLogo4); 
+					
+			PdfPTable tbOrdemServicoTitulo2 = new PdfPTable(new float[]{1f});
+			tbOrdemServicoTitulo2.setWidthPercentage(100f);
+			tbOrdemServicoTitulo2.addCell(getPdfCell2("ORDEM DE SERVIÇO Nº "+cod, Element.ALIGN_CENTER, fTitulo, false, 5));
+			
+			PdfPTable tbInfoAdd2 = new PdfPTable(new float[]{0.70f,1f});
+			tbInfoAdd2.setWidthPercentage(100f);
+			tbInfoAdd2.addCell(pCell_logo); 
+			tbInfoAdd2.addCell(getPdfCell3("DIAGRAMA DE REDE", Element.ALIGN_CENTER, fTitulo, false, 5));
+													
+			PdfPTable tbUtiEsp2 = new PdfPTable(new float[]{1f});
+			tbUtiEsp2.setSpacingBefore(8f);
+			tbUtiEsp2.setWidthPercentage(100f);
+								
+			PdfPCell p_cell_custom = new PdfPCell();
+			p_cell_custom.setPaddingBottom(540);
+			p_cell_custom.addElement(new Paragraph("UTILIZE ESTE ESPAÇO PARA DESENHAR O DIAGRAMA DA REDE INTERNA DO CLIENTE"
+					+ " REFERENTE A ESTA ORDEM DE SERVIÇO \n",fCampo));
+			
+			p_cell_custom.addElement(new Paragraph("\n",fSubTitulo));
+			p_cell_custom.addElement(new Paragraph("       Informações necessárias: \n",fSubTituloSemBold));
+			p_cell_custom.addElement(new Paragraph("       [  ] Cômodos que possuem dispositivos fixos \n",fSubTituloSemBold));
+			p_cell_custom.addElement(new Paragraph("       [  ] Ativos de rede \n",fSubTituloSemBold));
+			p_cell_custom.addElement(new Paragraph("       [  ] Dispositivos fixos do assinante \n",fSubTituloSemBold));
+			p_cell_custom.addElement(new Paragraph("       [  ] Forma de conexão de cada dispositivo fixo \n",fSubTituloSemBold));
+								
+			tbUtiEsp2.addCell(p_cell_custom);
+		
+			PdfPTable tbAssinatura2 = new PdfPTable(new float[]{1f});
+			tbAssinatura2.setSpacingBefore(8f);
+			tbAssinatura2.setWidthPercentage(100f);
+			tbAssinatura2.addCell(getPdfCell4("_________________________________________________    \n Assinatura do Cliente ou Preposto    ", Element.ALIGN_RIGHT, 
+					fCampo, false, 5,20));
+			
+								
+			doc.newPage();
+			doc.add(tbOrdemServicoTitulo2);
+			doc.add(tbInfoAdd2);
+			doc.add(tbUtiEsp2);
+			doc.add(tbAssinatura2);
 			
 		} finally {
 			if (doc.isOpen() && doc != null) {
