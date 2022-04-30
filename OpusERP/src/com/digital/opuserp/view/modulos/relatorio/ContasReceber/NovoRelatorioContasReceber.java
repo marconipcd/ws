@@ -623,6 +623,7 @@ public class NovoRelatorioContasReceber extends Window {
 		cbFiltro.addItem("Controle");
 		cbFiltro.addItem("Número do Documento");
 		cbFiltro.addItem("Nosso Número");
+		cbFiltro.addItem("Transacao GerenciaNet");
 		cbFiltro.addItem("Data de Emissão");
 		cbFiltro.addItem("Valor Título");
 		cbFiltro.addItem("Data de Vencimento");
@@ -738,6 +739,8 @@ public class NovoRelatorioContasReceber extends Window {
 			filtro = "n_doc";			
 		}else if(s.equals("Nosso Número")){
 			filtro = "n_numero";			
+		}else if(s.equals("Transacao GerenciaNet")){
+			filtro = "transacao_gerencianet";			
 		}else if(s.equals("Valor Título")){
 			filtro = "valor_titulo";			
 		}else if(s.equals("Valor Pago")){
@@ -791,6 +794,8 @@ public class NovoRelatorioContasReceber extends Window {
 			filtro = "Número do Documento";			
 		}else if(s.equals("n_numero")){
 			filtro = "Nosso Número";			
+		}else if(s.equals("transacao_gerencianet")){
+			filtro = "Transacao GerenciaNet";			
 		}else if(s.equals("valor_titulo")){
 			filtro = "Valor Título";			
 		}else if(s.equals("valor_pagamento")){

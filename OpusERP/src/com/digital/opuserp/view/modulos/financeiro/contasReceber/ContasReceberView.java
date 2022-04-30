@@ -22,7 +22,6 @@ import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 
 import org.cups4j.CupsPrinter;
@@ -128,6 +127,9 @@ import com.vaadin.ui.Window.CloseEvent;
 public class ContasReceberView extends VerticalLayout {
 
 	//JPAContainer<Child> container;
+	
+	//String endereco_ip = "172.17.0.13";
+	String endereco_ip = "172.17.0.90";
 	
 	TreeTable tb;
 	TextField tfBusca;
@@ -1340,67 +1342,92 @@ public class ContasReceberView extends VerticalLayout {
 					
 				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Negativar"))				
 				{
-					NegativarTituloEditor gd = new NegativarTituloEditor("Negativar Título(s)",true);
-					gd.addListerner(new NegativarTituloEditor.NegativarTituloListerner() {
-						
-						@Override
-						public void onClose(NegativarTituloEvent event) {
-							if(event.isConfirm()){								
+					final Set<Object> selecteds = (Set<Object>)tb.getValue();
+					
+						if(selecteds.size() == 1){
+							
+								boolean check_datas = false;
 								
-								
-									EntityManager em = ConnUtil.getEntity();						
-									
-									
-									
-									try {
-									
-										final Set<Object> selecteds = (Set<Object>)tb.getValue();
-										em.getTransaction().begin();
-										for (Object object : selecteds) {
-											
+							    ContasReceber cr = ContasReceberDAO.find(Integer.parseInt(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cod.").getValue().toString()));
+							    if(cr.getN_doc().split("-")[1].equals("01/12") ){
+								    String cod_contrato = cr.getN_doc().split("-")[0].split("/")[0];
+								    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
+								    Date data_instalacao = contrato.getData_instalacao();
+								    Date data_vencimento = cr.getData_vencimento();
+								    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
+								    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
+								    
+								    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
+								    	check_datas = true;
+								    }
+							    }
+							    
+							    if(check_datas){
+							    	Notify.Show("Não é possível negativar esse boleto, consulte o Jurídico", Notify.TYPE_WARNING);
+							    }else{
+							    
+									NegativarTituloEditor gd = new NegativarTituloEditor("Negativar Título(s)",true);
+									gd.addListerner(new NegativarTituloEditor.NegativarTituloListerner() {
+										
+										@Override
+										public void onClose(NegativarTituloEvent event) {
+											if(event.isConfirm()){								
 												
-												ContasReceber cr = em.find(ContasReceber.class, Integer.parseInt(tb.getItem(object).getItemProperty("Cod.").getValue().toString()));
-												cr.setStatus(event.getStatusNegativado());
-												em.merge(cr);	
-												em.merge((new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date())));
-												//AlteracoesContasReceberDAO.save(new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
-
+												
+													EntityManager em = ConnUtil.getEntity();						
+													
+													
+													
+													try {
+													
+														em.getTransaction().begin();
+														for (Object object : selecteds) {
+															
+																
+																ContasReceber cr = em.find(ContasReceber.class, Integer.parseInt(tb.getItem(object).getItemProperty("Cod.").getValue().toString()));
+																cr.setStatus(event.getStatusNegativado());
+																em.merge(cr);	
+																em.merge((new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date())));
+																//AlteracoesContasReceberDAO.save(new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+				
+														}
+														
+														em.getTransaction().commit();
+														tfBusca.setValue(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cliente").getValue().toString());
+														refresh(tfBusca.getValue());										
+														Notification.show("Boleto(s) Negativado com Sucesso !");
+														
+														LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Negativou um ou Mais Boleto(s)"));
+													
+													} catch (Exception e) {
+														
+														if(em.getTransaction().isActive()){
+															em.getTransaction().rollback();
+														}
+														
+														Notification.show("Não foi Possivel Concluir a Negativado de Boleto(s)");
+														//e.printStackTrace();
+													}			
+													
+													
+												
+											}
 										}
-										
-										em.getTransaction().commit();
-										tfBusca.setValue(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cliente").getValue().toString());
-										refresh(tfBusca.getValue());										
-										Notification.show("Boleto(s) Negativado com Sucesso !");
-										
-										LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Negativou um ou Mais Boleto(s)"));
+									});
 									
-									} catch (Exception e) {
+									
+									gd.addCloseListener(new Window.CloseListener() {
 										
-										if(em.getTransaction().isActive()){
-											em.getTransaction().rollback();
+										@Override
+										public void windowClose(CloseEvent e) {						
+											tb.focus();						
 										}
-										
-										Notification.show("Não foi Possivel Concluir a Negativado de Boleto(s)");
-										//e.printStackTrace();
-									}			
+									});
 									
-									
+									getUI().addWindow(gd);
 								
-							}
-						}
-					});
-					
-					
-					gd.addCloseListener(new Window.CloseListener() {
-						
-						@Override
-						public void windowClose(CloseEvent e) {						
-							tb.focus();						
-						}
-					});
-					
-					getUI().addWindow(gd);
-					
+								}
+						}		
 					}else{
 						Notification.show("Atenção", "Você não Possui Permissão para Negativar um Boleto", Type.ERROR_MESSAGE);
 					}
@@ -1539,6 +1566,11 @@ public class ContasReceberView extends VerticalLayout {
 										@Override
 										public void onClose(BaixarTituloEvent event) {
 											if(event.isConfirm()){
+												
+												if(ContasReceberDAO.find(codContaReceber).getStatus().equals("NEGATIVADO|AVALISTA")){
+													Notification.show("ATENÇÃO", "Em caso de protesto o avalista precisa ser removido!", Type.WARNING_MESSAGE);
+												}
+												
 																					
 												//Baixa Boleto
 												boolean check = ContasReceberDAO.baixarBoletoProcessoCompleto(codContaReceber, event.getValor(),"0,00","0,00", event.getFormaPgto(), "manual", new Date(), new Date(), event.getValor_recebido(), event.getValor_troco());	
@@ -1919,7 +1951,7 @@ public class ContasReceberView extends VerticalLayout {
 					
 					if(tb.getItem(o).getItemProperty("Cod.").getValue() != null){
 						String cod_boleto = tb.getItem(o).getItemProperty("Cod.").getValue().toString();					
-						links.add("URLhttp://172.17.0.13/boletoSemCodigo/index.php?b="+cod_boleto);
+						links.add("URLhttp://"+endereco_ip+"/boletoSemCodigo/index.php?b="+cod_boleto);
 					}
 				}
 				
@@ -1931,7 +1963,7 @@ public class ContasReceberView extends VerticalLayout {
 						urls += s;
 					}
 					
-					final String url = "http://172.17.0.13/boletoSemCodigo/montarBoletos.php?url="+urls;
+					final String url = "http://"+endereco_ip+"/boletoSemCodigo/montarBoletos.php?url="+urls;
 
 					Window wVideo  = new Window("Imprimir boletos");
 			        wVideo.setResizable(false); 
@@ -1997,7 +2029,7 @@ public class ContasReceberView extends VerticalLayout {
 					if(boleto.getTransacao_gerencianet() != null && !boleto.getTransacao_gerencianet().equals("")){
 						
 						if(boleto.getN_numero_gerencianet() != null && !boleto.getN_numero_gerencianet().equals("")){
-							links.add("URLhttp://172.17.0.13/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
+							links.add("URLhttp://"+endereco_ip+"/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
 						}else{
 							//Pegar a URL
 							String detalhes = detalharTransacao(boleto.getTransacao_gerencianet());
@@ -2007,7 +2039,7 @@ public class ContasReceberView extends VerticalLayout {
 								em.merge(boleto);
 								em.getTransaction().commit();
 								
-								links.add("URLhttp://172.17.0.13/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
+								links.add("URLhttp://"+endereco_ip+"/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
 							}
 						}
 					}else{
@@ -2034,7 +2066,7 @@ public class ContasReceberView extends VerticalLayout {
 				            String vencimento = sdf.format(boleto.getData_vencimento());
 				            String codBoleto = boleto.getId().toString();
 				            
-				            String url = "http://172.17.0.13/boleto/api.php";
+				            String url = "http://"+endereco_ip+"/boleto/api.php";
 		
 				            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 		
@@ -2094,7 +2126,7 @@ public class ContasReceberView extends VerticalLayout {
 				    	        em.merge(boleto);
 				    	        em.getTransaction().commit();
 				    	        
-				    	        links.add("URLhttp://172.17.0.13/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
+				    	        links.add("URLhttp://"+endereco_ip+"/boletoNovo/boletoUnico.php?url2="+boleto.getN_numero_gerencianet());
 				    	        
 				            }
 		            
@@ -2111,7 +2143,7 @@ public class ContasReceberView extends VerticalLayout {
 						urls += s;
 					}
 					
-					final String url = "http://172.17.0.13/boletoNovo/pegaCodigoHtml2.php?url="+urls;
+					final String url = "http://"+endereco_ip+"/boletoNovo/pegaCodigoHtml2.php?url="+urls;
 
 					Window wVideo  = new Window("Imprimir boletos");
 			        wVideo.setResizable(false); 
@@ -2324,7 +2356,7 @@ public class ContasReceberView extends VerticalLayout {
 		
 				try{
 					
-		            String url = "http://172.17.0.13/boleto/marcarComoPago.php";
+		            String url = "http://"+endereco_ip+"/boleto/marcarComoPago.php";
 
 		            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 
@@ -2393,7 +2425,7 @@ public class ContasReceberView extends VerticalLayout {
 		
 				try{
 					
-		            String url = "http://172.17.0.13/boleto/alterarVencimento.php";
+		            String url = "http://"+endereco_ip+"/boleto/alterarVencimento.php";
 
 		            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 
@@ -2461,7 +2493,7 @@ public class ContasReceberView extends VerticalLayout {
 			
 			try{
 				
-	            String url = "http://172.17.0.13/boleto/detalhesTransacao.php";
+	            String url = "http://"+endereco_ip+"/boleto/detalhesTransacao.php";
 
 	            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 
@@ -2599,7 +2631,7 @@ public class ContasReceberView extends VerticalLayout {
 		
 				try{
 					
-		            String url = "http://172.17.0.13/boleto/testeCancelamentoTransacao.php";
+		            String url = "http://"+endereco_ip+"/boleto/testeCancelamentoTransacao.php";
 
 		            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 
@@ -2665,7 +2697,7 @@ public class ContasReceberView extends VerticalLayout {
 		
 				try{
 					
-		            String url = "http://172.17.0.13/boleto/testeCancelamentoTransacao.php";
+		            String url = "http://"+endereco_ip+"/boleto/testeCancelamentoTransacao.php";
 
 		            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
 

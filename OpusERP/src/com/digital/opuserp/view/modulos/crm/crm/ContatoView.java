@@ -143,6 +143,7 @@ public class ContatoView extends VerticalLayout{
 			hlButons.addComponent(BuildbtLog());
 			
 			
+			
 			addComponent(hlButons);
 			setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
 			

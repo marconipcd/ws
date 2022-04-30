@@ -864,6 +864,64 @@ public class RoteirizacaoView extends VerticalLayout {
         winSubDocumentos.setPositionY(event.getClientY() - event.getRelativeY());
         winSubDocumentos.setCloseShortcut(KeyCode.ESCAPE, null);
         
+        Button btSubImpSoliMudanEnder = new Button("Imprimir Solicitação de mudança de endereço", new Button.ClickListener() {
+			
+			public void buttonClick(ClickEvent event) {
+						if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, 
+								OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Solicitar Mudanca Endereco"))				
+						{
+						
+							final Set<Object> selecteds = (Set<Object>)tb.getValue();
+							
+							if(selecteds.size() == 1){
+							
+								EntityItem<Ose> eiOse =(EntityItem<Ose>)tb.getItem(selecteds.toArray()[0]);
+								Integer cod  = Integer.parseInt(tb.getItem(selecteds.toArray()[0]).getItemProperty("id").getValue().toString());
+								
+								try {
+									//-----INSTANCIA UMA NOVA JANELA E ADICIONA SUAS PROPRIEDADES
+									Window win = new Window("Protocolo de Roterização");
+									win.setWidth("800px");
+									win.setHeight("600px");
+									win.setResizable(true);
+									win.center();
+									win.setModal(true);
+									win.setStyleName("disable_scroolbar");
+									
+									StreamResource resource;
+									//resource = new StreamResource(new ExportProtocolo(cod), "ORDEM DE SERVICO "+String.valueOf(cod)+".pdf");
+									resource = new StreamResource(new FormSolicMudanEndere(cod), "SOLICITACAO MUDANCA ENDERECO "+String.valueOf(cod)+"-"+eiOse.getEntity().getCliente().getNome_razao()+".pdf");
+									resource.getStream();
+									resource.setMIMEType("application/pdf");
+									resource.setCacheTime(0);
+									
+									Embedded e = new Embedded();
+									e.setSizeFull();
+									e.setType(Embedded.TYPE_BROWSER);
+									e.setSource(resource);
+									
+									win.setContent(e);
+									getUI().addWindow(win);								
+									
+									win.addCloseListener(new Window.CloseListener() {
+																			
+										public void windowClose(CloseEvent e) {
+											tb.focus();
+										}
+									});
+							
+								} catch (Exception e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
+					}else{
+						Notify.Show("Você não Possui Permissão para Visualizar Solicitação de mudança de endereço",Notify.TYPE_ERROR);
+					}				
+			}
+		});       
+        btSubImpSoliMudanEnder.setPrimaryStyleName("btSubMenu");
+                
         Button btSubImprimir = new Button("Imprimir Ordem de Serviço", new Button.ClickListener() {
 			
 			public void buttonClick(ClickEvent event) {
@@ -955,6 +1013,7 @@ public class RoteirizacaoView extends VerticalLayout {
 		btSubDocumentos.setPrimaryStyleName("btSubMenu");
 		                          
         l.addComponent(btSubImprimir);
+        l.addComponent(btSubImpSoliMudanEnder);
         l.addComponent(btSubDocumentos);        
 	}
 	
@@ -1185,7 +1244,8 @@ public class RoteirizacaoView extends VerticalLayout {
 					
 							
 							boolean check_pendencia_upload_contrato = true;
-							if(ose.getContrato() != null && ose.getContrato().isPendencia_upload()){
+							if(ose.getContrato() != null && ose.getContrato().isPendencia_upload() || 
+									ose.getContrato() != null && ose.getContrato().getArquivo_upload() == null){
 								check_pendencia_upload_contrato = false;
 							}
 					

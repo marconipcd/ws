@@ -31,6 +31,33 @@ import domain.RadReply;
 
 public class ContasReceberDAO {
 	
+	public static boolean retirarTransacaoBoleto(String transacao){
+		
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
+		EntityManager em = emf.createEntityManager();
+		
+		try{
+			
+			
+			Query q = em.createQuery("select c from ContasReceber c where c.transacao_gerencianet=:t", ContasReceber.class);
+			
+			q.setParameter("t", transacao);
+			
+			em.getTransaction().begin();
+			for (ContasReceber boleto : (List<ContasReceber>)q.getResultList()) {
+				boleto.setTransacao_gerencianet(null);
+				boleto.setN_numero_gerencianet(null);
+			}
+			em.getTransaction().commit();
+			
+			return true;
+		}catch(Exception e){
+			
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public static void gerarBoletosAcesso2(Integer codCliente, AcessoCliente contrato,String valorPrimeiroBoleto,String valorPlano, Date primeiroVenc, 
 			Integer qtd,String valorAdesao, String controle, Integer codPlano) throws Exception{
 		
@@ -386,6 +413,44 @@ public class ContasReceberDAO {
 			return false;
 		}
 		
+	}
+	
+	public static List<ContasReceber> procurarTodosBoletosDoAcessoPorContratoPorVenc(Integer codAcesso, String data1, String data2){
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
+		EntityManager em = emf.createEntityManager();
+
+
+		try{
+		String regexNova = "^"+codAcesso.toString()+"/[0-9]{2}-[0-9]{2}/[0-9]{2}";//1245/15-12/12
+		String regexAntiga = "^"+codAcesso.toString()+"/[0-9]{2}/[0-9]{2}";
+		String rProRata = codAcesso.toString()+"/PRORATA";
+		
+		Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
+							
+				"cr.n_doc REGEXP :rNova "+ "and cr.data_vencimento >=:dt1 and cr.data_vencimento <=:dt2 "+				
+				"or "+							
+				"cr.n_doc REGEXP :rAntiga " + "and cr.data_vencimento >=:dt1 and cr.data_vencimento <=:dt2 " +
+				"or "+
+				"cr.n_doc LIKE :rProrata " + "and cr.data_vencimento >=:dt1 and cr.data_vencimento <=:dt2 "
+				
+				, ContasReceber.class);
+			
+		qn.setParameter("rNova", regexNova);
+		qn.setParameter("rAntiga", regexAntiga);
+		qn.setParameter("rProrata", rProRata);
+		qn.setParameter("dt1", data1);
+		qn.setParameter("dt2", data2);
+		
+		if(qn.getResultList().size() > 0){
+			return qn.getResultList();
+		}else{
+			return null;
+		}
+		
+		}catch (Exception e){
+			e.printStackTrace();			
+			return null;
+		}
 	}
 	
 	

@@ -249,8 +249,9 @@ public class RelatorioContasReceberView extends VerticalLayout{
 		tb.setSelectable(true);
 		tb.setColumnCollapsingAllowed(true);
 		
-		tb.setVisibleColumns(new Object[]{"cliente.nome_razao","cliente.id","id","controle","n_doc","n_numero","n_numero_sicred","data_emissao","valor_titulo",
-				"data_vencimento","status","bloqueado","valor_pagamento","valor_lancamento","valor_tarifa","data_pagamento","forma_pgto","operador","tipo_baixa"});
+		tb.setVisibleColumns(new Object[]{"cliente.nome_razao","cliente.id","id","controle","n_doc","transacao_gerencianet","n_numero","n_numero_sicred",
+				"data_emissao","valor_titulo","data_vencimento","status","bloqueado","valor_pagamento","valor_lancamento","valor_tarifa",
+				"data_pagamento","forma_pgto","operador","tipo_baixa"});
 				
 		tb.setColumnHeader("cliente.nome_razao", "Cliente");
 		tb.setColumnHeader("cliente.id", "Cod. Cliente");
@@ -259,6 +260,7 @@ public class RelatorioContasReceberView extends VerticalLayout{
 		tb.setColumnHeader("n_doc", "N.Doc");
 		tb.setColumnHeader("n_numero", "Nosso N.");
 		tb.setColumnHeader("n_numero_sicred", "Nosso N. Sicred");
+		tb.setColumnHeader("transacao_gerencianet", "Transacao GerenciaNet");
 		tb.setColumnHeader("data_emissao", "Emissão");
 		tb.setColumnHeader("valor_titulo", "Valor");
 		tb.setColumnHeader("valor_lancamento", "Valor Lancamento");
@@ -407,6 +409,8 @@ public class RelatorioContasReceberView extends VerticalLayout{
 			filtro = "n_numero";			
 		}else if(s.equals("Nosso Número Sicred")){
 			filtro = "n_numero_sicred";			
+		}else if(s.equals("Transacao GerenciaNet")){
+			filtro = "transacao_gerencianet";			
 		}else if(s.equals("Valor Título")){
 			filtro = "valor_titulo";			
 		}else if(s.equals("Valor Pago")){

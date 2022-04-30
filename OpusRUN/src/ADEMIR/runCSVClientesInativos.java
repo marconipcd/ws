@@ -22,8 +22,8 @@ public class runCSVClientesInativos {
 			EntityManager em = emf.createEntityManager();
 		
 			Query q = em.createNativeQuery("SELECT * FROM clientes c WHERE EXISTS(SELECT * FROM acesso_cliente a WHERE  "
-					+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 230 AND a.STATUS_2 NOT LIKE 'ENCERRADO' OR "
-					+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 253 AND a.STATUS_2 NOT LIKE 'ENCERRADO')  ", Cliente.class);
+					+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 202 AND a.STATUS_2 NOT LIKE 'ENCERRADO' OR "
+					+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 254 AND a.STATUS_2 NOT LIKE 'ENCERRADO')  ", Cliente.class);
 
 			
 			List<Cliente> contratosEncerrado = q.getResultList();
@@ -33,7 +33,7 @@ public class runCSVClientesInativos {
 			sb.append(new String("Name,Given Name,Additional Name,Family Name,Yomi Name,Given Name Yomi,Additional Name Yomi,Family Name Yomi,Name Prefix,Name Suffix,Initials,Nickname,Short Name,Maiden Name,Birthday,Gender,Location,Billing Information,Directory Server,Mileage,Occupation,Hobby,Sensitivity,Priority,Subject,Notes,Group Membership,E-mail 1 - Type,E-mail 1 - Value,E-mail 2 - Type,E-mail 2 - Value,Phone 1 - Type,Phone 1 - Value,Phone 2 - Type,Phone 2 - Value,Phone 3 - Type,Phone 3 - Value,Website 1 - Type,Website 1 - Value"));
 			sb.append(System.getProperty("line.separator"));
 			
-			File f = new File("F:\\30MFibraUpEUltraMais.csv");
+			File f = new File("F:\\50mFibraUpUltraMais.csv");
 			BufferedWriter br = new BufferedWriter(new FileWriter(f));  
 			 					
 				if(f.canWrite()){
@@ -55,8 +55,8 @@ public class runCSVClientesInativos {
 								String tipo4 = cel4 != null ? "Celular" : "";
 									
 								Query q2 = em.createNativeQuery("select * from acesso_cliente a where "									
-										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=230  AND a.STATUS_2 NOT LIKE 'ENCERRADO' OR "
-										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=253  AND a.STATUS_2 NOT LIKE 'ENCERRADO' ",  AcessoCliente.class);
+										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=202  AND a.STATUS_2 NOT LIKE 'ENCERRADO' OR "
+										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=254  AND a.STATUS_2 NOT LIKE 'ENCERRADO' ",  AcessoCliente.class);
 								q2.setParameter("c", c);
 								
 								AcessoCliente contrato = null;

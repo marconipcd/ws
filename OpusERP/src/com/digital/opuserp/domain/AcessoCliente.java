@@ -28,11 +28,9 @@ public class AcessoCliente {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="ID", nullable=false, unique=false)
-	private Integer id;
-	
+	private Integer id;	
 	@Column(name="CODIGO_CARTAO", nullable=true, unique=true)
-	private String codigo_cartao;
-	
+	private String codigo_cartao;	
 	@Column(name="EMPRESA_ID", nullable=false, unique=false)
 	private Integer empresa_id;
 	@OneToOne
@@ -117,13 +115,11 @@ public class AcessoCliente {
 	@Column(name="INSTALACAO_GRATIS")
 	private String instalacao_gratis;	
 	@Column(name="NAO_CONTROLA_VLR_PLANO")
-	private boolean n_controla_vlr_plano;
-	
+	private boolean n_controla_vlr_plano;	
 	@Column(name="TEM_PENDENCIA")
 	private String tem_pendencia;
 	@Column(name="ULTIMA_PENDENCIA")
-	private String ultima_pendencia;
-	
+	private String ultima_pendencia;	
 	@Column(name="VALOR_ADESAO_POS_ENCERRAMENTO")
 	private String valor_adesao_pos_encerramento;
 	@Column(name="VALOR_EQUIPAMENTO_POS_ENCERRAMENTO")
@@ -132,24 +128,14 @@ public class AcessoCliente {
 	private String valor_instalacao_pos_encerramento;
 	@Column(name="VALOR_MULTA_POS_ENCERRAMENTO")
 	private String valor_multa_pos_encerramento;
-
 	@Column(name="VALOR_TOTAL_POS_ENCERRAMENTO")
-	private String valor_total_pos_encerramento;
-	
+	private String valor_total_pos_encerramento;	
 	@Transient
-	private Integer dias;
-	
+	private Integer dias;	
 	@Transient
-	private String cod_contrato;
-	
+	private String cod_contrato;	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date desbloqueio_tmp;
-	
-	
-	
-	
-//	@Transient
-//	private String vlr_carencia;
 	
 	@OneToOne
 	@JoinColumn(name="SWITH_ID", nullable=true)
@@ -165,23 +151,17 @@ public class AcessoCliente {
 	@Transient
 	private Date coluna_date;
 	@Transient
-	private Long qtd;
-	
+	private Long qtd;	
 	@Column(name="ITTV_ID")
-	private String ittv_id;
-	
+	private String ittv_id;	
 	@Column(name="U_ITTV")
-	private String u_ittv;
-	
+	private String u_ittv;	
 	@Column(name="S_ITTV")
-	private String s_ittv;
-	
+	private String s_ittv;	
 	@Column(name="ARQUIVO_UPLOAD")
-	private String arquivo_upload;
-	
+	private String arquivo_upload;	
 	@Column(name="PREST_SERV_MANUTENCAO")
-	private String prest_serv_manutecao;
-	
+	private String prest_serv_manutecao;	
 	@Column(name="PENDENCIA_UPLOAD")
 	private boolean pendencia_upload;
 	
@@ -618,119 +598,86 @@ public class AcessoCliente {
 	public void setCod_contrato(String cod_contrato) {
 		this.cod_contrato = getId().toString();
 	}
-
 	public String getValor_multa_pos_encerramento() {
 		return valor_multa_pos_encerramento;
 	}
-
 	public void setValor_multa_pos_encerramento(String valor_multa_pos_encerramento) {
 		this.valor_multa_pos_encerramento = valor_multa_pos_encerramento;
 	}
-
 	public String getValor_adesao_pos_encerramento() {
 		return valor_adesao_pos_encerramento;
 	}
-
 	public void setValor_adesao_pos_encerramento(
 			String valor_adesao_pos_encerramento) {
 		this.valor_adesao_pos_encerramento = valor_adesao_pos_encerramento;
 	}
-
 	public String getValor_equipamento_pos_encerramento() {
 		return valor_equipamento_pos_encerramento;
 	}
-
 	public void setValor_equipamento_pos_encerramento(
 			String valor_equipamento_pos_encerramento) {
 		this.valor_equipamento_pos_encerramento = valor_equipamento_pos_encerramento;
 	}
-
 	public String getValor_instalacao_pos_encerramento() {
 		return valor_instalacao_pos_encerramento;
 	}
-
 	public void setValor_instalacao_pos_encerramento(
 			String valor_instalacao_pos_encerramento) {
 		this.valor_instalacao_pos_encerramento = valor_instalacao_pos_encerramento;
 	}
-
 	public String getValor_total_pos_encerramento() {
 		return valor_total_pos_encerramento;
 	}
-
 	public void setValor_total_pos_encerramento(String valor_total_pos_encerramento) {
 		this.valor_total_pos_encerramento = valor_total_pos_encerramento;
 	}
-
 	public String getIttv_id() {
 		return ittv_id;
 	}
-
 	public void setIttv_id(String ittv_id) {
 		this.ittv_id = ittv_id;
 	}
-
 	public String getU_ittv() {
 		return u_ittv;
 	}
-
 	public void setU_ittv(String u_ittv) {
 		this.u_ittv = u_ittv;
 	}
-
 	public String getS_ittv() {
 		return s_ittv;
 	}
-
 	public void setS_ittv(String s_ittv) {
 		this.s_ittv = s_ittv;
 	}
-
 	public String getArquivo_upload() {
 		return arquivo_upload;
 	}
-
 	public void setArquivo_upload(String arquivo_upload) {
 		this.arquivo_upload = arquivo_upload;
 	}
-
 	public String getCodigo_cartao() {
 		return codigo_cartao;
 	}
-
 	public void setCodigo_cartao(String codigo_cartao) {
 		this.codigo_cartao = codigo_cartao;
 	}
-
 	public String getPrest_serv_manutecao() {
 		return prest_serv_manutecao;
 	}
-
 	public void setPrest_serv_manutecao(String prest_serv_manutecao) {
 		this.prest_serv_manutecao = prest_serv_manutecao;
 	}
-
 	public double getIsencao_prest_serv_manutencao() {
 		return isencao_prest_serv_manutencao;
 	}
-
 	public void setIsencao_prest_serv_manutencao(
 			double isencao_prest_serv_manutencao) {
 		this.isencao_prest_serv_manutencao = isencao_prest_serv_manutencao;
 	}
-
 	public boolean isPendencia_upload() {
 		return pendencia_upload;
 	}
-
 	public void setPendencia_upload(boolean pendencia_upload) {
 		this.pendencia_upload = pendencia_upload;
 	}
-
-	
-
-	
-	
-	
-	
 }
