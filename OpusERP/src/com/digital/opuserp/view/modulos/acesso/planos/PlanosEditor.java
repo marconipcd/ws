@@ -758,6 +758,29 @@ public class PlanosEditor extends Window implements GenericEditor {
 			}
 		});
 		
+		
+		vlRoot.addComponent(	new FormLayout(){					
+			{
+				
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+				
+				ComboBox cbPossuiAppParamount = new ComboBox("Possui Paramount");							
+				cbPossuiAppParamount.addStyleName("caption-align-planos");				
+				cbPossuiAppParamount.addStyleName("align-currency");
+				cbPossuiAppParamount.setNullSelectionAllowed(false);
+				cbPossuiAppParamount.setRequired(true);
+				cbPossuiAppParamount.addItem("SIM");
+				cbPossuiAppParamount.addItem("NAO");				
+				addComponent(cbPossuiAppParamount);
+				setExpandRatio(cbPossuiAppParamount, 2);
+				
+				fieldGroup.bind(cbPossuiAppParamount, "possui_appneo");
+				
+			}
+		});
+		
 		vlRoot.addComponent(	new FormLayout(){					
 			{
 				

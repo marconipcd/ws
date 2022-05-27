@@ -57,6 +57,8 @@ public class runGerarCrmBoletosAtrasados15Dias {
 					crm.setCrm_assuntos(new CrmAssunto(653));
 					crm.setCrm_formas_contato(new CrmFormasContato(15));
 					crm.setContato(boleto.getCliente().getContato());
+					crm.setEnd(contrato.getEndereco());
+					crm.setContrato(contrato); 
 					crm.setOrigem("ROTINA");
 					crm.setConteudo("BOLETO "+boleto.getId().toString()+" ATRASADO COM MAIS DE 15 DIAS.");
 					crm.setData_agendado(new Date());

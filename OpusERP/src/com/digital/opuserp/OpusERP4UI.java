@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,14 +14,8 @@ import java.util.Properties;
 
 import org.vaadin.addons.idle.Idle;
 
-import com.boletobancario.boletofacilsdk.BoletoFacil;
-import com.boletobancario.boletofacilsdk.enums.BoletoFacilEnvironment;
-import com.boletobancario.boletofacilsdk.model.entities.Charge;
-import com.boletobancario.boletofacilsdk.model.entities.Payer;
-import com.boletobancario.boletofacilsdk.model.response.ChargeResponse;
 import com.digital.opuserp.Broadcaster.BroadcastListener;
 import com.digital.opuserp.dao.AlertaPendenciaDAO;
-import com.digital.opuserp.dao.GerenciaNet;
 import com.digital.opuserp.dao.LogDAO;
 import com.digital.opuserp.dao.LogErrorDAO;
 import com.digital.opuserp.dao.LoginDAO;
@@ -63,7 +56,6 @@ import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -143,6 +135,8 @@ public class OpusERP4UI extends UI implements BroadcastListener {
     public static String SENHA_SAMBA = "managerdigi_SB@18";
     
     public static boolean mobile = false;
+    
+    public static boolean rodarComApi = false;
         	
 	@Override
 	protected void init(VaadinRequest request) {		

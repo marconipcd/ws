@@ -49,7 +49,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
 
-public class PlanosView extends VerticalLayout implements GenericView {
+public class PlanosView extends VerticalLayout{
 
 	JPAContainer<PlanoAcesso> container;
 	
@@ -77,8 +77,8 @@ public class PlanosView extends VerticalLayout implements GenericView {
 		
 		HorizontalLayout hlButons = new HorizontalLayout();
 		hlButons.addComponent(BuildbtTransferencia());
-		hlButons.addComponent(BuildbtAceitar());
-		hlButons.addComponent(BuildbtCancelar());
+		hlButons.addComponent(BuildbtEditar());
+		hlButons.addComponent(BuildbtExcluir());
 		
 		addComponent(hlButons);
 		setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
@@ -167,7 +167,7 @@ public class PlanosView extends VerticalLayout implements GenericView {
 	}
 	
 
-	@Override
+	
 	public Table buildTbGeneric() {
 		tb = new Table(null, buildContainer());
 		tb.setSizeFull();
@@ -258,7 +258,7 @@ public class PlanosView extends VerticalLayout implements GenericView {
 		return cbStatus;
 	}
 
-	@Override
+	
 	public TextField buildTfbusca() {
 		tfBusca = new TextField();
 		tfBusca.setWidth("100%");
@@ -275,7 +275,7 @@ public class PlanosView extends VerticalLayout implements GenericView {
 		return tfBusca;
 	}
 
-	@Override
+	
 	public void addFilter(String s) {
 		
 
@@ -313,7 +313,7 @@ public class PlanosView extends VerticalLayout implements GenericView {
 		
 	}
 
-	@Override
+	
 	public Button BuildbtTransferencia() {
 		btNovo = new Button("Novo", new Button.ClickListener() {
 			
@@ -397,8 +397,8 @@ public class PlanosView extends VerticalLayout implements GenericView {
 		return btNovo;
 	}
 
-	@Override
-	public Button BuildbtAceitar() {
+	
+	public Button BuildbtEditar() {
 		btEditar = new Button("Editar", new Button.ClickListener() {
 			
 			@Override
@@ -549,9 +549,8 @@ public class PlanosView extends VerticalLayout implements GenericView {
 
 		return btEditar;
 	}
-
-	@Override
-	public Button BuildbtCancelar() {
+	
+	public Button BuildbtExcluir() {
 		btExcluir = new Button("Excluir", new Button.ClickListener() {
 			
 			@Override

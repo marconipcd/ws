@@ -200,18 +200,21 @@
 		<class>com.digital.opuserp.domain.ArquivosOse2</class>
 		<class>com.digital.opuserp.domain.FichaCegaCab</class>
 		<class>com.digital.opuserp.domain.FichaCegaDet</class>
+		<class>com.digital.opuserp.domain.Beneficio</class>
 	
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
 			<property name="hibernate.default_catalog" value="db_opus"/>
-			
-<!-- 		<property name="hibernate.default_catalog" value="opus_bkp"/> -->			
-<!-- 		<property name="hibernate.connection.url" value="jdbc:mysql://172.17.0.11/opus_bkp?autoReconnect=true"/> -->
-			
+
 			<property name="hibernate.connection.url" value="jdbc:mysql://172.17.0.11/db_opus?autoReconnect=true"/>
 			<property name="hibernate.connection.username" value="root"/>
 			<property name="hibernate.connection.password" value="managerdigi_1q2w3e4r5t"/>
+			
+<!-- 			<property name="hibernate.connection.url" value="jdbc:mysql://opus2.cyhuxyrirmnx.sa-east-1.rds.amazonaws.com/db_opus?autoReconnect=true"/> -->
+<!-- 			<property name="hibernate.connection.username" value="marconi"/> -->
+<!-- 			<property name="hibernate.connection.password" value="idigital123mc"/> -->
+<!-- 		    <property name="hibernate.connection.useSSL" value="false" /> -->
 			
 			<!-- 179.127.32.11 -->
 			<!--<property name="hibernate.connection.url" value="jdbc:mysql://172.17.0.11/db_opus"/>

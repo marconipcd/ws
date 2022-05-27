@@ -15,7 +15,6 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
@@ -25,11 +24,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javassist.compiler.ast.CondExpr;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -65,19 +61,72 @@ import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.util.Notify;
-import com.jcabi.immutable.ArrayMap;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 public class ContasReceberDAO {
 	
+	static String  endereco_ip = "172.17.0.13";
+	
+	public static boolean cancelarTransacao(String transacao) {
+		
+		if(transacao != null && !transacao.equals("")){
+		
+				try{
+					
+		            String url = "http://"+endereco_ip+"/boleto/testeCancelamentoTransacao.php";
+
+		            HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
+
+		            //add reuqest header
+		            httpClient.setRequestMethod("POST");
+		            httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+		            httpClient.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		            
+		            
+		            String urlParameters = "cod="+Integer.parseInt(transacao);
+		            		
+		            httpClient.setDoOutput(true);
+		            try (DataOutputStream wr = new DataOutputStream(httpClient.getOutputStream())) {
+		                wr.writeBytes(urlParameters);
+		                wr.flush();
+		            }
+
+            		
+		            try (BufferedReader in = new BufferedReader(
+		                    new InputStreamReader(httpClient.getInputStream()))) {
+
+		                String line;
+		                StringBuilder response = new StringBuilder();
+
+		                while ((line = in.readLine()) != null) {
+		                    response.append(line);
+		                }
+
+		                if(response.toString() != null && !response.toString().equals("")){
+		                	org.json.JSONObject json = new org.json.JSONObject(response.toString());    
+		                	System.out.println(json);
+		                }
+		                
+		                if(httpClient.getResponseCode() == 200){		                	
+		                	boolean check = ContasReceberDAO.retirarTransacaoBoleto(transacao);           	
+		                }
+		            }
+					
+					return true;
+					
+					}catch(Exception e){
+						e.printStackTrace();
+						return false;
+					}
+		}
+		
+		return false;
+    }
+
 	
 //	private void gerarCarne(Set<Object> boletos){
 //		

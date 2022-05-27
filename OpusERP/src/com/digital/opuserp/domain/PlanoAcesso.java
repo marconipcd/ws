@@ -1,7 +1,5 @@
 package com.digital.opuserp.domain;
 
-import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -83,6 +79,10 @@ public class PlanoAcesso {
 	
 	@Column(name="POSSUI_ITTV")
 	private String possui_ittv;
+	
+	@Column(name="POSSUI_APPNEO")
+	private String possui_appneo;
+	
 	
 	@Column(name="PLANO_ITTV")
 	private String plano_ittv;
@@ -330,6 +330,14 @@ public class PlanoAcesso {
 
 	public void setPlano_bloqueio(PlanoAcesso plano_bloqueio) {
 		this.plano_bloqueio = plano_bloqueio;
+	}
+
+	public String getPossui_appneo() {
+		return possui_appneo;
+	}
+
+	public void setPossui_appneo(String possui_appneo) {
+		this.possui_appneo = possui_appneo;
 	}
 	
 	

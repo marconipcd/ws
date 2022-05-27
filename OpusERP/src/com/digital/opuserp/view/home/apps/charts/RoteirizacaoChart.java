@@ -582,6 +582,10 @@ public class RoteirizacaoChart extends CssLayout {
         	}
            
         	try{
+        		
+        		String data1 = sdfCHora.parse(sdfCHora.format(new DateTime().minusMonths(3).toDate()).toString()+" 00:00:00").toString();
+        		String data2 = sdfCHora.parse(sdfCHora.format(new DateTime().toDate()).toString()+" 00:00:00").toString();
+        		
         		q.setParameter("data1", sdfCHora.parse(sdfCHora.format(new DateTime().minusMonths(3).toDate()).toString()+" 00:00:00"));
         		q.setParameter("data2", sdfCHora.parse(sdfCHora.format(new DateTime().toDate()).toString()+" 00:00:00"));
         	}catch(Exception e){
