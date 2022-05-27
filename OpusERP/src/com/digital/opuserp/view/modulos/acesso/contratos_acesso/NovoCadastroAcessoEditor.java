@@ -1005,10 +1005,10 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 				cbContratoPrestServManuten.addItem("NAO");
 				cbContratoPrestServManuten.select("NAO");
 				
-				HorizontalLayout hlPlanos = new HorizontalLayout();
-				hlPlanos.setMargin(false);
-				hlPlanos.setSpacing(false);
-				hlPlanos.addComponent(new FormLayout(){					
+				HorizontalLayout hlServManu = new HorizontalLayout();
+				hlServManu.setMargin(false);
+				hlServManu.setSpacing(false);
+				hlServManu.addComponent(new FormLayout(){					
 					{
 						//70
 						setStyleName("form-cutom-new");
@@ -1018,7 +1018,7 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 						addComponent(cbContratoPrestServManuten);
 					}});
 				
-				hlPlanos.addComponent(new FormLayout(){					
+				hlServManu.addComponent(new FormLayout(){					
 					{
 						//30
 						setStyleName("form-cutom-new");
@@ -1028,13 +1028,15 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 						addComponent(txtPermiteServManuten);
 					}});
 			
-				addComponent(hlPlanos);
+				addComponent(hlServManu);
 				
 				//addComponent(cbContratoPrestServManuten);			
 				
 				//cbInstalaçãoGratis.setEnabled(false); 
 			}
 		});
+		
+		
 		
 		
 	}

@@ -128,8 +128,8 @@ public class ContasReceberView extends VerticalLayout {
 
 	//JPAContainer<Child> container;
 	
-	//String endereco_ip = "172.17.0.13";
-	String endereco_ip = "172.17.0.90";
+	String endereco_ip = "172.17.0.13";
+	//String endereco_ip = "172.17.0.90";
 	
 	TreeTable tb;
 	TextField tfBusca;
@@ -2223,7 +2223,8 @@ public class ContasReceberView extends VerticalLayout {
 			double  atualizacao_monetaria;
 			
 			Double jurosTotais;
-			if(dias > Integer.parseInt(contaBancaria.getTolerancia_juros_multa()))
+			//if(dias > Integer.parseInt(contaBancaria.getTolerancia_juros_multa()))
+			if(dias > 0)
 			{
 				juros = ((Double.parseDouble(contaBancaria.getJuros()) * dias));
 				multa = Double.parseDouble(contaBancaria.getMulta());					

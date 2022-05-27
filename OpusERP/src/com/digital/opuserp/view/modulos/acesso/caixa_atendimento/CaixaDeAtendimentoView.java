@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import com.digital.opuserp.OpusERP4UI;
 import com.digital.opuserp.dao.AcessoDAO;
 import com.digital.opuserp.dao.GerenciarModuloDAO;
@@ -454,6 +457,20 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 											
 											AcessoCliente contrato = (AcessoCliente)event.getItem().getItemProperty("contrato_monitoramento").getValue();
 											contrato.setEndereco_ip(event.getItem().getItemProperty("ip_monitoramento").getValue().toString());
+											
+											//Limpa contratos que tenham mesmo ip
+											EntityManager em = ConnUtil.getEntity();
+											Query q = em.createQuery("select a from AcessoCliente a where a.endereco_ip=:ip", AcessoCliente.class);
+											q.setParameter("ip", event.getItem().getItemProperty("ip_monitoramento").getValue());
+											List<AcessoCliente> contratos = q.getResultList();
+											
+											em.getTransaction().begin();
+											for (AcessoCliente c: contratos) {
+												c.setEndereco_ip(null);
+												em.merge(c);
+											}
+											em.getTransaction().commit();
+											
 											
 											boolean check1 = AcessoDAO.save(contrato);
 											boolean check2 = AcessoDAO.alterarIpFixo(contrato);

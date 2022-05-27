@@ -1,6 +1,5 @@
 package domain;
 
-
 import java.util.Date;
 
 import javax.persistence.Cacheable;
@@ -11,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -146,30 +144,18 @@ public class ContasReceber {
 	public void setColuna(String coluna) {
 		this.coluna = coluna;
 	}
-	
 	public Long getQtd() {
 		return qtd;
 	}
-
-
-
-
 	public void setQtd(Long qtd) {
 		this.qtd = qtd;
 	}
-
-
-
-
 	public ContasReceber(){
 		
 	}
-	
 	public ContasReceber(Integer id){
 		this.id = id;
 	}
-	
-	
 	public ContasReceber(Integer id, String n_doc, String n_numero,
 			String valor_titulo, String valor_pagamento, Date data_emissao,
 			Date data_vencimento, Date data_pagamento, Date data_baixa,

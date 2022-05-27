@@ -347,7 +347,13 @@ public class PedidoChart extends CssLayout {
 	        if(cbPeriodicidade.getValue() != null && cbPeriodicidade.getValue().toString().equals("DIÁRIO")){
 	        	q = em.createNativeQuery("SELECT DATE_FORMAT( DATA_PV,  '%d/%m/%Y' ) AS DATA, SUM( valor) AS QTD FROM  ecf_pre_venda_cabecalho where `SITUACAO` = 'F' AND TIPO = 'PEDIDO' AND EMPRESA_ID = :codEmpresa AND NATUREZA_OPERACAO = :codNatureza GROUP BY DATE_FORMAT( DATA_PV,  '%d/%m/%Y' ) ORDER BY `DATA_PV` DESC LIMIT 0,30");
 	        }else if(cbPeriodicidade.getValue() != null && cbPeriodicidade.getValue().toString().equals("MENSAL")){
-	        	q = em.createNativeQuery("SELECT DATE_FORMAT( DATA_PV,  '%m/%Y' ) AS DATA, SUM( valor) AS QTD FROM  ecf_pre_venda_cabecalho where `SITUACAO` = 'F' AND TIPO = 'PEDIDO' AND EMPRESA_ID = :codEmpresa AND NATUREZA_OPERACAO = :codNatureza GROUP BY DATE_FORMAT( DATA_PV,  '%m/%Y' ) ORDER BY `DATA_PV` DESC LIMIT 0,12");
+	        	
+	        	q = em.createNativeQuery("SELECT DATE_FORMAT( DATA_PV,  '%m/%Y' ) AS DATA, "
+	        			+ "SUM( valor) AS QTD FROM  ecf_pre_venda_cabecalho where `SITUACAO` = 'F' AND "
+	        			+ "TIPO = 'PEDIDO' AND EMPRESA_ID = :codEmpresa AND NATUREZA_OPERACAO = :codNatureza "
+	        			+ "GROUP BY DATE_FORMAT( DATA_PV,  '%m/%Y' ) ORDER BY `DATA_PV` DESC LIMIT 0,12");
+	        	
+	        	
 	        }else if(cbPeriodicidade.getValue() != null && cbPeriodicidade.getValue().toString().equals("ANUAL")){
 	        	q = em.createNativeQuery("SELECT DATE_FORMAT( DATA_PV,  '%Y' ) AS DATA, SUM( valor) AS QTD FROM  ecf_pre_venda_cabecalho where `SITUACAO` = 'F' AND TIPO = 'PEDIDO' AND EMPRESA_ID = :codEmpresa AND NATUREZA_OPERACAO = :codNatureza GROUP BY DATE_FORMAT( DATA_PV,  '%Y' ) ORDER BY `DATA_PV` DESC LIMIT 0,10");
 	        }

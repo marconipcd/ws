@@ -778,7 +778,8 @@ public class AcessoDAO {
 	 * 	8- Desconecta cliente do concentrador
 	 * 	9- Gera logs
 	 */
-	public static boolean alteraPlano(AcessoCliente contrato, PlanoAcesso planoNovo, NfeMestre nfe, String InstGratis, boolean isBoletoAdiantado){
+	public static boolean alteraPlano(AcessoCliente contrato, PlanoAcesso planoNovo, NfeMestre nfe, 
+			String InstGratis, boolean isBoletoAdiantado){
 		
 		EntityManager em = ConnUtil.getEntity();
 		Date dataNfe;
@@ -874,12 +875,23 @@ public class AcessoDAO {
 											crINN.setN_numero_sicred_antigo(cr.getN_numero_sicred());
 											crINN.setN_numero(null);
 											crINN.setStatus("EXCLUIDO");
+											
+											if(crINN.getTransacao_gerencianet() != null && crINN.getTransacao_gerencianet() != ""){
+												ContasReceberDAO.cancelarTransacao(crINN.getTransacao_gerencianet());
+											}
 										}
 										
 										cr.setValor_titulo(valorBoleto);
 									    cr.setN_numero_sicred(null); 
 										cr.setN_numero_sicred_antigo(null);
-										cr.setN_numero(null); 
+										cr.setN_numero(null);
+										
+										
+										//Cancela transação gerenciaNet 
+										if(cr.getTransacao_gerencianet() != null && cr.getTransacao_gerencianet() != ""){
+											ContasReceberDAO.cancelarTransacao(cr.getTransacao_gerencianet());
+										}
+										
 										
 										if(contrato.getCodigo_cartao() != null){
 											cr.setCodigo_cartao(contrato.getCodigo_cartao());
@@ -1150,7 +1162,10 @@ public class AcessoDAO {
 		try{
 			
 			em.getTransaction().begin();
-			CredenciaisAcessoDAO.alterarCredenciaisRadius(ac.getStatus_2(), ac.getLogin(), ac.getLogin(), ac.getSenha(), ac.getContrato().getId().toString()+"_"+ac.getPlano().getNome(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), ac.getEndereco_ip());
+			CredenciaisAcessoDAO.alterarCredenciaisRadius(ac.getStatus_2(), ac.getLogin(), ac.getLogin(), ac.getSenha(), 
+					ac.getContrato().getId().toString()+"_"+ac.getPlano().getNome(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), 
+					ac.getEndereco_ip());
+			
 			em.getTransaction().commit();
 			
 			LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Alteração de IP Fixo para um Contrato de Acesso"));

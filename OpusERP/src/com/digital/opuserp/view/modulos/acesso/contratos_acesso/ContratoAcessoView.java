@@ -20,6 +20,7 @@ import org.joda.time.Months;
 import com.digital.opuserp.OpusERP4UI;
 import com.digital.opuserp.dao.AcessoDAO;
 import com.digital.opuserp.dao.AlteracoesContratoDAO;
+import com.digital.opuserp.dao.ApiTopSappDAO;
 import com.digital.opuserp.dao.ArquivosContratoDAO;
 import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.ContratosAcessoDAO;
@@ -30,12 +31,10 @@ import com.digital.opuserp.dao.GerenciarModuloDAO;
 import com.digital.opuserp.dao.IttvDAO;
 import com.digital.opuserp.dao.LogDAO;
 import com.digital.opuserp.dao.OseDAO;
-import com.digital.opuserp.dao.PlanoAcessoDAO;
 import com.digital.opuserp.dao.SubModuloDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.AlteracoesContrato;
 import com.digital.opuserp.domain.Cliente;
-import com.digital.opuserp.domain.Concentrador;
 import com.digital.opuserp.domain.ContasReceber;
 import com.digital.opuserp.domain.Crm;
 import com.digital.opuserp.domain.CrmAssunto;
@@ -2230,6 +2229,148 @@ public class ContratoAcessoView extends VerticalLayout {
 		});
         btLiberarItTv.setPrimaryStyleName("btSubMenu");
         
+        Button btLiberarAppNeo = new Button("Liberar Paramount", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				
+				if(tb.getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().toString().equals("ATIVO")){
+										
+					final Window winLiberarAppNeo = new Window("Liberar Paramount");
+					
+					final VerticalLayout vlRootITTV = new VerticalLayout(){
+						{
+								setStyleName("border-form");
+								setMargin(true);
+								
+								EntityManager em = ConnUtil.getEntity();
+								final AcessoCliente contrato = em.find(AcessoCliente.class, tb.getItem(tb.getValue()).getItemProperty("id").getValue());
+								
+								addComponent(new FormLayout(){
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);
+										
+										TextField txtNome = new TextField("Nome");
+										txtNome.setRequired(true);
+										txtNome.setWidth("280px");
+										txtNome.setStyleName("caption-align-ittv");	
+										txtNome.setValue(contrato.getCliente().getNome_razao());
+										txtNome.setReadOnly(true);
+
+										addComponent(txtNome);
+									}
+								});
+																	
+								
+								final TextField txtUsername = new TextField("Usuário");
+								txtUsername.setRequired(true);
+								txtUsername.setWidth("280px");
+								txtUsername.setStyleName("caption-align-ittv");
+								addComponent(new FormLayout(){
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);
+										
+										if(contrato.getU_ittv() != null){
+											txtUsername.setValue(contrato.getU_ittv());
+										}
+										addComponent(txtUsername);
+										
+										txtUsername.setValue(contrato.getCliente().getDoc_cpf_cnpj());
+										txtUsername.setReadOnly(true); 
+									}
+								});
+								
+								final TextField txtSenha = new TextField("Senha");
+								txtSenha.setRequired(true);
+								
+								txtSenha.setStyleName("caption-align-ittv");
+								addComponent(new FormLayout(){
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);
+										
+										if(contrato.getS_ittv() != null){
+											txtSenha.setValue(contrato.getS_ittv());
+										}
+										addComponent(txtSenha);
+									}
+								});
+									
+								HorizontalLayout hlButtons = new HorizontalLayout();
+								hlButtons.setStyleName("hl_buttons_bottom");
+								hlButtons.setSpacing(true);
+								hlButtons.setMargin(true);
+																
+								hlButtons.addComponent(new Button("Cadastrar", new Button.ClickListener() {
+									
+									@Override
+									public void buttonClick(ClickEvent event) {
+										try{
+											if(txtUsername.getValue() != null && !txtUsername.getValue().isEmpty() && !txtUsername.getValue().equals("") &&
+													txtSenha.getValue() != null && !txtSenha.getValue().isEmpty() && !txtSenha.getValue().equals("") &&
+													txtSenha.getValue().toString().length() >= 7){
+												
+												boolean check  = ApiTopSappDAO.liberarClienteNeo(contrato.getCliente(), txtSenha.getValue());
+												
+												if(check){
+													
+													contrato.setS_ittv(txtSenha.getValue());
+													AcessoDAO.save(contrato);
+													
+													Notify.Show("Credenciais liberadas com sucesso", Notify.TYPE_SUCCESS);
+													winLiberarAppNeo.close();
+												}
+												
+											}else{
+												Notify.Show("Campos obrigatórios precisam ser preenchidos!", Notify.TYPE_WARNING);
+												
+												if(txtSenha.getValue().toString().length() < 7){
+													Notify.Show("Informe uma senha de no mínimo 7 digitos", Notify.TYPE_WARNING);
+												}
+												
+											}
+										}catch(Exception e){
+											e.printStackTrace();
+										}
+									}
+								}));
+								
+								
+								addComponent(hlButtons);
+								setComponentAlignment(hlButtons, Alignment.BOTTOM_RIGHT);	
+							
+						}						
+					};					
+					winLiberarAppNeo.setContent(new VerticalLayout(){
+						{
+							setMargin(true);
+							addComponent(vlRootITTV);
+						}
+					});
+					
+					winLiberarAppNeo.setWidth("433px");
+					winLiberarAppNeo.setHeight("250px");
+					winLiberarAppNeo.setResizable(false);
+										
+					vlRootITTV.setSizeFull();
+					
+					winLiberarAppNeo.setModal(true);
+					winLiberarAppNeo.center();
+					getUI().addWindow(winLiberarAppNeo); 
+					
+				}else{
+					Notify.Show("Só é permitido liberar AppNeo para contratos ATIVOS!", Notify.TYPE_WARNING);
+				}				
+			}
+		});
+        btLiberarAppNeo.setPrimaryStyleName("btSubMenu");
+        
         l.addComponent(btLiberarCartaoCliente);
         l.addComponent(btLiberarBoletos);
         l.addComponent(btLiberarCredenciais);
@@ -2239,6 +2380,11 @@ public class ContratoAcessoView extends VerticalLayout {
         
         if(contratoSelecionado.getPlano().getPossui_ittv() != null && contratoSelecionado.getPlano().getPossui_ittv().equals("SIM")){
         	l.addComponent(btLiberarItTv);
+        }
+        
+        //if(true){
+        if(contratoSelecionado.getPlano().getPossui_appneo() != null && contratoSelecionado.getPlano().getPossui_appneo().equals("SIM")){
+        	l.addComponent(btLiberarAppNeo);
         }
     }	
 	
@@ -3768,6 +3914,63 @@ public class ContratoAcessoView extends VerticalLayout {
 		});
         btAlterarIpFixo.setPrimaryStyleName("btSubMenu");
         
+        Button btVincularVendedor = new Button("Vincular vendedor", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				final Window winLiberarAppNeo = new Window("Vincular vendedor");
+				
+				final VerticalLayout vlRootVincularVendedor = new VerticalLayout(){
+					{
+							setStyleName("border-form");
+							setMargin(true);
+							
+							EntityManager em = ConnUtil.getEntity();
+							final AcessoCliente contrato = em.find(AcessoCliente.class, tb.getItem(tb.getValue()).getItemProperty("id").getValue());
+								
+							HorizontalLayout hlButtons = new HorizontalLayout();
+							hlButtons.setStyleName("hl_buttons_bottom");
+							hlButtons.setSpacing(true);
+							hlButtons.setMargin(true);
+															
+							hlButtons.addComponent(new Button("Salvar", new Button.ClickListener() {
+								
+								@Override
+								public void buttonClick(ClickEvent event) {
+									try{
+										
+									}catch(Exception e){
+										e.printStackTrace();
+									}
+								}
+							}));
+							
+							addComponent(hlButtons);
+							setComponentAlignment(hlButtons, Alignment.BOTTOM_RIGHT);	
+						
+					}						
+				};					
+				winLiberarAppNeo.setContent(new VerticalLayout(){
+					{
+						setMargin(true);
+						addComponent(vlRootVincularVendedor);
+					}
+				});
+				
+				winLiberarAppNeo.setWidth("433px");
+				winLiberarAppNeo.setHeight("250px");
+				winLiberarAppNeo.setResizable(false);
+									
+				vlRootVincularVendedor.setSizeFull();
+				
+				winLiberarAppNeo.setModal(true);
+				winLiberarAppNeo.center();
+				getUI().addWindow(winLiberarAppNeo); 
+			}
+		});
+        
+        btVincularVendedor.setPrimaryStyleName("btSubMenu");
+        
         if(tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().equals("BLOQUEADO")){
         	btAlterarIpFixo.setEnabled(true);
         	btAlterarTipoNf.setEnabled(true);
@@ -3877,6 +4080,7 @@ public class ContratoAcessoView extends VerticalLayout {
         l.addComponent(btAlterarTipoNf);
         l.addComponent(btSuspenderContrato);
         l.addComponent(btReativarContrato);
+        l.addComponent(btVincularVendedor);
         
         
         

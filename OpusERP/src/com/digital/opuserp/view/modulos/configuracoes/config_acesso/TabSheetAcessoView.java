@@ -2,6 +2,7 @@ package com.digital.opuserp.view.modulos.configuracoes.config_acesso;
 
 
 import com.digital.opuserp.dao.GerenciarModuloDAO;
+import com.digital.opuserp.view.modulos.configuracoes.config_acesso.beneficio.BeneficioView;
 import com.digital.opuserp.view.modulos.configuracoes.config_acesso.central.ConfigCentralAssinanteView;
 import com.digital.opuserp.view.modulos.configuracoes.config_acesso.contratos.ContratosView;
 import com.digital.opuserp.view.modulos.configuracoes.config_acesso.materiais.ConfigMaterialAcessoView;
@@ -31,6 +32,10 @@ public class TabSheetAcessoView extends VerticalLayout {
 			 TabSheet.Tab tContratos = ts_principal.addTab(buildLayout(new ContratosView(true)), "Contratos");
 			 TabSheet.Tab tMateriais = ts_principal.addTab(buildLayout(new ConfigMaterialAcessoView()), "Material");
 			 TabSheet.Tab tAssinante = ts_principal.addTab(buildLayout(new ConfigCentralAssinanteView()), "Central de Assinante");
+			 
+			 TabSheet.Tab tBeneficio = ts_principal.addTab(buildLayout(new BeneficioView(true)), "Benefícios");
+			 
+			 
 //			 TabSheet.Tab tPool = ts_principal.addTab(buildLayout(new PoolView()), "Pool");
 			 
 			 			 

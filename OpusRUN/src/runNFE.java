@@ -28,19 +28,20 @@ public class runNFE {
 	//10222 - MILLENA COMERCIO VAREJISTA DE MOVEIS E ELETRO EIRELI	
 	//10435 - SUPRAMAX  
 	//10550 - ACUMULADORES MOURA *
-	//11085 - UNIVERSIDADE FEDERAL RURAL **
+	//11085 - UNIVERSIDADE FEDERAL RURAL 
 	//11425 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
 	//11426 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
 	//8892 - SINDICATO DOS TRABALHADORES RURAIS DE B. JARDIM
-	//11268 - 
+	//11268 - *
 	//12053 - KATHARYNE RAYLLE BEZERRA DA SILVA *
 	//12200 - 
+	//11851 - 
 
 	public static void main(String[] args) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 		
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where  c.id=12200 and "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=11851 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'ENCERRADO' and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -61,7 +62,7 @@ public class runNFE {
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
 
-				boolean manual = false;
+				boolean manual = true;
 				
 				if(!manual){
 					Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
@@ -85,14 +86,14 @@ public class runNFE {
 					qn.setParameter("rNova", regexNova);
 					qn.setParameter("rAntiga", regexAntiga);
 					qn.setParameter("rProrata", regexProrata);
-					qn.setParameter("anoMes", "2204");
+					qn.setParameter("anoMes", "2205");
 					
 					if(qn.getResultList().size()  == 1){
 						boleto = (ContasReceber)qn.getSingleResult();					
 					}
 				}else{
 					//557413->128684 - 582019 - 632154
-					boleto = em.find(ContasReceber.class, 582020);
+					boleto = em.find(ContasReceber.class, 626846   );
 				}
 				
 				//&& boleto.getStatus().equals("ABERTO")

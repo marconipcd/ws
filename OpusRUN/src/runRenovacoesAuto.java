@@ -86,7 +86,7 @@ public class runRenovacoesAuto {
 			em.getTransaction().commit();
 			
 			//boolean check = CredenciaisAcessoDAO.DesbloquearContrato(contrato.getId());
-			
+			//
 			//LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Renovou Um Novo Contrato de Acesso"));
 			//AlteracoesContratoDAO.save(new AlterarcoesContrato(null, "RENOVAÇÃO DE CONTRATO", contrato, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
 			//if(contrato.getStatus_2().equals("BLOQUEADO") && check){

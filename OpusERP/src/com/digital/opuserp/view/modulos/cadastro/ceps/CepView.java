@@ -10,10 +10,13 @@ import com.digital.opuserp.dao.LogDAO;
 import com.digital.opuserp.domain.Ceps;
 import com.digital.opuserp.domain.LogAcoes;
 import com.digital.opuserp.interfaces.GenericView;
+import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.view.modulos.cadastro.ceps.CepEditor.CepEvent;
 import com.digital.opuserp.view.util.Notify;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property;
@@ -43,8 +46,8 @@ import com.vaadin.ui.Window.CloseEvent;
 
 public class CepView extends VerticalLayout implements GenericView {
 
-	//JPAContainer<Ceps> containerCeps;
-	BeanItemContainer<Ceps> containerCeps = new BeanItemContainer<>(Ceps.class);
+	JPAContainer<Ceps> containerCeps;
+	//BeanItemContainer<Ceps> containerCeps = new BeanItemContainer<>(Ceps.class);
 	
 	Table tb;
 	TextField tfBusca;
@@ -149,10 +152,11 @@ public class CepView extends VerticalLayout implements GenericView {
 		return slEditar;
 	}
 	
-	public BeanItemContainer<Ceps> buildContainer(){
-		containerCeps = CepDAO.getCeps();
-		//containerCeps.sort(new String[] {"endereco"}, new boolean[]{true});
-				
+	public JPAContainer<Ceps> buildContainer(){
+		containerCeps = JPAContainerFactory.makeBatchable(Ceps.class, ConnUtil.getEntity());
+		containerCeps.sort(new String[] {"endereco"}, new boolean[]{true});
+		containerCeps.setAutoCommit(false);
+		
 		return containerCeps;
 	}
 	
