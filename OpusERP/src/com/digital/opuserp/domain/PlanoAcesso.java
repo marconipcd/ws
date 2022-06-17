@@ -32,6 +32,11 @@ public class PlanoAcesso {
 	private String upload;
 	@Column(name="RATE_LIMIT",nullable=false, unique=false, length=100)
 	private String rate_limit;
+	
+	@Column(name="RATE_LIMIT_HUAWEI_UP",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_up;	
+	@Column(name="RATE_LIMIT_HUAWEI_DOWN",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_down;	
 	@Column(name="MIN_RATE_LIMIT",nullable=false, unique=false, length=100)
 	private String min_rate_limit;	
 	@Column(name="PRIORIDADE", nullable=false,length=1)
@@ -338,6 +343,22 @@ public class PlanoAcesso {
 
 	public void setPossui_appneo(String possui_appneo) {
 		this.possui_appneo = possui_appneo;
+	}
+
+	public String getRate_limit_huawei_up() {
+		return rate_limit_huawei_up;
+	}
+
+	public void setRate_limit_huawei_up(String rate_limit_huawei_up) {
+		this.rate_limit_huawei_up = rate_limit_huawei_up;
+	}
+
+	public String getRate_limit_huawei_down() {
+		return rate_limit_huawei_down;
+	}
+
+	public void setRate_limit_huawei_down(String rate_limit_huawei_down) {
+		this.rate_limit_huawei_down = rate_limit_huawei_down;
 	}
 	
 	

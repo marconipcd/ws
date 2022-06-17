@@ -75,8 +75,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 	Button btPool;
 	
 	Concentrador concentrador;
-	
-	
+		
 	boolean valid_ip = false;
 	boolean valid_mac = false;
 	boolean valid_serial_material_comodato = false;
@@ -142,8 +141,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 				setWidth("100%");
 				setMargin(true);
 				addComponent(vlRoot);
-				
-				
+								
 				HorizontalLayout hlButtons = new HorizontalLayout();
 				hlButtons.setStyleName("hl_buttons_bottom");
 				hlButtons.setSpacing(true);

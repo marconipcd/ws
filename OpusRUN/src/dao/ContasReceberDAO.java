@@ -550,6 +550,29 @@ public class ContasReceberDAO {
 		}
 	}
 	
+	public static List<ContasReceber> getBoletoPorContrato(Integer codContrato){
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
+		EntityManager em = emf.createEntityManager();
+			
+			try{
+			
+				Query qn = em.createNativeQuery(
+						"select * from contas_receber cr where " +				
+						"cr.status_2 ='ABERTO' " +
+						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{2}-[0-9]{2}/[0-9]{2}' "+							
+						
+						"or cr.status_2 ='ABERTO' " +
+						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{1,}/[0-9]{2}-[0-9]{2}/[0-9]{2}' ",	
+												
+						ContasReceber.class);				
+								
+				return qn.getResultList();
+			}catch (Exception e){
+				e.printStackTrace();			
+				return null;
+			}
+	}
+	
 	public static List<ContasReceber> getBoletoPorContratoNaoVencidos(Integer codContrato){
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();

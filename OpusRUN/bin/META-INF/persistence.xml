@@ -59,6 +59,8 @@
 		<class>domain.ArquivosOse</class>
 		<class>domain.ArquivosOse2</class>
 		<class>domain.NotificacoesGerencianet</class>
+		<class>domain.RadGroupReply</class>
+		<class>domain.RadAcct</class>
 		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

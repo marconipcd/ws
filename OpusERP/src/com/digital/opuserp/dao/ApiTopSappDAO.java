@@ -19,14 +19,18 @@ import okhttp3.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.Cliente;
 
 
 
 public class ApiTopSappDAO {
 	
-	
-public static boolean liberarClienteNeo(Cliente c, String senha){
+	private static OkHttpClient client = null;
+    private static boolean ignoreSslCertificate = false;
+	private static String ip_servidor= "186.233.104.165:9910";
+    
+	public static boolean liberarClienteNeo(AcessoCliente contrato, Cliente c, String senha){
 		
 		try{			
 			//Autencia
@@ -60,6 +64,9 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 					if(status.equals("true")){
 						String dados =  ((JSONObject)parser.parse(cliente)).get("dados").toString();
 						String cod_cliente = ((JSONObject)parser.parse(dados)).get("cliente_id").toString();
+						
+						contrato.setId_cliente_topsapp(Integer.parseInt(cod_cliente));
+						AcessoDAO.save(contrato);
 												
 						//Vincula Serviço ao Cliente
 						String result = cadastrar_cliente_servico(id_usuario, sessao, "OPUS", cod_cliente, "13", "1", "1", c.getEmail(), senha);						
@@ -82,12 +89,8 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 			return false;
 		}
 	}
-	
-	private static OkHttpClient client = null;
-    private static boolean ignoreSslCertificate = false;
-    
-    
-	public static String autenticar(){
+	    
+	private static String autenticar(){
 		try{
 			
 				OkHttpClient.Builder builder = new OkHttpClient.Builder();	        
@@ -100,7 +103,7 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 				 MediaType mediaType = MediaType.parse("text/plain");
 				 RequestBody body = RequestBody.create(mediaType, "");
 				 Request request = new Request.Builder()
-					      .url("https://186.233.104.165:9910/Login?usuario=topsapp&senha=mkcolmeia&identificador=OPUS")
+					      .url("https://"+ip_servidor+"/Login?usuario=topsapp&senha=mkcolmeia&identificador=OPUS")
 					      .method("POST", body)
 					      .build();
 				Response response = client.newCall(request).execute();
@@ -114,7 +117,7 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 				return null;
 			}
 	}
-	public static String cadastrar_cliente(String idUsuario, String sessao, String nome, 
+	private static String cadastrar_cliente(String idUsuario, String sessao, String nome, 
 			String cpf_cnpj, String data_nascimento, String endereco, String numero, String bairro, String cidade, String cep, 
 			String senha_central){
 		try{
@@ -129,7 +132,7 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 				 MediaType mediaType = MediaType.parse("text/plain");
 				 RequestBody body = RequestBody.create(mediaType, "");
 				 Request request = new Request.Builder()
-					      .url("https://186.233.104.165:9910/CadastrarCliente?"
+					      .url("https://"+ip_servidor+"/CadastrarCliente?"
 					      		+ "idUsuario="+idUsuario
 					      		+"&sessao="+sessao
 					      		+"&identificador=OPUS&"
@@ -156,7 +159,7 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 				return null;
 			}
 	}
-	public static String cadastrar_cliente_servico(String idUsuario, String sessao, String identificador, String cliente_id, 
+	private static String cadastrar_cliente_servico(String idUsuario, String sessao, String identificador, String cliente_id, 
 			String servico_id, String plano_contas, String vencimento, String login, String senha){
 		
 		
@@ -171,7 +174,7 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 			 MediaType mediaType = MediaType.parse("text/plain");
 			 RequestBody body = RequestBody.create(mediaType, "");
 			 Request request = new Request.Builder()
-				      .url("https://186.233.104.165:9910/CadastrarClienteServico?"
+				      .url("https://"+ip_servidor+"/CadastrarClienteServico?"
 				      		+ "idUsuario="+idUsuario
 				      		+"&sessao="+sessao
 				      		+"&identificador=OPUS&"
@@ -197,7 +200,6 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 			return null;
 		}
 	}
-	
 	private static OkHttpClient.Builder configureToIgnoreCertificate(OkHttpClient.Builder builder) {
 	    //    LOGGER.warn("Ignore Ssl Certificate");
 	        try {
@@ -237,6 +239,53 @@ public static boolean liberarClienteNeo(Cliente c, String senha){
 	        return builder;
 	    }
 
+	public static boolean alterar_cliente_dados(Integer idCliente,String senhaCentral){
+		
+		 try{		
+			 
+			 	String r = autenticar();			
+				JSONParser parser = new JSONParser();
+				
+				String sessao =  ((JSONObject) parser.parse(r)).get("sessao").toString();
+				String id_usuario =  ((JSONObject) parser.parse(r)).get("id_usuario").toString();
+				String resultado = ((JSONObject) parser.parse(r)).get("resultado").toString();
+			 
+			if(resultado.equals("true")){
+					 OkHttpClient.Builder builder = new OkHttpClient.Builder();	        
+				       
+				   	 ignoreSslCertificate = true;
+				   	 builder = configureToIgnoreCertificate(builder);        
+				
+				   	 OkHttpClient client = builder.build();
+					
+					 MediaType mediaType = MediaType.parse("text/plain");
+					 RequestBody body = RequestBody.create(mediaType, "");
+					 Request request = new Request.Builder()
+							      .url("https://"+ip_servidor+"/AlterarClienteDados?"
+							      		+ "idUsuario="+id_usuario
+							      		+"&idCliente="+idCliente
+							      		+"&senhaCentral="+senhaCentral
+							      		+"&sessao="+sessao				      		
+							      		+"&identificador=OPUS")
+							      		
+							      .method("POST", body)
+							      .build();
+						Response response = client.newCall(request).execute();
+						String r2 = response.body().string();
+						System.out.println(r2);
+						
+						return true;
+				
+			}else{
+			
+				return false;
+			}
+			
+		 }catch(Exception e){
+			 e.printStackTrace();
+			 return false;
+		 }
+	}
 	
 	
 }

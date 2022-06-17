@@ -130,6 +130,8 @@ public class AcessoCliente {
 
 	@Column(name="VALOR_TOTAL_POS_ENCERRAMENTO")
 	private String valor_total_pos_encerramento;
+	@Column(name="CODIGO_CARTAO", nullable=true, unique=true)
+	private String codigo_cartao;	
 	
 	@Column(name="ARQUIVO_UPLOAD")
 	private String arquivo_upload;
@@ -679,6 +681,14 @@ public class AcessoCliente {
 
 	public void setArquivo_upload(String arquivo_upload) {
 		this.arquivo_upload = arquivo_upload;
+	}
+
+	public String getCodigo_cartao() {
+		return codigo_cartao;
+	}
+
+	public void setCodigo_cartao(String codigo_cartao) {
+		this.codigo_cartao = codigo_cartao;
 	}
 
 	

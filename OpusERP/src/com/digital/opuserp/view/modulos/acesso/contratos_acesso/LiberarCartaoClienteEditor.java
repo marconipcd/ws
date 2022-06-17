@@ -6,11 +6,14 @@ import java.lang.reflect.Method;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import com.digital.opuserp.dao.AcessoDAO;
 import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.interfaces.GenericEditor;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.GenericDialog;
+import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -48,7 +51,7 @@ public class LiberarCartaoClienteEditor extends Window implements GenericEditor 
 	ContasReceberDAO crDAO = new ContasReceberDAO();
 	
 	String valorPrimeiroBoleto;
-	String contrato;
+	AcessoCliente contrato;
 		
 	private Label lbRegistros;
 	
@@ -64,8 +67,14 @@ public class LiberarCartaoClienteEditor extends Window implements GenericEditor 
 	
 	TextField txtVlrCodigoCartao;
 	
-	public LiberarCartaoClienteEditor(String title, boolean modal){
+	String codigo_antigo;
 	
+	
+	public LiberarCartaoClienteEditor(String title, boolean modal, String codigo_antigo, AcessoCliente contrato){
+	
+		this.codigo_antigo = codigo_antigo;
+		this.contrato = contrato;
+		
 		setWidth("322px");
 		setHeight("164px");
 		
@@ -120,15 +129,14 @@ public class LiberarCartaoClienteEditor extends Window implements GenericEditor 
 				setSpacing(true);
 													
 				txtVlrCodigoCartao = new TextField ("Cartão Cliente");
-				txtVlrCodigoCartao.setRequired(true);												
-				//txtVlrCodigoCartao.setStyleName("caption-align-acesso");
-				
+				txtVlrCodigoCartao.setRequired(true);										
 				txtVlrCodigoCartao.setId("txtVlrCodigoCartao");
 				JavaScript.getCurrent().execute("$('#txtVlrCodigoCartao').mask('000000')");
 				
+				if(codigo_antigo != null){
+					txtVlrCodigoCartao.setValue(codigo_antigo);
+				}
 				
-				
-			
 				addComponent(txtVlrCodigoCartao);			
 			
 			}
@@ -142,12 +150,15 @@ public class LiberarCartaoClienteEditor extends Window implements GenericEditor 
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				concluirCadastro();		
-		   }
-		
+				
+				if(!txtVlrCodigoCartao.getValue().equals(codigo_antigo)){				
+					concluirCadastro();		
+				}else{
+					Notify.Show("Informe um código diferente!", Notify.TYPE_ERROR);
+				}
+		   }		
 		});
 		
-
 		ShortcutListener slbtOK = new ShortcutListener("Ok", ShortcutAction.KeyCode.ENTER,null) {
 			
 			@Override
@@ -201,12 +212,29 @@ public class LiberarCartaoClienteEditor extends Window implements GenericEditor 
 				
 			}	
 			
-			Integer codigo = Integer.parseInt(txtVlrCodigoCartao.getValue());
-			//if(codigo >= 100001 && codigo <= 101000){
-				check_range_cartao = true;				
-			//}else{
-			//	Notify.Show("Este código não está dentro do intervalo de código permitido [100001-101000]",  Notify.TYPE_ERROR);
-			//}
+			Integer codigo = Integer.parseInt(txtVlrCodigoCartao.getValue());			
+			check_range_cartao = true;			
+			
+		}else{
+			if(codigo_antigo != null && txtVlrCodigoCartao.getValue().equals("")){
+				GenericDialog gd = new GenericDialog("Confirme para continuar", "Deseja desvincular o cartão deste contrato ?", true, true);
+				gd.addListerner(new GenericDialog.DialogListerner() {
+					
+					@Override
+					public void onClose(DialogEvent event) {
+						if(event.isConfirm()){
+							boolean check  = AcessoDAO.desvincular_cartao_cliente(codigo_antigo, contrato);
+							
+							if(check){
+								Notify.Show("Cartão desvinculado com sucesso!", Notify.TYPE_SUCCESS);
+								close();
+							}
+						}
+					}
+				});
+			
+				getUI().addWindow(gd); 
+			}
 		}
 													
 		if( fieldGroup.isValid() && txtVlrCodigoCartao.isValid() && check_uso_cartao && check_range_cartao){

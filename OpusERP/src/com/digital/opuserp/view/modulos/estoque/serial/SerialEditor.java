@@ -911,7 +911,7 @@ public class SerialEditor extends Window implements GenericEditor {
 				//		Notify.Show("A Quantidade de Seriais informados é superior a Quantidade de Produtos!", Notify.TYPE_ERROR);
 
 				//	}else{
-						if(seriais.length>1){
+						if(seriais.length>=1){
 													
 							for(int i = 0 ; i < seriais.length; i++){
 								

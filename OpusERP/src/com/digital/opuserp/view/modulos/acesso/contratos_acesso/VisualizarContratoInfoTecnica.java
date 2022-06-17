@@ -12,19 +12,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.Months;
 
 import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.Concentrador;
-import com.digital.opuserp.domain.ContasReceber;
 import com.digital.opuserp.domain.FiltroAcesso;
 import com.digital.opuserp.domain.RadAcct;
 import com.digital.opuserp.domain.RadUserGroupDAO;
 import com.digital.opuserp.util.ConnUtil;
-import com.digital.opuserp.util.DataUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
 import com.vaadin.data.Item;
@@ -35,6 +33,7 @@ import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.FormLayout;
@@ -45,7 +44,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Reindeer;
 
 public class VisualizarContratoInfoTecnica extends Window {
@@ -75,6 +73,8 @@ public class VisualizarContratoInfoTecnica extends Window {
 	boolean comunicacao;
 	
 	EntityManager em = ConnUtil.getEntity();
+	
+	String[] info = null;
 	
 	public VisualizarContratoInfoTecnica(Item item, String title, boolean modal){
 		this.item = item;
@@ -242,8 +242,12 @@ public class VisualizarContratoInfoTecnica extends Window {
 		vlconexao = new VerticalLayout(){
 			{
 				
-				if(base!=null){
+				if(base!=null && base.getTipo().equals("mikrotik")){
 					queue = MikrotikUtil.listarQueuesList(base.getUsuario(),base.getSenha(),base.getEndereco_ip(),Integer.parseInt(base.getPorta_api()),ac.getLogin());
+				}
+				
+				if(base != null && base.getTipo().equals("huawei")){
+					info = HuaweiUtil.pegarInformacoes(ac.getLogin());
 				}
 				
 				setMargin(true);
@@ -256,8 +260,15 @@ public class VisualizarContratoInfoTecnica extends Window {
 						TextField tfStatusConcent= new TextField("Status Concentrador");				
 						tfStatusConcent.setWidth("150px");	
 						
-						if(base!=null){
-							statusConcentrador = MikrotikUtil.testconexao(base.getUsuario(),base.getSenha(),base.getEndereco_ip(),Integer.parseInt(base.getPorta_api()));
+						if(base!=null){						
+												
+							if(base.getTipo().equals("mikrotik")){
+								statusConcentrador = MikrotikUtil.testconexao(base.getUsuario(),base.getSenha(),base.getEndereco_ip(),Integer.parseInt(base.getPorta_api()));
+							}
+							if(base.getTipo().equals("huawei") && info != null){
+								statusConcentrador = true;
+							}
+							
 						}
 	
 						if(statusConcentrador){						
@@ -289,8 +300,21 @@ public class VisualizarContratoInfoTecnica extends Window {
 								tfComunConcen.setWidth("150px");			
 
 								if(base!=null){
-									comunicacao =	MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
-									logado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+									
+									if(base.getTipo().equals("mikrotik")){
+									
+											comunicacao =	MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
+											logado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+									}
+									
+									if(base.getTipo().equals("huawei")){
+											
+											
+											if(info != null){
+												comunicacao = true;
+												logado = true;
+											}
+									}
 								}
 	
 								if(comunicacao || logado){
@@ -360,13 +384,23 @@ public class VisualizarContratoInfoTecnica extends Window {
 						@Override
 						public void buttonClick(ClickEvent event) {
 							
+							boolean check = false;
 							if(item != null && base!=null){
-								boolean check = MikrotikUtil.desconectarCliente(base.getUsuario(), base.getSenha(), base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()),ac.getLogin());
-								if(check){
-									Notification.show("O Cliente foi Desconectado Com Sucesso!");
-								}else{
-									Notification.show("O Cliente já esta Desconectado!");
+								
+								if(base.getTipo().equals("mikrotik")){
+									check = MikrotikUtil.desconectarCliente(base.getUsuario(), base.getSenha(), base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()),ac.getLogin());
 								}
+								
+								if(base.getTipo().equals("huawei")){
+									check = HuaweiUtil.desconectarCliente(ac.getLogin());
+								}
+							}
+							
+							
+							if(check){
+								Notification.show("O Cliente foi Desconectado Com Sucesso!");
+							}else{
+								Notification.show("O Cliente já esta Desconectado!");
 							}
 							
 							vlRootConexao.replaceComponent(vlconexao, buildVlConecao());
@@ -399,7 +433,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 						TextField tfRadioName= new TextField("Radio Name");				
 						tfRadioName.setWidth("150px");			
 		
-						if(base!=null){
+						if(base!=null && base.getTipo().equals("mikrotik")){
 							regTable = MikrotikUtil.buscarRegistationTable(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
 							activeConnections  = MikrotikUtil.buscarActiveConnections(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
 						}
@@ -453,9 +487,16 @@ public class VisualizarContratoInfoTecnica extends Window {
 						TextField tfUptime= new TextField("Uptime");				
 						tfUptime.setWidth("150px");			
 
-						if(activeConnections!=null && activeConnections.get("uptime") !=null){	
-							tfUptime.setValue(activeConnections.get("uptime"));												
+						if(base.getTipo().equals("mikrotik")){
+							if(activeConnections!=null && activeConnections.get("uptime") !=null){	
+								tfUptime.setValue(activeConnections.get("uptime"));												
+							}
 						}
+						
+						if(base.getTipo().equals("huawei") && info != null){
+							tfUptime.setValue(info[0]);
+						}
+						
 						
 						tfUptime.setReadOnly(true);
 						tfUptime.setStyleName("caption-align-visualizar-conexao");
@@ -475,14 +516,18 @@ public class VisualizarContratoInfoTecnica extends Window {
 							
 							TextField tfEndIpPool= new TextField("Endereço Ip Adress List");				
 							tfEndIpPool.setWidth("200px");	
-													
-							if(logado){		 							
-								String ip = MikrotikUtil.getRemoteIpPPOE(ac.getBase().getEndereco_ip(), ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getLogin());
-								tfEndIpPool.setValue(ip);										
-//								BrowserWindowOpener openIpPool = new BrowserWindowOpener("http://"+ip);
-//								openIpPool.setFeatures("height=600,width=800");
-//								openIpPool.extend(tfEndIpPool);
+						
+							if(base.getTipo().equals("mikrotik")){								
+									if(logado){		 							
+										String ip = MikrotikUtil.getRemoteIpPPOE(ac.getBase().getEndereco_ip(), ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getLogin());
+										tfEndIpPool.setValue(ip);									
+									}			
 							}
+							
+							if(base.getTipo().equals("huawei") && info != null){								
+								tfEndIpPool.setValue(info[2]);
+							}
+														
 							tfEndIpPool.setReadOnly(true);
 							tfEndIpPool.setStyleName("caption-align-visualizar-conexao");
 							
@@ -500,9 +545,15 @@ public class VisualizarContratoInfoTecnica extends Window {
 							TextField tfQueuesUp= new TextField("Queues Upload");				
 							tfQueuesUp.setWidth("80px");			
 							
-							if(queue!=null && queue.get("max-limit")!=null){		
-								String queueUp [] = queue.get("max-limit").split("/");
-								tfQueuesUp.setValue(queueUp[0]);												
+							if(base.getTipo().equals("mikrotik")){								
+								if(queue!=null && queue.get("max-limit")!=null){		
+									String queueUp [] = queue.get("max-limit").split("/");
+									tfQueuesUp.setValue(queueUp[0]);												
+								}									
+							}
+							
+							if(base.getTipo().equals("huawei") && info != null){								
+								tfQueuesUp.setValue(info[3]);
 							}
 							
 							String bloqueado = RadUserGroupDAO.getPlanoByUsername(ac.getLogin());
@@ -555,10 +606,18 @@ public class VisualizarContratoInfoTecnica extends Window {
 								TextField tfQueuesDown= new TextField("Queues Download");				
 								tfQueuesDown.setWidth("80px");	
 								
-								if(queue!=null && queue.get("max-limit")!=null){		
-									String queueDown [] = queue.get("max-limit").split("/");
-									tfQueuesDown.setValue(queueDown[1]);												
+								if(base.getTipo().equals("mikrotik")){									
+										if(queue!=null && queue.get("max-limit")!=null){		
+											String queueDown [] = queue.get("max-limit").split("/");
+											tfQueuesDown.setValue(queueDown[1]);												
+										}							
 								}
+								
+								if(base.getTipo().equals("huawei") && info != null){								
+									tfQueuesDown.setValue(info[4]);
+								}
+								
+								
 								String bloqueado = RadUserGroupDAO.getPlanoByUsername(ac.getLogin());
 		
 								tfQueuesDown.setReadOnly(true);
@@ -588,9 +647,17 @@ public class VisualizarContratoInfoTecnica extends Window {
 								TextField tfMacAdress= new TextField("MAC Adress");				
 								tfMacAdress.setWidth("200px");			
 
-								if(regTable!=null && regTable.get("mac-address") !=null){	
-									tfMacAdress.setValue(regTable.get("mac-address"));												
+								if(base.getTipo().equals("mikrotik")){
+									
+									if(regTable!=null && regTable.get("mac-address") !=null){	
+										tfMacAdress.setValue(regTable.get("mac-address"));												
+									}																	
 								}
+								
+								if(base.getTipo().equals("huawei") && info != null){								
+									tfMacAdress.setValue(info[1]);
+								}
+								
 								
 								tfMacAdress.setReadOnly(true);
 								tfMacAdress.setStyleName("caption-align-visualizar-conexao");

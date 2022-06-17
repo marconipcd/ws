@@ -4,19 +4,25 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import com.digital.opuserp.OpusERP4UI;
+import com.digital.opuserp.dao.AlteracoesContratoDAO;
 import com.digital.opuserp.dao.ArquivosContratoDAO;
 import com.digital.opuserp.dao.GerenciarModuloDAO;
 import com.digital.opuserp.domain.AcessoCliente;
+import com.digital.opuserp.domain.AlteracoesContrato;
 import com.digital.opuserp.domain.ArquivosContrato2;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
+import com.digital.opuserp.view.modulos.acesso.contratos_acesso.LiberarCartaoClienteEditor.LiberarCartaoClienteEvent;
+import com.digital.opuserp.view.modulos.acesso.contratos_acesso.LiberarCartaoClienteEditor.LiberarCartaoClienteListerner;
 import com.digital.opuserp.view.util.FileUploadUtil;
 import com.digital.opuserp.view.util.FileUploadUtil.FileUploadUtilEvent;
 import com.digital.opuserp.view.util.Notify;
@@ -24,6 +30,7 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
+import com.vaadin.data.Item;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ExternalResource;
@@ -33,6 +40,8 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component.Event;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
@@ -93,10 +102,8 @@ public class ArquivosUpload extends Window {
 					}
 				});
 				btEnviarNovoArquivo.setStyleName("default");
-				hlButtons.addComponent(btEnviarNovoArquivo);
-				
-				hlButtons.addComponent(buildBtCancelar());
-				
+				hlButtons.addComponent(btEnviarNovoArquivo);				
+				hlButtons.addComponent(buildBtCancelar());				
 				
 				addComponent(hlButtons);
 				setComponentAlignment(hlButtons, Alignment.BOTTOM_RIGHT);
@@ -105,7 +112,7 @@ public class ArquivosUpload extends Window {
 		buildLayout();
 		
 	}
-	
+	String nome_arquivo  ="";
 	private void uploadNovoArquivo(){
 			
 		final FileUploadUtil imgUtil = new FileUploadUtil("Upload de Arquivo", true, "contratos", contrato.getId().toString());
@@ -113,11 +120,14 @@ public class ArquivosUpload extends Window {
 			
 			@Override
 			public void onClose(FileUploadUtilEvent event) {
-				if(event.isConfirm()){					
+				if(event.isConfirm()){
+					nome_arquivo = event.getNome();
+					
 					ArquivosContratoDAO.save2(new ArquivosContrato2(null, contrato,event.getNome(), new Date(), event.getLink()));
+					AlteracoesContratoDAO.save(new AlteracoesContrato(null, "FEZ UPLOAD CONTRATO: "+event.getNome(), contrato, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+					
 					containerArquivos.refresh();											
 					imgUtil.close();
-					
 					
 				}
 			}
@@ -285,6 +295,8 @@ public class ArquivosUpload extends Window {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {	
+				
+					fireEvent(new ArquivoUploadEvent(getUI(), nome_arquivo));
 					close();									
 			}
 		});
@@ -302,4 +314,35 @@ public class ArquivosUpload extends Window {
 		
 		return btCancelar;
 	}
+	
+	
+	public void addListerner(ArquivoUploadListerner target){
+		try {
+			Method method = ArquivoUploadListerner.class.getDeclaredMethod("onClose", ArquivoUploadEvent.class);
+			addListener(ArquivoUploadEvent.class, target, method);
+		} catch (Exception e) {
+			System.out.println("Método não Encontrado!");
+		}
+	}
+	public void removeListerner(ArquivoUploadListerner target){
+		removeListener(ArquivoUploadEvent.class, target);
+	}
+	public static class ArquivoUploadEvent extends Event{
+		
+		private String nome_arquivo;
+		
+		public ArquivoUploadEvent(Component source, String nome_arquivo) {
+			super(source);
+			this.nome_arquivo = nome_arquivo;
+		}
+
+		public String getNomeArquivo() {
+			return nome_arquivo;
+		}	
+	}
+	public interface ArquivoUploadListerner extends Serializable{
+		public void onClose(ArquivoUploadEvent event);
+	}
+	
+	
 }

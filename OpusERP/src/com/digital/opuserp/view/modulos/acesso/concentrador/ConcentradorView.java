@@ -201,7 +201,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 		tb.setSizeFull();
 		tb.setSelectable(true);
 		tb.setColumnCollapsingAllowed(true);
-		tb.setVisibleColumns(new Object[] {"id","identificacao","base.nome","infraestrutura","modelo","antena","loop_back","endereco_ip","situacao"});
+		tb.setVisibleColumns(new Object[] {"id","identificacao","base.nome","infraestrutura","modelo","antena","loop_back","endereco_ip","situacao","tipo"});
 
 		tb.setColumnCollapsed("id", true);
 		
@@ -220,6 +220,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 		tb.setColumnHeader("infraestrutura", "Infraestrutura");
 		tb.setColumnHeader("loop_back", "Loopback");
 		tb.setColumnHeader("situacao", "Situação");
+		tb.setColumnHeader("tipo", "Tipo");
 		
 		tb.setImmediate(true);
 		tb.addListener(new Property.ValueChangeListener() {

@@ -76,7 +76,7 @@ public class PlanosView extends VerticalLayout{
 		gmDAO = new GerenciarModuloDAO();
 		
 		HorizontalLayout hlButons = new HorizontalLayout();
-		hlButons.addComponent(BuildbtTransferencia());
+		hlButons.addComponent(BuildbtNovo());
 		hlButons.addComponent(BuildbtEditar());
 		hlButons.addComponent(BuildbtExcluir());
 		
@@ -314,7 +314,7 @@ public class PlanosView extends VerticalLayout{
 	}
 
 	
-	public Button BuildbtTransferencia() {
+	public Button BuildbtNovo() {
 		btNovo = new Button("Novo", new Button.ClickListener() {
 			
 			@Override
@@ -350,6 +350,16 @@ public class PlanosView extends VerticalLayout{
 								
 								em.persist(new RadGroupReply(null, cAdd.getContrato_acesso().getId().toString()+"_"+cAdd.getNome(), 
 										"Mikrotik-Rate-Limit", "=", cAdd.getRate_limit()+" 0/0 0/0 0/0 "+cAdd.getPrioridade()+" "+cAdd.getMin_rate_limit()));
+								
+								
+								//---Huawei
+								em.persist(new RadGroupReply(null, cAdd.getContrato_acesso().getId().toString()+"_"+cAdd.getNome(), 
+										"Huawei-Input-Average-Rate", "=", cAdd.getRate_limit_huawei_up()));
+								
+								em.persist(new RadGroupReply(null, cAdd.getContrato_acesso().getId().toString()+"_"+cAdd.getNome(), 
+										"Huawei-Output-Average-Rate", "=", cAdd.getRate_limit_huawei_down()));
+								
+								
 								
 								
 								em.getTransaction().commit();
@@ -424,6 +434,8 @@ public class PlanosView extends VerticalLayout{
 									String MikrotikRateLimitValue = event.getItem().getItemProperty("rate_limit").getValue().toString()+" 0/0 0/0 0/0 "+event.getItem().getItemProperty("prioridade").getValue().toString()+" "+event.getItem().getItemProperty("min_rate_limit").getValue().toString();
 									ContratosAcesso contrato = (ContratosAcesso)event.getItem().getItemProperty("contrato_acesso").getValue();
 									String GroupNameValue = contrato.getId().toString()+"_"+event.getItem().getItemProperty("nome").getValue().toString();
+									String HuaweiInput = event.getItem().getItemProperty("rate_limit_huawei_up").getValue().toString();
+									String HuaweiOutput = event.getItem().getItemProperty("rate_limit_huawei_down").getValue().toString();
 									
 									PlanoAcesso plano = em.find(PlanoAcesso.class, codPlano);
 									
@@ -498,6 +510,41 @@ public class PlanosView extends VerticalLayout{
 												em.remove(rgr);
 											}
 											em.persist(new RadGroupReply(null, GroupNameValue,"Mikrotik-Rate-Limit", "=", IdleTimeOutValue));
+										}
+										
+										
+										//Huawei Input Rate Limit
+										Query qRadGroupHuaweiInputRateLimit = em.createQuery("select rgr from RadGroupReply rgr where " +
+												"rgr.groupname = :groupName and rgr.attribute = 'Huawei-Input-Average-Rate' ", RadGroupReply.class);
+										qRadGroupHuaweiInputRateLimit.setParameter("groupName", groupName);
+									
+										if(qRadGroupHuaweiInputRateLimit.getResultList().size() == 1){
+											RadGroupReply rgr = (RadGroupReply)qRadGroupHuaweiInputRateLimit.getSingleResult();
+											rgr.setValue(HuaweiInput);
+											rgr.setGroupname(GroupNameValue);
+											em.merge(rgr);
+										}else{
+											for(RadGroupReply rgr:(List<RadGroupReply>)qRadGroupHuaweiInputRateLimit.getResultList()){
+												em.remove(rgr);
+											}
+											em.persist(new RadGroupReply(null, GroupNameValue,"Huawei-Input-Average-Rate", "=", HuaweiInput));
+										}
+										
+										//Huawei Output Rate Limit
+										Query qRadGroupHuaweiOutputRateLimit = em.createQuery("select rgr from RadGroupReply rgr where " +
+												"rgr.groupname = :groupName and rgr.attribute = 'Huawei-Output-Average-Rate' ", RadGroupReply.class);
+										qRadGroupHuaweiOutputRateLimit.setParameter("groupName", groupName);
+									
+										if(qRadGroupHuaweiOutputRateLimit.getResultList().size() == 1){
+											RadGroupReply rgr = (RadGroupReply)qRadGroupHuaweiOutputRateLimit.getSingleResult();
+											rgr.setValue(HuaweiOutput);
+											rgr.setGroupname(GroupNameValue);
+											em.merge(rgr);
+										}else{
+											for(RadGroupReply rgr:(List<RadGroupReply>)qRadGroupHuaweiOutputRateLimit.getResultList()){
+												em.remove(rgr);
+											}
+											em.persist(new RadGroupReply(null, GroupNameValue,"Huawei-Output-Average-Rate", "=", HuaweiOutput));
 										}
 										
 										

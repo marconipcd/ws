@@ -140,6 +140,10 @@ public class AcessoCliente {
 	@OneToOne
 	@JoinColumn(name="SWITH_ID", nullable=true)
 	private Swith swith;
+	
+	@OneToOne
+	@JoinColumn(name="VENDEDOR", nullable=true)
+	private Usuario vendedor;
 		
 	@PrePersist
 	private void onInsert(){
@@ -165,6 +169,19 @@ public class AcessoCliente {
 	@Column(name="PENDENCIA_UPLOAD")
 	private boolean pendencia_upload;
 	
+	@Column(name="ID_CLIENTE_TOPSAPP")
+	private Integer id_cliente_topsapp;
+	@Column(name="SENHA_PARAMOUNT")
+	private String senha_paramount;
+	
+	public String getSenha_paramount() {
+		return senha_paramount;
+	}
+
+	public void setSenha_paramount(String senha_paramount) {
+		this.senha_paramount = senha_paramount;
+	}
+
 	public AcessoCliente(String coluna, Long qtd) {		
 		this.coluna = coluna;
 		this.qtd = qtd;
@@ -680,4 +697,24 @@ public class AcessoCliente {
 	public void setPendencia_upload(boolean pendencia_upload) {
 		this.pendencia_upload = pendencia_upload;
 	}
+
+	public Integer getId_cliente_topsapp() {
+		return id_cliente_topsapp;
+	}
+
+	public void setId_cliente_topsapp(Integer id_cliente_topsapp) {
+		this.id_cliente_topsapp = id_cliente_topsapp;
+	}
+
+	public Usuario getVendedor() {
+		return vendedor;
+	}
+
+	public void setVendedor(Usuario vendedor) {
+		this.vendedor = vendedor;
+	}
+
+	
+	
+	
 }

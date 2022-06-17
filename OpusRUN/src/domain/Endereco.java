@@ -45,6 +45,9 @@ public class Endereco {
 	@Column(name="STATUS", nullable=true)
 	private String status;
 	
+	@Column(name="LOCALIZACAO", nullable=true, unique=false)
+	private String localizacao;
+	
 	
 	@OneToOne
 	@JoinColumn(name="CLIENTES_ID")
@@ -189,6 +192,14 @@ public class Endereco {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getLocalizacao() {
+		return localizacao;
+	}
+
+	public void setLocalizacao(String localizacao) {
+		this.localizacao = localizacao;
 	}
    
 

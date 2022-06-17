@@ -5229,6 +5229,13 @@ body .dashboard.v-app .v-app-loading {
 	width: 25px;
 }
 
+.dashboard .v-caption-caption-vendedor-visualizar {
+	display: inline-block;
+	padding-left: 10px;
+	padding-rigth: 5px;
+	width: 265px;
+}
+
 .dashboard .v-caption-caption-align-plano-acao {
 	display: inline-block;
 	padding-left: 10px;

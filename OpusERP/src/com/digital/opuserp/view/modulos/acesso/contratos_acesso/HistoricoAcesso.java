@@ -8,6 +8,7 @@ import com.digital.opuserp.domain.Concentrador;
 import com.digital.opuserp.domain.RadAcct;
 import com.digital.opuserp.util.ByteUtil;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.TimeUtil;
 import com.digital.opuserp.view.util.Notify;
@@ -370,12 +371,22 @@ public class HistoricoAcesso extends Window {
 				
 				if(item != null){
 					Concentrador base = (Concentrador) item.getItemProperty("base").getValue();
-					boolean check = MikrotikUtil.desconectarCliente(base.getUsuario(), base.getSenha(), base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), username);
+					
+					boolean check = false;
+					if(base.getTipo().equals("mikrotik")){					
+							check = MikrotikUtil.desconectarCliente(base.getUsuario(), base.getSenha(), base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), username);
+					}
+					
+					if(base.getTipo().equals("huawei")){		
+							check  = HuaweiUtil.desconectarCliente(item.getItemProperty("login").getValue().toString());
+					}
+
+					
 					if(check){						
 						Notify.Show("O Cliente foi Desconectado Com Sucesso!", Notify.TYPE_SUCCESS);
 					}else{
 						Notify.Show("O Cliente já esta Desconectado!", Notify.TYPE_NOTICE);
-					}
+					}					
 				}
 				vl.replaceComponent(tbChamados, buildTbChamados());
 				vl.setExpandRatio(tbChamados, 1);

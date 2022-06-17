@@ -9,7 +9,9 @@ import com.digital.opuserp.dao.ContratosAcessoDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.Cliente;
+import com.digital.opuserp.domain.Concentrador;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Validator;
 import com.digital.opuserp.view.util.Notify;
@@ -73,6 +75,10 @@ public class AlterarIpFixoEditor extends Window {
 	
 	boolean valid_ip = true;
 	
+	String[] info = null;
+	
+	Concentrador base; 
+	
 	public AlterarIpFixoEditor(Item item, String title, boolean modal){
 		this.item = item;
 		
@@ -83,6 +89,11 @@ public class AlterarIpFixoEditor extends Window {
 		if (item.getItemProperty("id").getValue() != null) {
 			codAcesso = (Integer)item.getItemProperty("id").getValue();
 			acesso = ContratosAcessoDAO.find(codAcesso);
+			base = acesso.getBase();
+			
+			if(base != null && base.getTipo().equals("huawei")){
+				info = HuaweiUtil.pegarInformacoes(acesso.getLogin());
+			}			
 		}
 	
 		setWidth("745px");
@@ -174,7 +185,17 @@ public class AlterarIpFixoEditor extends Window {
 					addComponent(txtStatusConcentrador);
 					
 					
-					boolean statusConcentrador = MikrotikUtil.testconexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(),Integer.parseInt(acesso.getBase().getPorta_api()));
+					boolean statusConcentrador = false;
+					
+					if(base.getTipo().equals("mikrotik")){
+							statusConcentrador = MikrotikUtil.testconexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(),Integer.parseInt(acesso.getBase().getPorta_api()));
+					}
+					
+					if(base.getTipo().equals("huawei")){
+						if(info != null){
+							statusConcentrador = true;
+						}
+					}
 					
 					if(statusConcentrador){
 						txtStatusConcentrador.setReadOnly(false);
@@ -207,8 +228,24 @@ public class AlterarIpFixoEditor extends Window {
 							
 							addComponent(txtComunicacaoConcentrador);
 							
-							comunicacao =	MikrotikUtil.buscarComunicacao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),  acesso.getEndereco_mac());
-							logado = MikrotikUtil.buscarStatusConexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+							if(base.getTipo().equals("mikrotik")){
+								comunicacao =	MikrotikUtil.buscarComunicacao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),  acesso.getEndereco_mac());
+								logado = MikrotikUtil.buscarStatusConexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+							}
+							
+							if(base.getTipo().equals("huawei")){
+								if(info != null){
+									comunicacao = true;
+									
+									if(info.length > 1){
+										logado = true;
+									}else{
+										logado = false;
+									}
+								}
+							}
+							
+							
 							
 							if(comunicacao || logado){
 								txtComunicacaoConcentrador.setReadOnly(false);
@@ -232,8 +269,21 @@ public class AlterarIpFixoEditor extends Window {
 					
 					@Override
 					public void buttonClick(ClickEvent event) {
-						comunicacao =	MikrotikUtil.buscarComunicacao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),  acesso.getEndereco_mac());
-						logado = MikrotikUtil.buscarStatusConexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+						
+						if(base.getTipo().equals("mikrotik")){
+							comunicacao =	MikrotikUtil.buscarComunicacao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),  acesso.getEndereco_mac());
+							logado = MikrotikUtil.buscarStatusConexao(acesso.getBase().getUsuario(),acesso.getBase().getSenha(),acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+						}
+						
+						if(base.getTipo().equals("huawei") && info != null){
+							comunicacao = true;
+							
+							if(info.length > 1){
+								logado = true;
+							}else{
+								logado = false;
+							}
+						}
 						
 						if(comunicacao || logado){
 							txtComunicacaoConcentrador.setReadOnly(false);
@@ -265,8 +315,18 @@ public class AlterarIpFixoEditor extends Window {
 						
 						txtEnderecoIpPool.setReadOnly(false);		
 						
-						String ip = MikrotikUtil.getRemoteIpPPOE(acesso.getBase().getEndereco_ip(),acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getLogin());
-						txtEnderecoIpPool.setValue(ip);										
+						String ip = "";
+						if(base.getTipo().equals("mikrotik")){
+							ip = MikrotikUtil.getRemoteIpPPOE(acesso.getBase().getEndereco_ip(),acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getLogin());
+							txtEnderecoIpPool.setValue(ip);			
+						}
+						
+						if(base.getTipo().equals("huawei") && info != null && info.length > 1){
+							ip = info[2];
+							txtEnderecoIpPool.setValue(ip);			
+						}
+						
+						
 						BrowserWindowOpener openIpPool = new BrowserWindowOpener("http://"+ip);
 						openIpPool.setFeatures("height=600,width=800");
 						openIpPool.extend(txtEnderecoIpPool);
@@ -322,9 +382,29 @@ public class AlterarIpFixoEditor extends Window {
 							
 							@Override
 							public void buttonClick(ClickEvent event) {
-								boolean check = MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),acesso.getLogin());
+								
+								boolean check = false;
+								if(base.getTipo().equals("mikrotik")){
+									check = MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()),acesso.getLogin());
+								}
+								
+								if(base.getTipo().equals("huawei")){
+									check = HuaweiUtil.desconectarCliente(acesso.getLogin());
+								}
+																
 								if(check){
 									Notification.show("O Cliente foi Desconectado Com Sucesso!");
+									
+									if(base.getTipo().equals("huawei")){
+										info = HuaweiUtil.pegarInformacoes(acesso.getLogin());
+										
+										if(info != null && info.length>1){
+											txtEnderecoIpPool.setReadOnly(false);
+											txtEnderecoIpPool.setValue(info[2]);
+											txtEnderecoIpPool.setReadOnly(true);
+										}
+									}
+									
 								}else{
 									Notification.show("O Cliente já esta Desconectado!");
 								}
@@ -347,9 +427,20 @@ public class AlterarIpFixoEditor extends Window {
 						txtEnderecoIpPool.setStyleName("caption-align-ip-fixo");
 						
 						txtEnderecoIpPool.setReadOnly(false);		
-										
-						String ip = MikrotikUtil.getRemoteIpPPOE(acesso.getBase().getEndereco_ip(),acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getLogin());
-						txtEnderecoIpPool.setValue(ip);										
+						
+						
+						String ip = "";
+						
+						if(base.getTipo().equals("mikrotik")){
+							ip = MikrotikUtil.getRemoteIpPPOE(acesso.getBase().getEndereco_ip(),acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getLogin());
+						}
+						
+						if(base.getTipo().equals("huawei")){
+							ip = info[2];
+						}
+						
+						txtEnderecoIpPool.setValue(ip);								
+						
 						BrowserWindowOpener openIpPool = new BrowserWindowOpener("http://"+ip+":1802");
 						openIpPool.setFeatures("height=600,width=800");
 						openIpPool.extend(txtEnderecoIpPool);

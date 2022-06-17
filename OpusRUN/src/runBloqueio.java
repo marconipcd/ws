@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import util.HuaweiUtil;
 import util.MikrotikUtil;
 import dao.ContasReceberDAO;
 import dao.CredenciaisAcessoDAO;
@@ -98,7 +99,14 @@ public class runBloqueio {
 									
 									//Derruba Cliente Caso Esteja Logado
 									//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
-									MikrotikUtil.derrubarConexaoPPPOE(acessoCliente.getBase().getUsuario(), acessoCliente.getBase().getSenha(), acessoCliente.getBase().getEndereco_ip(), Integer.parseInt(acessoCliente.getBase().getPorta_api()), acessoCliente.getLogin());
+									
+									if(acessoCliente.getBase().getTipo().equals("mikrotik")){
+										MikrotikUtil.derrubarConexaoPPPOE(acessoCliente.getBase().getUsuario(), acessoCliente.getBase().getSenha(), acessoCliente.getBase().getEndereco_ip(), Integer.parseInt(acessoCliente.getBase().getPorta_api()), acessoCliente.getLogin());
+									}
+									
+									if(acessoCliente.getBase().getTipo().equals("huawei")){
+										HuaweiUtil.desconectarCliente(acessoCliente.getLogin());
+									}
 								
 									//Mudar status Ittv para INACTIVE
 									if(acessoCliente.getIttv_id() != null && !acessoCliente.getIttv_id().equals("")){
@@ -139,7 +147,14 @@ public class runBloqueio {
 									
 									//Derruba Cliente Caso Esteja Logado
 									//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
-									MikrotikUtil.derrubarConexaoPPPOE(acessoCliente.getBase().getUsuario(), acessoCliente.getBase().getSenha(), acessoCliente.getBase().getEndereco_ip(), Integer.parseInt(acessoCliente.getBase().getPorta_api()), acessoCliente.getLogin());
+									
+									if(acessoCliente.getBase().getTipo().equals("mikrotik")){
+											MikrotikUtil.derrubarConexaoPPPOE(acessoCliente.getBase().getUsuario(), acessoCliente.getBase().getSenha(), acessoCliente.getBase().getEndereco_ip(), Integer.parseInt(acessoCliente.getBase().getPorta_api()), acessoCliente.getLogin());
+									}
+									
+									if(acessoCliente.getBase().getTipo().equals("huawei")){
+											HuaweiUtil.desconectarCliente(acessoCliente.getLogin());
+									}
 								
 								em.getTransaction().commit();
 							}
@@ -225,7 +240,14 @@ public class runBloqueio {
 
 								//Derruba Conexao
 								if(acesso.getBase() != null && acesso.getBase().getUsuario() != null && acesso.getBase().getSenha() != null && acesso.getBase().getEndereco_ip() != null && acesso.getBase().getPorta_api() != null && acesso.getLogin() != null){
-									MikrotikUtil.derrubarConexaoPPPOE(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+									
+									if(acesso.getBase().getTipo().equals("mikrotik")){
+											MikrotikUtil.derrubarConexaoPPPOE(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+									}
+									
+									if(acesso.getBase().getTipo().equals("huawei")){
+											HuaweiUtil.desconectarCliente(acesso.getLogin());
+									}
 								}
 							
 							em.getTransaction().commit();
@@ -279,17 +301,18 @@ public class runBloqueio {
 		for (RadReply rr : (List<RadReply>)q5.getResultList()) {
 			em.remove(rr); 
 		}
-										
-		//Altera o Plano para plano de bloqueio
-		Query q6 = em.createQuery("select r from RadUserGroup r where r.username=:login", RadUserGroup.class);
-		q6.setParameter("login", acesso.getLogin());
-		
-		for (RadUserGroup r : (List<RadUserGroup>)q6.getResultList()) {
-			em.remove(r); 
+			
+		if(acesso.getPlano().getPlano_bloqueio() != null){
+				//Altera o Plano para plano de bloqueio
+				Query q6 = em.createQuery("select r from RadUserGroup r where r.username=:login", RadUserGroup.class);
+				q6.setParameter("login", acesso.getLogin());
+				
+				for (RadUserGroup r : (List<RadUserGroup>)q6.getResultList()) {
+					em.remove(r); 
+				}
+				
+				em.persist(new RadUserGroup(null, acesso.getLogin(), acesso.getPlano().getPlano_bloqueio().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getPlano_bloqueio().getNome(), "1"));
 		}
-		
-		em.persist(new RadUserGroup(null, acesso.getLogin(), acesso.getPlano().getPlano_bloqueio().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getPlano_bloqueio().getNome(), "1"));
-		
 	}
 	
 	private static void verificaBoletosAtrasadosMarcaParaBloquear(){
