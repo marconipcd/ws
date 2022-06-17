@@ -184,7 +184,7 @@ public class UsuarioUtil extends Window {
 
 	public void addFilter(String s) {
 		container.removeAllContainerFilters();
-		container.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
+		//container.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
 			
 		
 		Object[] collums = tb.getVisibleColumns();		
@@ -296,8 +296,7 @@ public class UsuarioUtil extends Window {
 			this.usuario  = usuario;
 		}
 
-		public Usuario getFormaPgto() {
-			
+		public Usuario getUsuario() {			
 			return usuario;
 		}		
 	}

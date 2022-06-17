@@ -8,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -64,6 +62,9 @@ public class Concentrador {
 	
 	@Column(name="LOOP_BACK", unique=false, nullable=false, length=20)
 	private String loop_back;
+	
+	@Column(name="TIPO", nullable=true) 
+	private String tipo;
 	
 	public Concentrador(){
 		
@@ -225,6 +226,14 @@ public class Concentrador {
 
 	public void setLoop_back(String loop_back) {
 		this.loop_back = loop_back;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 	
 	

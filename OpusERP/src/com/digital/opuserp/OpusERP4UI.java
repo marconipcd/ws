@@ -89,7 +89,7 @@ import com.vaadin.ui.themes.Reindeer;
 @JavaScript({
 	"https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
 	"jquery.maskMoney.js","jquery.mask.min.js","jnotify.js",
-	"confirmation.js",
+	//"confirmation.js",
 	"bootstrap.min.js",
 	"Moeda.js",
 	"notify.js",
@@ -141,12 +141,12 @@ public class OpusERP4UI extends UI implements BroadcastListener {
 	@Override
 	protected void init(VaadinRequest request) {		
 		
+		System.out.println(getWidth());
 		System.out.println(request.getHeader("User-Agent"));
 		if(request.getHeader("User-Agent").contains("Mobi")){
 			mobile = true;
 		}
 		
-		//request.
 		//browser = getPage().getWebBrowser();
         setLocale(new Locale("pt", "BR"));
        
@@ -184,13 +184,13 @@ public class OpusERP4UI extends UI implements BroadcastListener {
 	}
 	
 	private void buildLoginView(boolean exit) {
-       // if(!mobile){
         	loginViewNormal(exit);
-      //  }else{
-      //  	loginViewMobile(exit);
-        	
-        	
-      //  }
+       if(!mobile){
+    	   System.out.println("desktop");
+        }else{
+        	//loginViewMobile(exit);
+        	System.out.println("mobile");        	
+        }
     }
 	
 	private void loginViewMobile(boolean exit){

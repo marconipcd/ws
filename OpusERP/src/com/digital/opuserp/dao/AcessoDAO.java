@@ -8,15 +8,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.hibernate.LockMode;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Months;
 
 import com.digital.opuserp.OpusERP4UI;
 import com.digital.opuserp.domain.AcessoCliente;
-import com.digital.opuserp.domain.AlteracoesSerial;
 import com.digital.opuserp.domain.AlteracoesContrato;
+import com.digital.opuserp.domain.AlteracoesSerial;
 import com.digital.opuserp.domain.Cliente;
 import com.digital.opuserp.domain.Concentrador;
 import com.digital.opuserp.domain.ContasReceber;
@@ -34,6 +33,7 @@ import com.digital.opuserp.domain.RadUserGgroup;
 import com.digital.opuserp.domain.SerialProduto;
 import com.digital.opuserp.domain.Swith;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.util.Notify;
@@ -41,6 +41,41 @@ import com.digital.opuserp.view.util.Notify;
 
 public class AcessoDAO {
 	
+	public static boolean desvincular_cartao_cliente(String cartao, AcessoCliente contrato3){
+		
+		try{
+			EntityManager em = ConnUtil.getEntity();
+			Query q = em.createQuery("select a from AcessoCliente a where a.codigo_cartao=:codigo", AcessoCliente.class);
+			q.setParameter("codigo", cartao);
+			List<AcessoCliente> contratos = q.getResultList();
+			
+			Query q2 = em.createQuery("select a from ContasReceber a where a.codigo_cartao=:codigo", ContasReceber.class);
+			q2.setParameter("codigo", cartao);
+			List<ContasReceber> boletos = q2.getResultList();
+			
+			em.getTransaction().begin();
+			for (AcessoCliente contrato: contratos) {
+				contrato.setCodigo_cartao(null);
+				em.merge(contrato);
+			}
+			
+			for (ContasReceber boleto : boletos) {
+				boleto.setCodigo_cartao(null);
+				em.merge(boleto);
+			}
+			em.getTransaction().commit();
+			
+			AlteracoesContratoDAO.save(new AlteracoesContrato(null, "DESVINCULOU CARTAO: "+cartao,contrato3, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+			
+			
+			return true;
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			
+			return false;
+		}
+	}
 	
 	public static boolean checkVinculoCaixaAtendimento(AcessoCliente contrato){
 		
@@ -460,7 +495,7 @@ public class AcessoDAO {
 							}
 						}
 						
-						if(contrato.getBase().getWireless().equals("SIM")){				
+						if(contrato.getBase().getWireless().equals("SIM") && contrato.getBase().getTipo().equals("mikrotik")){				
 							MikrotikUtil.liberarAccessList(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(),Integer.parseInt(contrato.getBase().getPorta_api()),contrato.getId().toString(), contrato.getCliente().getNome_razao(), contrato.getEndereco_mac(), contrato.getInterfaces(),contrato.getSignal_strength());
 						}
 						
@@ -556,7 +591,7 @@ public class AcessoDAO {
 						}
 					}
 					
-					if(contrato.getBase().getWireless().equals("SIM")){				
+					if(contrato.getBase().getWireless().equals("SIM") && contrato.getBase().getTipo().equals("mikrotik")){				
 						MikrotikUtil.liberarAccessList(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(),Integer.parseInt(contrato.getBase().getPorta_api()),contrato.getId().toString(), contrato.getCliente().getNome_razao(), contrato.getEndereco_mac(), contrato.getInterfaces(),contrato.getSignal_strength());
 					}
 					
@@ -738,7 +773,14 @@ public class AcessoDAO {
 				em.getTransaction().commit();			
 								
 				if(contrato.getBase() != null && contrato.getLogin() != null){
-					MikrotikUtil.desconectarCliente(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(), Integer.parseInt(contrato.getBase().getPorta_api()), contrato.getLogin());
+					
+					if(contrato.getBase().getTipo().equals("mikrotik")){
+						MikrotikUtil.desconectarCliente(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(), Integer.parseInt(contrato.getBase().getPorta_api()), contrato.getLogin());
+					}
+					if(contrato.getBase().getTipo().equals("huawei")){
+						HuaweiUtil.desconectarCliente(contrato.getLogin());
+					}
+					
 				}
 		
 				LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Alteração de Plano para um Contrato de Acesso"));
@@ -966,7 +1008,13 @@ public class AcessoDAO {
 				em.getTransaction().commit();			
 								
 				if(contrato.getBase() != null && contrato.getLogin() != null){
-					MikrotikUtil.desconectarCliente(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(), Integer.parseInt(contrato.getBase().getPorta_api()), contrato.getLogin());
+					
+					if(contrato.getBase().getTipo().equals("mikrotik")){
+						MikrotikUtil.desconectarCliente(contrato.getBase().getUsuario(), contrato.getBase().getSenha(), contrato.getBase().getEndereco_ip(), Integer.parseInt(contrato.getBase().getPorta_api()), contrato.getLogin());
+					}
+					if(contrato.getBase().getTipo().equals("huawei")){
+						HuaweiUtil.desconectarCliente(contrato.getLogin());
+					}
 				}
 				
 				
@@ -1062,7 +1110,13 @@ public class AcessoDAO {
 			LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Alteração de Credenciais para um Contrato de Acesso"));
 			AlteracoesContratoDAO.save(new AlteracoesContrato(null, "ALTERAÇÃO DE CREDENCIAIS", ac, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
 			
-			MikrotikUtil.desconectarCliente(ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()), ac.getLogin());
+			if(ac.getBase().getTipo().equals("mikrotik")){
+					MikrotikUtil.desconectarCliente(ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()), ac.getLogin());
+			}
+			
+			if(ac.getBase().getTipo().equals("huawei")){
+					HuaweiUtil.desconectarCliente(ac.getLogin());
+			}
 			
 			return true;
 		}catch(Exception e){
@@ -1108,26 +1162,25 @@ public class AcessoDAO {
 			
 				String interfaces = ac.getInterfaces();
 				String signal_strength = ac.getSignal_strength();
-										
-				//Remover Access-List 
-				MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), endereco_mac);				
-				MikrotikUtil.removerAccessList(b_nova.getUsuario(), b_nova.getSenha(), b_nova.getEndereco_ip(),Integer.parseInt(b_nova.getPorta_api()),c.getNome_razao(), endereco_mac);
-				
-				//Alterar Concentrador
-				if(b_nova.getWireless().equals("SIM")){
-					MikrotikUtil.liberarAccessList(b_nova.getUsuario(), b_nova.getSenha(), b_nova.getEndereco_ip(),Integer.parseInt(b_nova.getPorta_api()),ac.getId().toString(),c.getNome_razao(), endereco_mac_novo, interfaces, signal_strength);
-				}
-				
-				List<FiltroAcesso> filtros = CredenciaisAcessoDAO.getFiltrosAcesso(ac.getId());
-				
-				if(filtros != null && filtros.size() > 0){
 					
-					for (FiltroAcesso filtro : filtros) {
-																	
-						MikrotikUtil.removerMarcacaoFirewallFiltroBloqContext(ac.getBase().getUsuario(), ac.getBase().getSenha(),ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), filtro.getPalavra());
+				if(ac.getBase().getTipo().equals("mikrotik")){
+						//Remover Access-List 
+						MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), endereco_mac);				
+						MikrotikUtil.removerAccessList(b_nova.getUsuario(), b_nova.getSenha(), b_nova.getEndereco_ip(),Integer.parseInt(b_nova.getPorta_api()),c.getNome_razao(), endereco_mac);
 						
-						MikrotikUtil.criarMarcacaoFirewallFiltroBloqContext(b_nova.getUsuario(), b_nova.getSenha(),b_nova.getEndereco_ip(), Integer.parseInt(b_nova.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), filtro.getPalavra());
-					}									
+						//Alterar Concentrador
+						if(b_nova.getWireless().equals("SIM")){
+							MikrotikUtil.liberarAccessList(b_nova.getUsuario(), b_nova.getSenha(), b_nova.getEndereco_ip(),Integer.parseInt(b_nova.getPorta_api()),ac.getId().toString(),c.getNome_razao(), endereco_mac_novo, interfaces, signal_strength);
+						}
+						
+						List<FiltroAcesso> filtros = CredenciaisAcessoDAO.getFiltrosAcesso(ac.getId());
+						
+						if(filtros != null && filtros.size() > 0){					
+							for (FiltroAcesso filtro : filtros) {																	
+								MikrotikUtil.removerMarcacaoFirewallFiltroBloqContext(ac.getBase().getUsuario(), ac.getBase().getSenha(),ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), filtro.getPalavra());						
+								MikrotikUtil.criarMarcacaoFirewallFiltroBloqContext(b_nova.getUsuario(), b_nova.getSenha(),b_nova.getEndereco_ip(), Integer.parseInt(b_nova.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), filtro.getPalavra());
+							}									
+						}
 				}
 				
 				em.getTransaction().begin();
@@ -1312,12 +1365,19 @@ public class AcessoDAO {
 						em.getTransaction().commit();
 		
 						Concentrador b = ac.getBase();		
-						MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
 						
-						if(b != null){ 
-							MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getCliente().getNome_razao(), ac.getEndereco_mac());
-							MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), ac.getInterfaces(), ac.getSignal_strength());
-						}	
+						if(b.getTipo().equals("mikrotik")){
+								MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
+								
+								if(b != null){ 
+									MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getCliente().getNome_razao(), ac.getEndereco_mac());
+									MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), ac.getInterfaces(), ac.getSignal_strength());
+								}	
+						}
+						
+						if(b.getTipo().equals("huawei")){
+								HuaweiUtil.desconectarCliente(ac.getLogin());
+						}
 						
 						LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Alteração de Material para um Contrato de Acesso"));		
 						AlteracoesContratoDAO.save(new AlteracoesContrato(null, "ALTERAÇÃO DE MATERIAL", ac, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
@@ -1490,13 +1550,21 @@ public class AcessoDAO {
 						
 						em.getTransaction().commit();
 		
-						Concentrador b = ac.getBase();		
-						MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
+						Concentrador b = ac.getBase();	
 						
-						if(b != null){ 
-							MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getCliente().getNome_razao(), ac.getEndereco_mac());
-							MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), ac.getInterfaces(), ac.getSignal_strength());
-						}	
+						if(b.getTipo().equals("mikrotik")){
+							MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
+							
+							if(b != null){ 
+								MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getCliente().getNome_razao(), ac.getEndereco_mac());
+								MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),ac.getId().toString(), ac.getCliente().getNome_razao(), ac.getEndereco_mac(), ac.getInterfaces(), ac.getSignal_strength());
+							}	
+						}
+						
+						if(b.getTipo().equals("huawei")){
+							HuaweiUtil.desconectarCliente(ac.getLogin());
+						}
+						
 						
 						LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Alteração de Material para um Contrato de Acesso"));		
 						AlteracoesContratoDAO.save(new AlteracoesContrato(null, "ALTERAÇÃO DE MATERIAL", ac, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
@@ -1575,8 +1643,16 @@ public class AcessoDAO {
 				Concentrador b = ac.getBase();											
 				
 				if(b != null){
-					MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
-					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getCliente().getNome_razao(), ac.getEndereco_mac());										
+					
+					if(b.getTipo().equals("mikrotik")){
+						MikrotikUtil.desconectarCliente(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getLogin());
+						MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), ac.getCliente().getNome_razao(), ac.getEndereco_mac());
+					}
+					
+					if(b.getTipo().equals("huawei")){
+						HuaweiUtil.desconectarCliente(ac.getLogin());
+					}
+					
 				}										
 				
 				LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Fez uma Remoção de Material para um Contrato de Acesso"));											
@@ -1717,7 +1793,7 @@ public class AcessoDAO {
 				
 				
 				Concentrador b = ac.getBase();
-				if(b != null && b.getWireless().equals("SIM")){				 
+				if(b != null && b.getWireless().equals("SIM") && b.getTipo().equals("mikrotik")){				 
 					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), ac.getEndereco_mac());			
 					MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), 	ac.getId().toString(), c.getNome_razao(), endereco_mac_novo, ac.getInterfaces(), ac.getSignal_strength());
 				}			
@@ -1802,7 +1878,7 @@ public class AcessoDAO {
 				}	
 				
 				Concentrador b = ac.getBase();
-				if(b != null){				 
+				if(b != null && b.getTipo().equals("mikrotik")){				 
 					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), ac.getEndereco_mac());			
 					MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), 	ac.getId().toString(), c.getNome_razao(), endereco_mac_novo, ac.getInterfaces(), ac.getSignal_strength());
 				}			
@@ -1882,7 +1958,7 @@ public class AcessoDAO {
 				
 				
 				Concentrador b = ac.getBase();
-				if(b != null){				 
+				if(b != null && b.getTipo().equals("mikrotik")){				 
 					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), ac.getEndereco_mac());			
 					MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), 	ac.getId().toString(), c.getNome_razao(), endereco_mac_novo, ac.getInterfaces(), ac.getSignal_strength());
 				}			
@@ -1941,7 +2017,7 @@ public class AcessoDAO {
 				}	
 								
 				Concentrador b = ac.getBase();
-				if(b != null){				 
+				if(b != null && b.getTipo().equals("mikrotik")){				 
 					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), ac.getEndereco_mac());			
 					MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), 	ac.getId().toString(), c.getNome_razao(), endereco_mac_novo, ac.getInterfaces(), ac.getSignal_strength());
 				}			
@@ -2003,7 +2079,7 @@ public class AcessoDAO {
 				
 				
 				Concentrador b = ac.getBase();
-				if(b != null){				 
+				if(b != null && b.getTipo().equals("mikrotik")){				 
 					MikrotikUtil.removerAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()),c.getNome_razao(), ac.getEndereco_mac());			
 					MikrotikUtil.liberarAccessList(b.getUsuario(), b.getSenha(), b.getEndereco_ip(),Integer.parseInt(b.getPorta_api()), 	ac.getId().toString(), c.getNome_razao(), endereco_mac_novo, ac.getInterfaces(), ac.getSignal_strength());
 				}			

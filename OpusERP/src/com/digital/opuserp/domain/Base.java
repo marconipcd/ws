@@ -106,15 +106,12 @@ public class Base {
 	private String situacao;
 	
 	
+	
+	
 	public Base(){
 		
 	}
 	
-	
-
-	
-
-
 	public Base(Integer id, Integer empresa_id, String nome, String altura,
 			String altitude, String coordenadas_sul, String coordenadas_oeste,
 			String tipo_torre, String tensao, String tipo_tensao,
@@ -528,6 +525,8 @@ public class Base {
 	public void setSituacao(String situacao) {
 		this.situacao = situacao;
 	}
+
+	
 
 	
 	

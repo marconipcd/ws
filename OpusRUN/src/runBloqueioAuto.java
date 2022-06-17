@@ -7,6 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import util.HuaweiUtil;
 import util.MikrotikUtil;
 import dao.CredenciaisAcessoDAO;
 import domain.AcessoCliente;
@@ -107,7 +108,13 @@ public class runBloqueioAuto {
 										
 		em.getTransaction().commit();
 		
-		MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+		if(acesso.getBase().getTipo().equals("mikrotik")){
+				MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+		}
+		if(acesso.getBase().getTipo().equals("huawei")){
+				HuaweiUtil.desconectarCliente(acesso.getLogin());
+		}
+		
 		
 	}
 	

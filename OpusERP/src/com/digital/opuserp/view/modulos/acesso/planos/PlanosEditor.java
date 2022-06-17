@@ -402,6 +402,47 @@ public class PlanosEditor extends Window implements GenericEditor {
 				setExpandRatio(txtMinDownloadUpload, 2);						
 			}
 		});	
+		
+		
+		vlRoot.addComponent(new FormLayout(){					
+			{
+				
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+								
+				TextField txtUploadHuawei = (TextField)fieldGroup.buildAndBind("Upload Huawei", "rate_limit_huawei_up");				
+				txtUploadHuawei.setWidth("130px");				
+				txtUploadHuawei.addStyleName("caption-align-planos");
+				txtUploadHuawei.setNullRepresentation("");					
+				txtUploadHuawei.setRequired(true);
+				txtUploadHuawei.setMaxLength(100);				
+								
+				addComponent(txtUploadHuawei);
+				setExpandRatio(txtUploadHuawei, 2);						
+			}
+		});	
+		
+		vlRoot.addComponent(new FormLayout(){					
+			{
+				
+				setMargin(true);
+				setSpacing(true);
+				addStyleName("form-cutom");						
+								
+				TextField txtDownloadHuawei = (TextField)fieldGroup.buildAndBind("Download Huawei", "rate_limit_huawei_down");				
+				txtDownloadHuawei.setWidth("130px");				
+				txtDownloadHuawei.addStyleName("caption-align-planos");
+				txtDownloadHuawei.setNullRepresentation("");					
+				txtDownloadHuawei.setRequired(true);
+				txtDownloadHuawei.setMaxLength(100);				
+								
+				addComponent(txtDownloadHuawei);
+				setExpandRatio(txtDownloadHuawei, 2);						
+			}
+		});	
+
+			
 		vlRoot.addComponent(new FormLayout(){					
 			{
 				

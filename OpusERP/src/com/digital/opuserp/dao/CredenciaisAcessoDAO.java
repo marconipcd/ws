@@ -32,6 +32,7 @@ import com.digital.opuserp.domain.RadUserGgroup;
 import com.digital.opuserp.domain.RegistroTrocaMaterial;
 import com.digital.opuserp.domain.SerialProduto;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.util.Notify;
@@ -188,7 +189,14 @@ public class CredenciaisAcessoDAO {
 				
 				//Derruba Cliente Caso Esteja Logado
 				//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
-				MikrotikUtil.derrubarConexaoPPPOE(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+				
+				if(acesso.getBase().getTipo().equals("mikrotik")){
+						MikrotikUtil.derrubarConexaoPPPOE(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+				}
+				if(acesso.getBase().getTipo().equals("huawei")){
+						HuaweiUtil.desconectarCliente(acesso.getLogin());
+				}
+				
 				
 				//Volta cadastro ITTV para ativo
 				if(acesso != null && acesso.getIttv_id() != null){
@@ -268,7 +276,14 @@ public class CredenciaisAcessoDAO {
 				emr.getTransaction().commit();
 
 				//Derruba Conexão do Cliente
-				MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+				
+				if(acesso.getBase().getTipo().equals("mikrotik")){
+					MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+				}
+				
+				if(acesso.getBase().getTipo().equals("huawei")){
+					HuaweiUtil.desconectarCliente(acesso.getLogin());
+				}
 				
 				Notify.Show("Contrato de Acesso Desbloqueado!", Notify.TYPE_SUCCESS);	
 				return true;										
@@ -1218,7 +1233,7 @@ public class CredenciaisAcessoDAO {
 		
 		//Credenciais na Tabela RadCheck
 		em.persist(new RadCheck(null, username, "Password", "==", senha));
-		em.persist(new RadCheck(null, username, "Calling-Station-ID", "==", mac));
+		em.persist(new RadCheck(null, username, "Calling-Station-ID", ":=", mac));
 		
 		//Plano na Tabela RadGroupReply
 		em.persist(new RadUserGgroup(null, username, gruoupName, "1"));
@@ -1258,7 +1273,7 @@ public class CredenciaisAcessoDAO {
 		}
 
 		if(mac != null){
-			em.persist(new RadCheck(null, username, "Calling-Station-ID", "==", mac));
+			em.persist(new RadCheck(null, username, "Calling-Station-ID", ":=", mac));
 		}
 		
 	}
@@ -1282,7 +1297,7 @@ public class CredenciaisAcessoDAO {
 		
 		//Credenciais na Tabela RadCheck
 //		em.persist(new RadCheck(null, username, "Password", "==", senha));
-		em.persist(new RadCheck(null, username, "Calling-Station-ID", "==", mac));
+		em.persist(new RadCheck(null, username, "Calling-Station-ID", ":=", mac));
 			
 		//TODO Remover todas as Linhas da Tabela RadUserGroup e Radreply e Cadastralas Novamente
 		
@@ -1309,7 +1324,7 @@ public class CredenciaisAcessoDAO {
 		
 		//Credenciais na Tabela RadCheck
 //		em.persist(new RadCheck(null, username, "Password", "==", senha));
-		em.persist(new RadCheck(null, username, "Calling-Station-ID", "==", mac));
+		em.persist(new RadCheck(null, username, "Calling-Station-ID", ":=", mac));
 			
 		//TODO Remover todas as Linhas da Tabela RadUserGroup e Radreply e Cadastralas Novamente
 		
@@ -1343,7 +1358,7 @@ public class CredenciaisAcessoDAO {
 		
 		//Credenciais na Tabela RadCheck
 		em.persist(new RadCheck(null, username, "Password", "==", senha));
-		em.persist(new RadCheck(null, username, "Calling-Station-ID", "==", mac));
+		em.persist(new RadCheck(null, username, "Calling-Station-ID", ":=", mac));
 		
 		//Plano na Tabela RadGroupReply
 		em.persist(new RadUserGgroup(null, username, groupname, "1"));

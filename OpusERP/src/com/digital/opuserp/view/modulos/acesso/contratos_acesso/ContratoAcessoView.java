@@ -47,6 +47,7 @@ import com.digital.opuserp.domain.Produto;
 import com.digital.opuserp.domain.RadAcct;
 import com.digital.opuserp.domain.Setores;
 import com.digital.opuserp.domain.Swith;
+import com.digital.opuserp.domain.Usuario;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.DataUtil;
 import com.digital.opuserp.util.GenericDialog;
@@ -211,7 +212,7 @@ public class ContratoAcessoView extends VerticalLayout {
 //		addComponent(hlButonsAtualizar);
 //		HorizontalLayout hlButtons1112 = new HorizontalLayout();
 		
-		 addComponent(new HorizontalLayout(){
+		addComponent(new HorizontalLayout(){
 			 {
 				 setWidth("100%");				 
 				 addComponent(BuildbtAtualizar());
@@ -220,7 +221,7 @@ public class ContratoAcessoView extends VerticalLayout {
 				 setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
 				 setExpandRatio(hlButons, 1);
 			 }
-		 });
+		});
 
 //		addComponent(hlButons);
 //		setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
@@ -790,6 +791,14 @@ public class ContratoAcessoView extends VerticalLayout {
 					}					
 				}
 				
+				if(colId.equals("vendedor")){
+					
+					if(tb.getItem(rowId).getItemProperty("vendedor").getValue() != null){
+						Usuario usuario = (Usuario)tb.getItem(rowId).getItemProperty("vendedor").getValue();
+						return usuario.getUsername();				
+					}					
+				}
+				
 				if(colId.equals("data_alteracao_plano")){
 					
 					if(tb.getItem(rowId).getItemProperty("data_alteracao_plano").getValue() == null){						
@@ -904,6 +913,7 @@ public class ContratoAcessoView extends VerticalLayout {
 		tb.setColumnHeader("swith.olt", "OLT*");
 		tb.setColumnHeader("tem_pendencia", "Pendência");
 		tb.setColumnHeader("arquivo_upload", "Up");
+		tb.setColumnHeader("vendedor", "Vendedor");
 
 		tb.setColumnCollapsed("swith.olt", true);
 		
@@ -1016,7 +1026,7 @@ public class ContratoAcessoView extends VerticalLayout {
 		tb.setVisibleColumns(new Object[] {
 				"id","Up","codigo_cartao","cliente.nome_razao","plano.nome","contrato.nome","regime","Carência","data_venc_contrato",
 				"base.identificacao","interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
-				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia","data_alteracao_plano"});
+				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia","data_alteracao_plano","vendedor"});
 		
 		tb.setImmediate(true);
 		tb.addValueChangeListener(new Property.ValueChangeListener() {
@@ -1797,7 +1807,7 @@ public class ContratoAcessoView extends VerticalLayout {
 							final EntityItem<AcessoCliente> entityItem = (EntityItem<AcessoCliente>)item;						
 							final String codigo_antigo = entityItem.getEntity().getCodigo_cartao(); 
 							
-							final LiberarCartaoClienteEditor lcrEditor = new LiberarCartaoClienteEditor("Liberar Cartão Cliente",true);
+							final LiberarCartaoClienteEditor lcrEditor = new LiberarCartaoClienteEditor("Liberar Cartão Cliente",true, codigo_antigo, entityItem.getEntity());
 							
 							lcrEditor.addListerner(new LiberarCartaoClienteEditor.LiberarCartaoClienteListerner() {
 								
@@ -1824,6 +1834,7 @@ public class ContratoAcessoView extends VerticalLayout {
 								public void windowClose(CloseEvent e) {
 									tb.focus();
 									janelaAtiva= false;
+									refresh();
 								}
 							});
 							
@@ -2103,7 +2114,7 @@ public class ContratoAcessoView extends VerticalLayout {
 										if(contrato.getCliente().getEmail() != null){
 											txtUsername.setValue(contrato.getCliente().getEmail().toLowerCase());	
 										}
-										txtUsername.setReadOnly(true); 
+										//txtUsername.setReadOnly(true); 
 									}
 								});
 								
@@ -2234,8 +2245,28 @@ public class ContratoAcessoView extends VerticalLayout {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				
+				EntityManager em = ConnUtil.getEntity();
 				
-				if(tb.getValue() != null && tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().toString().equals("ATIVO")){
+				Integer cod_acesso = Integer.parseInt(tb.getItem(tb.getValue()).getItemProperty("id").toString());
+				Cliente itemCliente = (Cliente)tb.getItem(tb.getValue()).getItemProperty("cliente").getValue();
+				
+				boolean contrato_liberado = false;
+				Query q = em.createQuery("select a from AcessoCliente a where "
+						+ "a.id_cliente_topsapp != null and "
+						+ "a.cliente=:c and "
+						+ "a.id !=:cod", AcessoCliente.class);
+				
+				q.setParameter("c", itemCliente);
+				q.setParameter("cod", cod_acesso);
+				
+				if(q.getResultList().size() > 0){
+					contrato_liberado = true;
+				}
+				
+				
+				if(tb.getValue() != null && 
+					tb.getItem(tb.getValue()).getItemProperty("status_2").getValue().toString().equals("ATIVO") &&
+					!contrato_liberado){
 										
 					final Window winLiberarAppNeo = new Window("Liberar Paramount");
 					
@@ -2295,9 +2326,15 @@ public class ContratoAcessoView extends VerticalLayout {
 										setMargin(true);
 										setSpacing(true);
 										
-										if(contrato.getS_ittv() != null){
+										if(contrato.getSenha_paramount() == null && contrato.getS_ittv() != null){
 											txtSenha.setValue(contrato.getS_ittv());
+										}else{
+											if(contrato.getSenha_paramount()  != null){
+												txtSenha.setValue(contrato.getSenha_paramount());
+											}
 										}
+										
+										
 										addComponent(txtSenha);
 									}
 								});
@@ -2306,41 +2343,75 @@ public class ContratoAcessoView extends VerticalLayout {
 								hlButtons.setStyleName("hl_buttons_bottom");
 								hlButtons.setSpacing(true);
 								hlButtons.setMargin(true);
-																
-								hlButtons.addComponent(new Button("Cadastrar", new Button.ClickListener() {
 									
-									@Override
-									public void buttonClick(ClickEvent event) {
-										try{
-											if(txtUsername.getValue() != null && !txtUsername.getValue().isEmpty() && !txtUsername.getValue().equals("") &&
-													txtSenha.getValue() != null && !txtSenha.getValue().isEmpty() && !txtSenha.getValue().equals("") &&
-													txtSenha.getValue().toString().length() >= 7){
-												
-												boolean check  = ApiTopSappDAO.liberarClienteNeo(contrato.getCliente(), txtSenha.getValue());
-												
-												if(check){
-													
-													contrato.setS_ittv(txtSenha.getValue());
-													AcessoDAO.save(contrato);
-													
-													Notify.Show("Credenciais liberadas com sucesso", Notify.TYPE_SUCCESS);
-													winLiberarAppNeo.close();
+								if(contrato.getId_cliente_topsapp() != null){
+									hlButtons.addComponent(new Button("Alterar", new Button.ClickListener() {
+									
+											@Override
+											public void buttonClick(ClickEvent event) {
+												try{
+													if(txtUsername.getValue() != null && !txtUsername.getValue().isEmpty() && !txtUsername.getValue().equals("") &&
+															txtSenha.getValue() != null && !txtSenha.getValue().isEmpty() && !txtSenha.getValue().equals("") &&
+															txtSenha.getValue().toString().length() >= 7){
+														
+														boolean check  = ApiTopSappDAO.alterar_cliente_dados(contrato.getId_cliente_topsapp(), txtSenha.getValue());
+														
+														if(check){
+															
+															contrato.setSenha_paramount(txtSenha.getValue());
+															AcessoDAO.save(contrato);
+															
+															Notify.Show("Credenciais liberadas com sucesso", Notify.TYPE_SUCCESS);
+															winLiberarAppNeo.close();
+														}
+														
+													}else{
+														Notify.Show("Campos obrigatórios precisam ser preenchidos!", Notify.TYPE_WARNING);
+														
+														if(txtSenha.getValue().toString().length() < 7){
+															Notify.Show("Informe uma senha de no mínimo 7 digitos", Notify.TYPE_WARNING);
+														}
+														
+													}
+												}catch(Exception e){
+													e.printStackTrace();
 												}
-												
-											}else{
-												Notify.Show("Campos obrigatórios precisam ser preenchidos!", Notify.TYPE_WARNING);
-												
-												if(txtSenha.getValue().toString().length() < 7){
-													Notify.Show("Informe uma senha de no mínimo 7 digitos", Notify.TYPE_WARNING);
-												}
-												
 											}
-										}catch(Exception e){
-											e.printStackTrace();
+										}));
+								}else{
+									hlButtons.addComponent(new Button("Cadastrar", new Button.ClickListener() {
+										
+										@Override
+										public void buttonClick(ClickEvent event) {
+											try{
+												if(txtUsername.getValue() != null && !txtUsername.getValue().isEmpty() && !txtUsername.getValue().equals("") &&
+														txtSenha.getValue() != null && !txtSenha.getValue().isEmpty() && !txtSenha.getValue().equals("") &&
+														txtSenha.getValue().toString().length() >= 7){
+													
+													boolean check  = ApiTopSappDAO.liberarClienteNeo(contrato, contrato.getCliente(), txtSenha.getValue());
+													
+													if(check){
+														
+														contrato.setSenha_paramount(txtSenha.getValue());
+														AcessoDAO.save(contrato);
+														
+														Notify.Show("Credenciais liberadas com sucesso", Notify.TYPE_SUCCESS);
+														winLiberarAppNeo.close();
+													}
+													
+												}else{
+													Notify.Show("Campos obrigatórios precisam ser preenchidos!", Notify.TYPE_WARNING);
+													
+													if(txtSenha.getValue().toString().length() < 7){
+														Notify.Show("Informe uma senha de no mínimo 7 digitos", Notify.TYPE_WARNING);
+													}													
+												}
+											}catch(Exception e){
+												e.printStackTrace();
+											}
 										}
-									}
-								}));
-								
+									}));
+								}
 								
 								addComponent(hlButtons);
 								setComponentAlignment(hlButtons, Alignment.BOTTOM_RIGHT);	
@@ -4628,9 +4699,17 @@ public class ContratoAcessoView extends VerticalLayout {
 							
 							@Override
 							public void windowClose(CloseEvent e) {
-								btAtualizar.click();
+								btAtualizar.click();						
 							}
 						});
+						
+//						au.addListerner(new ArquivosUpload.ArquivoUploadListerner() {
+//							
+//							@Override
+//							public void onClose(ArquivoUploadEvent event) {
+//								
+//							}
+//						});
 						
 						getUI().addWindow(au); 						
 					

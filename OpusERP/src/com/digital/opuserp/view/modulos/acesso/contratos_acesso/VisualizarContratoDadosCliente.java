@@ -969,29 +969,59 @@ public class VisualizarContratoDadosCliente extends Window {
 								}
 							});
 					
-					addComponent(new FormLayout(){					
-						{
-							setMargin(true);
-							setSpacing(true);
-							setStyleName("form-cutom-new");		
-																
-							TextField tfStatusContrato = new TextField("Status de Contrato");				
-							tfStatusContrato.setWidth("160px");				
-							tfStatusContrato.setValue(ac.getStatus_2());	
+					
+					
+						addComponent(new HorizontalLayout(){
+							{
+								addComponent(new FormLayout(){					
+									{
+										setMargin(true);
+										setSpacing(true);
+										setStyleName("form-cutom-new");		
+																			
+										TextField tfStatusContrato = new TextField("Status de Contrato");				
+										tfStatusContrato.setWidth("160px");				
+										tfStatusContrato.setValue(ac.getStatus_2());	
+										
+										tfStatusContrato.setStyleName("caption-align-fornecedores");
+										tfStatusContrato.setReadOnly(true);
 							
-							tfStatusContrato.setStyleName("caption-align-fornecedores");
-							tfStatusContrato.setReadOnly(true);
-				
-							addComponent(tfStatusContrato);
-							setExpandRatio(tfStatusContrato, 2);	
+										addComponent(tfStatusContrato);
+										setExpandRatio(tfStatusContrato, 2);	
+										
+										if(tfStatusContrato.getValue().equals("ATIVO")){
+											tfStatusContrato.addStyleName("valid-cpf");
+										}else{
+											tfStatusContrato.addStyleName("invalid-cpf");
+										}
+									}
+								}); 
+								
+								
+								addComponent(new FormLayout(){					
+									{
+										setMargin(true);
+										setSpacing(true);
+										setStyleName("form-cutom-new");		
+																			
+										TextField tfVendedor = new TextField("Vendedor");				
+										tfVendedor.setWidth("160px");				
+										tfVendedor.setValue(ac.getVendedor() != null ? ac.getVendedor().getUsername() : "");	
+										
+										tfVendedor.setStyleName("caption-vendedor-visualizar");
+										tfVendedor.setReadOnly(true);
 							
-							if(tfStatusContrato.getValue().equals("ATIVO")){
-								tfStatusContrato.addStyleName("valid-cpf");
-							}else{
-								tfStatusContrato.addStyleName("invalid-cpf");
+										addComponent(tfVendedor);
+										setExpandRatio(tfVendedor, 2);											
+										
+									}
+								}); 
+								
+								
+								
+								
 							}
-						}
-					});
+						});
 					}
 				};
 		

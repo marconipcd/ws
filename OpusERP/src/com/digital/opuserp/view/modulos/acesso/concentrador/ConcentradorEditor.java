@@ -477,6 +477,27 @@ public class ConcentradorEditor extends Window implements GenericEditor {
 			}
 		});
 		
+		vlRoot.addComponent(	new FormLayout(){
+			{
+			
+				setStyleName("form-cutom");
+				setMargin(true);
+				setSpacing(true);
+				
+				ComboBox cbTipo = new ComboBox("Tipo");
+				cbTipo.setRequired(true); 
+				cbTipo.addItem("mikrotik");
+				cbTipo.addItem("huawei");				
+				cbTipo.setNullSelectionAllowed(false);
+				cbTipo.setStyleName("caption-align-concentrador");
+				cbTipo.setTextInputAllowed(false);
+				
+				addComponent(cbTipo);
+				fieldGroup.bind(cbTipo, "tipo");
+						
+			}
+		});
+		
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import com.digital.opuserp.domain.Swith;
 import com.digital.opuserp.interfaces.GenericEditor;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.SignalStrengthUtil;
@@ -71,6 +72,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 	boolean valid_senha = false;
 	boolean Validar_signal = false;
 	boolean conectado = false;
+	boolean conexao = false;
 	
 
 	TextField tfConexao; 
@@ -92,6 +94,9 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 	private ComboBox cbSwitch;
 	private TextField txtSinalDbCaixa;
 	
+	String[] info = null;
+	String tipo_concentrador_selecionado;
+	
 	public AlterarConcentradorAcessoView(Item item, String title, boolean modal){
 		this.item = item;
 		
@@ -99,6 +104,12 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 			codAcesso = (Integer) item.getItemProperty("id").getValue();
 			ac = em.find(AcessoCliente.class, codAcesso);				
 			base = (Concentrador) item.getItemProperty("base").getValue();	
+			
+			
+			if(base != null && base.getTipo().equals("huawei")){
+				info = HuaweiUtil.pegarInformacoes(ac.getLogin());
+			}
+			
 		}
 		
 		if (item.getItemProperty("endereco_ip").getValue() != null) {
@@ -203,8 +214,17 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 				tfStatusConcent.setStyleName("caption-align-contrato");
 				
 				boolean teste =false;
-				if(base!=null){
-					teste = MikrotikUtil.testconexao(base.getUsuario(),base.getSenha(),base.getEndereco_ip(),Integer.parseInt(base.getPorta_api()));
+				
+				if(base.getTipo().equals("mikrotik")){
+					if(base!=null){
+						teste = MikrotikUtil.testconexao(base.getUsuario(),base.getSenha(),base.getEndereco_ip(),Integer.parseInt(base.getPorta_api()));
+					}
+				}
+				
+				if(base.getTipo().equals("huawei")){
+					if(info != null){
+						teste = true;
+					}
 				}
 
 				if(teste){						
@@ -238,8 +258,17 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 				
 				addComponent(tfComunicacao);
 								
-				boolean conexao = MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
-				conectado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+				
+				
+				if(base.getTipo().equals("mikrotik")){
+					conexao = MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
+					conectado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+				}
+				
+				if(base.getTipo().equals("huawei") && info != null){
+					conectado = true;
+					conexao = true;
+				}
 				
 				
 				if(conexao || conectado){
@@ -291,8 +320,17 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 					@Override
 					public void buttonClick(ClickEvent event) {	
 						
-						boolean conexao = MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
-						conectado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+						boolean conexao = false; 
+						
+						if(base.getTipo().equals("mikrotik")){
+							conexao = MikrotikUtil.buscarComunicacao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getEndereco_mac());
+							conectado = MikrotikUtil.buscarStatusConexao(base.getUsuario(), base.getSenha(),base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()), ac.getLogin());
+						}
+						
+						if(base.getTipo().equals("huawei") && info != null){
+							conectado = true;
+							conexao = true;
+						}
 					
 						if(conexao || conectado){
 							tfComunicacao.setReadOnly(false);						
@@ -405,6 +443,10 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 									if(vez > 0){
 										try{						
 											String usuario = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("usuario").getValue().toString();
+											String tipo = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("tipo").getValue().toString();
+											
+											tipo_concentrador_selecionado = tipo;
+											
 											String senha = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("senha").getValue().toString();
 											String ip = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("endereco_ip").getValue().toString();
 											Integer porta = Integer.parseInt(cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("porta_api").getValue().toString());
@@ -431,19 +473,24 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 												txtGpon.setRequired(false);
 											}
 											
-											List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
-											cbInterface.removeAllItems();
-											for (Map<String, String> wirelessInterface : result) {
-												String mtu = wirelessInterface.get("mtu");
-												if(mtu.equals("1500")){						
-													cbInterface.addItem(wirelessInterface.get("name") != null ? wirelessInterface.get("name") : "");
-												}
-												
-											}
 											
-											
-											if(item.getItemProperty("interfaces").getValue() != null){
-												cbInterface.select(item.getItemProperty("interfaces").getValue().toString());
+											if(tipo.equals("mikrotik")){
+													List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
+													
+													if(result != null){
+															cbInterface.removeAllItems();
+															for (Map<String, String> wirelessInterface : result) {
+																String mtu = wirelessInterface.get("mtu");
+																if(mtu.equals("1500")){						
+																	cbInterface.addItem(wirelessInterface.get("name") != null ? wirelessInterface.get("name") : "");
+																}																
+															}																								
+															if(item.getItemProperty("interfaces").getValue() != null){
+																cbInterface.select(item.getItemProperty("interfaces").getValue().toString());
+															}
+													}
+											}else{
+												cbInterface.setRequired(false); 
 											}
 											
 											
@@ -880,7 +927,10 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 		if(fieldGroup.isValid() && cbInterface.isValid() && Validar_signal){
 			try {												
 				fieldGroup.commit();
-				item.getItemProperty("interfaces").setValue(cbInterface.getValue().toString());
+				
+				if(tipo_concentrador_selecionado.equals("mikrotik")){
+					item.getItemProperty("interfaces").setValue(cbInterface.getValue().toString());
+				}
 
 				if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
 					item.getItemProperty("signal_strength").setValue("-120..120");

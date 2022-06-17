@@ -15,22 +15,24 @@ import com.digital.opuserp.dao.ClienteDAO;
 import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
 import com.digital.opuserp.dao.EmpresaDAO;
+import com.digital.opuserp.dao.UsuarioDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.Cliente;
 import com.digital.opuserp.domain.ContratosAcesso;
 import com.digital.opuserp.domain.Endereco;
 import com.digital.opuserp.domain.PlanoAcesso;
+import com.digital.opuserp.domain.Usuario;
 import com.digital.opuserp.interfaces.GenericEditor;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.view.util.ClienteUtil;
 import com.digital.opuserp.view.util.Notify;
+import com.digital.opuserp.view.util.UsuarioUtil;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.addon.jpacontainer.filter.Filters;
-import com.vaadin.client.ui.calendar.schedule.DateUtil;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -76,6 +78,8 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 	
 	boolean validarFiador = true;
 	boolean validarCliente = true;
+	boolean validarVendedor = true;
+	boolean validarUsuario = false;
 	boolean validarIdade = true;
 	boolean validarEndereco = true;
 	
@@ -87,18 +91,22 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 	Date dataPrimeiroBoleto;
 	Date dataInstalacao;
 	Cliente Clientelecionado;
+	Usuario UsuarioSelecionado;
 	Cliente Fiadorlecionado;
-		
+	
+	Integer codUsuario;
 	Integer codCliente;
 	Integer codFiador;
 	
 	private Label lbRegistros;
 	
 	TextField tfDescricaoCliente;
+	TextField tfDescricaoUsuario;
 	TextField tfDescricaoFiador;
 	
 	TextField tfCodFiador;
 	TextField tfCodCliente;
+	TextField tfCodUsuario;
 	
 	HorizontalLayout hlFloat;
 	
@@ -115,7 +123,7 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 		this.item = item;
 		
 		setWidth("822px");
-		setHeight("457px");
+		setHeight("487px");
 		
 		setCaption(title);
 		setModal(modal);
@@ -1037,6 +1045,175 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 		});
 		
 		
+		vlRoot.addComponent(new HorizontalLayout(){
+			{
+				//setWidth("100%");
+				
+				JPAContainer<Usuario> containerUsuario = JPAContainerFactory.make(Usuario.class, ConnUtil.getEntity());
+				//containerUsuario.addContainerFilter(Filters.eq("empresa", OpusERP4UI.getEmpresa()));
+				containerUsuario.addContainerFilter(Filters.eq("status", "ATIVO"));
+				
+				
+				boolean preencher = false;
+				if(item.getItemProperty("id").getValue() != null && item.getItemProperty("cliente").getValue() != null){
+					preencher = true;
+				}
+				
+				tfCodUsuario= new TextField("Vendedor");				
+				tfCodUsuario.setWidth("60px");				
+				tfCodUsuario.setNullRepresentation("");
+				tfCodUsuario.setStyleName("caption-align-acesso");				
+				tfCodUsuario.setId("tfCodUsuario");
+				tfCodUsuario.setRequired(true); 
+				
+				JavaScript.getCurrent().execute("$('#tfCodUsuario').mask('0000000000')");
+				tfCodUsuario.setImmediate(true);
+						
+				tfCodUsuario.addBlurListener(new FieldEvents.BlurListener() {
+					
+					@Override
+					public void blur(BlurEvent event) {
+												
+					}
+				});
+				
+				tfCodUsuario.addListener(new TextChangeListener() {
+					
+					@Override
+					public void textChange(TextChangeEvent event) {
+		
+						UsuarioSelecionado = new Usuario();					
+						//somente numeros contaas receber					
+						
+						if(event.getText()!=null && !event.getText().isEmpty() && !event.getText().equals("")){
+							
+							codCliente = Integer.parseInt(event.getText());
+							
+							UsuarioDAO cDAO = new UsuarioDAO();
+							
+							UsuarioSelecionado = cDAO.find(Integer.parseInt(event.getText()));		
+							
+							if(UsuarioSelecionado != null){
+									validarUsuario = true;
+								
+									tfDescricaoUsuario.setReadOnly(false);
+									tfDescricaoUsuario.setValue(UsuarioSelecionado.getUsername());
+									tfDescricaoUsuario.setReadOnly(true);
+									tfCodCliente.removeStyleName("invalid-txt");
+								
+								
+							}else {
+								tfDescricaoUsuario.setReadOnly(false);
+								tfDescricaoUsuario.setValue("");
+								tfDescricaoUsuario.setReadOnly(true);		
+								
+								validarUsuario = false;
+							}
+						}else{
+							tfDescricaoUsuario.setReadOnly(false);
+							tfDescricaoUsuario.setValue("");
+							tfDescricaoUsuario.setReadOnly(true);
+							
+							validarUsuario = false;
+							
+						}
+					}
+				});
+
+					
+				tfDescricaoUsuario = new TextField();
+				tfDescricaoUsuario.setTabIndex(2000);
+				tfDescricaoUsuario.setReadOnly(true);
+				tfDescricaoUsuario.setWidth("450px");
+									
+//				if(item.getItemProperty("cliente") != null && item.getItemProperty("cliente").getValue() != null){
+//					EmpresaDAO eDAO = new EmpresaDAO();
+//					Cliente c = eDAO.getCliente(((Cliente)item.getItemProperty("cliente").getValue()).getId());
+//					
+//					if(c != null){
+//						tfCodCliente.setValue(c.getId().toString());
+//						tfCodCliente.setReadOnly(false);
+//						tfDescricaoCliente.setValue(c.getNome_razao());
+//						tfDescricaoCliente.setReadOnly(true);
+//					}
+//				}
+							
+				final Button btSearchUsuario = new Button();
+				btSearchUsuario.setStyleName(BaseTheme.BUTTON_LINK);
+				btSearchUsuario.setIcon(new ThemeResource("icons/search-16.png"));
+				btSearchUsuario.setTabIndex(300000);
+				btSearchUsuario.addClickListener(new Button.ClickListener() {
+					
+					@Override
+					public void buttonClick(ClickEvent event) {
+						UsuarioUtil cUtil = new UsuarioUtil(true, true);
+						cUtil.addListerner(new UsuarioUtil.UsuarioListerner() {
+							
+							@Override
+							public void onSelected(UsuarioUtil.UsuarioEvent event) {
+									if(event.getUsuario() != null ){
+										
+										validarUsuario = false;
+											
+											tfCodUsuario.setValue(event.getUsuario().getId().toString());
+											tfDescricaoUsuario.setReadOnly(false);
+											tfDescricaoUsuario.setValue(event.getUsuario().getUsername());
+											tfDescricaoUsuario.setReadOnly(true);
+											
+											UsuarioSelecionado = event.getUsuario();
+											codUsuario = Integer.parseInt((event.getUsuario().getId().toString()));
+												 
+											tfCodUsuario.removeStyleName("invalid-txt");
+										
+									}	
+							}
+						});
+						
+						getUI().addWindow(cUtil);
+					}
+				});
+				
+				FormLayout frmCodigoUsuario = new FormLayout(){
+					{
+						
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new");		
+												
+						addComponent(tfCodUsuario);							
+					}
+				};
+				addComponent(frmCodigoUsuario);
+		
+				FormLayout frmButtonSearchUsuario =new FormLayout(){
+					{
+						
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new_hide_error_cell");										
+						addComponent(btSearchUsuario);							
+					}
+				}; 
+				FormLayout frmDescUsuario = new FormLayout(){
+					{
+						
+						setMargin(true);
+						setSpacing(true);						
+						setStyleName("form-cutom-new");		
+						addStyleName("form-cutom_hide_require");
+						
+						addComponent(tfDescricaoUsuario);							
+					}
+				}; 
+				
+				addComponent(frmButtonSearchUsuario);
+				addComponent(frmDescUsuario);
+				setExpandRatio(frmDescUsuario, 1);	
+	
+			}	
+		});
+		
+		
 		
 		
 	}
@@ -1139,7 +1316,7 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 		}
 							
 		if(validarEndereco && validarCliente && fieldGroup.isValid() && validarFiador && cbInstalaçãoGratis.getValue() != null && 
-				cbContratoPrestServManuten.getValue() != null ){
+				cbContratoPrestServManuten.getValue() != null &&  validarUsuario){
 			try {		
 				
 				fieldGroup.commit();		
@@ -1149,6 +1326,11 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 				item.getItemProperty("instalacao_gratis").setValue(cbInstalaçãoGratis.getValue() != null ? cbInstalaçãoGratis.getValue().toString() : "NAO");				
 				item.getItemProperty("endereco").setValue(new Endereco((Integer)cbEnderecos.getItem(cbEnderecos.getValue()).getItemProperty("id").getValue()));
 				item.getItemProperty("prest_serv_manutecao").setValue(cbContratoPrestServManuten.getValue());
+				
+				if(UsuarioSelecionado != null){
+					item.getItemProperty("vendedor").setValue(UsuarioSelecionado);
+				}
+				
 				
 				fireEvent(new NovoCadastroEvent(getUI(), item, true));
 
@@ -1171,6 +1353,12 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 			    	tfCodCliente.addStyleName("invalid-txt");
 			    }else{
 			    	tfCodCliente.removeStyleName("invalid-txt");  	
+			    }
+			    
+			    if(!tfCodUsuario.isValid()|| !validarUsuario){
+			    	tfCodUsuario.addStyleName("invalid-txt");
+			    }else{
+			    	tfCodUsuario.removeStyleName("invalid-txt");  	
 			    }
 			    
 			    if(!tfCodCliente.isValid()|| !validarFiador){

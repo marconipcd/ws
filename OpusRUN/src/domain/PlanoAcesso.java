@@ -23,6 +23,11 @@ public class PlanoAcesso {
 	@OneToOne
 	@JoinColumn(name="contratos_id")
 	private ContratosAcesso contrato_acesso;
+	
+	@Column(name="RATE_LIMIT_HUAWEI_UP",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_up;	
+	@Column(name="RATE_LIMIT_HUAWEI_DOWN",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_down;	
 		
 	@Column(name="NOME",nullable=false, unique=false, length=50)
 	private String nome;
@@ -250,6 +255,22 @@ public class PlanoAcesso {
 
 	public void setPlano_bloqueio(PlanoAcesso plano_bloqueio) {
 		this.plano_bloqueio = plano_bloqueio;
+	}
+
+	public String getRate_limit_huawei_up() {
+		return rate_limit_huawei_up;
+	}
+
+	public void setRate_limit_huawei_up(String rate_limit_huawei_up) {
+		this.rate_limit_huawei_up = rate_limit_huawei_up;
+	}
+
+	public String getRate_limit_huawei_down() {
+		return rate_limit_huawei_down;
+	}
+
+	public void setRate_limit_huawei_down(String rate_limit_huawei_down) {
+		this.rate_limit_huawei_down = rate_limit_huawei_down;
 	}
 	
 	

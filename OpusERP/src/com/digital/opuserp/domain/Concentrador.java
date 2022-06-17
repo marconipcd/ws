@@ -70,6 +70,11 @@ public class Concentrador {
 	private String situacao;
 	
 	
+	@Column(name="TIPO", nullable=true) 
+	private String tipo;
+	
+	
+	
 	public Concentrador(){
 		
 	}
@@ -261,6 +266,15 @@ public class Concentrador {
 	public void setSituacao(String situacao) {
 		this.situacao = situacao;
 	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+	
 	
 	
 	
