@@ -493,7 +493,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 							}
 						}
 						
-						if(base.getTipo().equals("huawei") && info != null){
+						if(base.getTipo().equals("huawei") && info != null && info.length > 0){
 							tfUptime.setValue(info[0]);
 						}
 						
@@ -524,7 +524,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 									}			
 							}
 							
-							if(base.getTipo().equals("huawei") && info != null){								
+							if(base.getTipo().equals("huawei") && info != null && info.length > 0){								
 								tfEndIpPool.setValue(info[2]);
 							}
 														

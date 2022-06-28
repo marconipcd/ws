@@ -97,9 +97,9 @@ public class MikrotikUtil {
 	public static boolean desconectarCliente(String usuario, String senha,String ip, Integer porta, String username){
 	
 		boolean ppoe = derrubarConexaoPPPOE(usuario, senha, ip, porta, username);
-		boolean hotspot = derrubarConexaoHOTSPOT(usuario, senha, ip, porta, username);
+		//boolean hotspot = derrubarConexaoHOTSPOT(usuario, senha, ip, porta, username);
 		
-		if(!ppoe && !hotspot){
+		if(!ppoe){
 			return false;
 		}else{
 			return true;

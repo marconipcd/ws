@@ -342,7 +342,11 @@ public class OseDAO {
 		q.setParameter("c", contrato);
 		q.setParameter("g", new GrupoOse(2));
 		
-		return (Ose)q.getSingleResult();
+		if(q.getResultList().size() > 0){
+			return (Ose)q.getSingleResult();
+		}else{
+			return null;
+		}
 	}
 	
 	public static Ose find(Integer id){

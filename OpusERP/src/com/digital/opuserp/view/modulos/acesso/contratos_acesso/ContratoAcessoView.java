@@ -181,74 +181,74 @@ public class ContratoAcessoView extends VerticalLayout {
 	public ContratoAcessoView(boolean act){
 		
 		if(act){
-		setSizeFull();
-		
-		gmDAO = new GerenciarModuloDAO();
-		
-		hlButons = new HorizontalLayout();
-		
-		Integer cSubModulo = SubModuloDAO.findToId("Contratos de Acesso");
-		if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(cSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Funcoes Administrativas"))				
-		{
-			hlButons.addComponent(BuildbtFuncoesAdministrativas());
-		}
-		
-		hlButons.addComponent(BuildbtNovo());		
-		hlButons.addComponent(BuildbtLiberar());
-		hlButons.addComponent(BuildbtDocumentos());		
-		hlButons.addComponent(BuildbtEdicoes());		
-		hlButons.addComponent(BuildbtEncerrar());		
-//		hlButons.addComponent(BuildbtAddFiltros());
-		hlButons.addComponent(BuildbtVisualizar());		
-		hlButons.addComponent(BuildbtHistorico());			
-		hlButons.addComponent(BuildbtClientesConectador());
-		hlButons.addComponent(buildBtBloquear("Bloquear/Desbloquear"));
-		hlButons.addComponent(buildBtPendencia());
-		hlButons.addComponent(buildBtLog());
+				setSizeFull();
 				
-//		HorizontalLayout hlButonsAtualizar = new HorizontalLayout();
-//		hlButonsAtualizar.addComponent(BuildbtAtualizar());
+				gmDAO = new GerenciarModuloDAO();
+				
+				hlButons = new HorizontalLayout();
+				
+				Integer cSubModulo = SubModuloDAO.findToId("Contratos de Acesso");
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(cSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Funcoes Administrativas"))				
+				{
+					hlButons.addComponent(BuildbtFuncoesAdministrativas());
+				}
+				
+				hlButons.addComponent(BuildbtNovo());		
+				hlButons.addComponent(BuildbtLiberar());
+				hlButons.addComponent(BuildbtDocumentos());		
+				hlButons.addComponent(BuildbtEdicoes());		
+				hlButons.addComponent(BuildbtEncerrar());		
+		//		hlButons.addComponent(BuildbtAddFiltros());
+				hlButons.addComponent(BuildbtVisualizar());		
+				hlButons.addComponent(BuildbtHistorico());			
+				hlButons.addComponent(BuildbtClientesConectador());
+				hlButons.addComponent(buildBtBloquear("Bloquear/Desbloquear"));
+				hlButons.addComponent(buildBtPendencia());
+				hlButons.addComponent(buildBtLog());
+						
+		//		HorizontalLayout hlButonsAtualizar = new HorizontalLayout();
+		//		hlButonsAtualizar.addComponent(BuildbtAtualizar());
+				
+		//		addComponent(hlButonsAtualizar);
+		//		HorizontalLayout hlButtons1112 = new HorizontalLayout();
+				
+				addComponent(new HorizontalLayout(){
+					 {
+						 setWidth("100%");				 
+						 addComponent(BuildbtAtualizar());
+						 setComponentAlignment(btAtualizar, Alignment.TOP_LEFT);
+						 addComponent(hlButons);
+						 setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
+						 setExpandRatio(hlButons, 1);
+					 }
+				});
 		
-//		addComponent(hlButonsAtualizar);
-//		HorizontalLayout hlButtons1112 = new HorizontalLayout();
-		
-		addComponent(new HorizontalLayout(){
-			 {
-				 setWidth("100%");				 
-				 addComponent(BuildbtAtualizar());
-				 setComponentAlignment(btAtualizar, Alignment.TOP_LEFT);
-				 addComponent(hlButons);
-				 setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
-				 setExpandRatio(hlButons, 1);
-			 }
-		});
-
-//		addComponent(hlButons);
-//		setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
-	
-		addComponent(new HorizontalLayout(){
-			{
-				setWidth("100%");
-				addComponent(buildCbStatus());
-				addComponent(buildTfbusca());
-				setExpandRatio(tfBusca, 1.0f);
-			}
-		});
-	
-		addComponent(buildTbGeneric());
-	
-		hlFloat = new HorizontalLayout();
-		hlFloat.setWidth("100%");
-		hlFloat.addComponent(buildLbRegistros());
-//		Label lbLegend = new Label("F2 - Novo Cadastro | ENTER - Editar");
-//		lbLegend.setWidth("250px");
-//		hlFloat.addComponent(lbLegend);
-		hlFloat.setComponentAlignment(lbRegistros, Alignment.BOTTOM_LEFT);
-//		hlFloat.setComponentAlignment(lbLegend, Alignment.BOTTOM_RIGHT);
-	
-	
-		addComponent(hlFloat);		
-		setExpandRatio(tb, 1);
+		//		addComponent(hlButons);
+		//		setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
+			
+				addComponent(new HorizontalLayout(){
+					{
+						setWidth("100%");
+						addComponent(buildCbStatus());
+						addComponent(buildTfbusca());
+						setExpandRatio(tfBusca, 1.0f);
+					}
+				});
+			
+				addComponent(buildTbGeneric());
+			
+				hlFloat = new HorizontalLayout();
+				hlFloat.setWidth("100%");
+				hlFloat.addComponent(buildLbRegistros());
+		//		Label lbLegend = new Label("F2 - Novo Cadastro | ENTER - Editar");
+		//		lbLegend.setWidth("250px");
+		//		hlFloat.addComponent(lbLegend);
+				hlFloat.setComponentAlignment(lbRegistros, Alignment.BOTTOM_LEFT);
+		//		hlFloat.setComponentAlignment(lbLegend, Alignment.BOTTOM_RIGHT);
+			
+			
+				addComponent(hlFloat);		
+				setExpandRatio(tb, 1);
 		}
 		
 		//addExtension(buildRefresher());	
@@ -3513,7 +3513,7 @@ public class ContratoAcessoView extends VerticalLayout {
 							Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);
 						}else{
 									
-								if(!regimeAntigo.equals("COMODATO (TOTAL)")){
+							if(!regimeAntigo.equals("COMODATO (TOTAL)")){
 							
 								janelaAtiva = true;
 								

@@ -430,25 +430,32 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 									}
 								}
 								
-								List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
-								BeanItemContainer<WirelessInterface> interfaces = new BeanItemContainer<>(WirelessInterface.class);
 								
-								if(result != null){
-									for (Map<String, String> wirelessInterface : result) {
+								if(concentrador != null && concentrador.getTipo().equals("mikrotik")){								
 								
-										String mtu = wirelessInterface.get("mtu");
-										if(mtu.equals("1500")){								
-											WirelessInterface wire = new WirelessInterface();
-											wire.setName(wirelessInterface.get("name")); 
-											interfaces.addBean(wire);
+										List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
+										BeanItemContainer<WirelessInterface> interfaces = new BeanItemContainer<>(WirelessInterface.class);
+										
+										if(result != null){
+											for (Map<String, String> wirelessInterface : result) {
+										
+												String mtu = wirelessInterface.get("mtu");
+												if(mtu.equals("1500")){								
+													WirelessInterface wire = new WirelessInterface();
+													wire.setName(wirelessInterface.get("name")); 
+													interfaces.addBean(wire);
+												}
+				
+											}						
 										}
-		
-									}						
+										interfaces.size();
+										
+										cbInterface.setContainerDataSource(interfaces);
+										cbInterface.setItemCaptionPropertyId("name");
+								}else{
+									cbInterface.setEnabled(false);
+									cbInterface.setRequired(false);  
 								}
-								interfaces.size();
-								
-								cbInterface.setContainerDataSource(interfaces);
-								cbInterface.setItemCaptionPropertyId("name");
 								
 								
 								Integer codConcentrador = (Integer)cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("id").getValue();
@@ -1401,7 +1408,10 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					item.getItemProperty("material").setValue(material_selecionado);
 					item.getItemProperty("onu_serial").setValue(cbSerialMaterialComodato.getItem(cbSerialMaterialComodato.getValue()).getItemProperty("serial").getValue().toString());
 					item.getItemProperty("endereco_mac").setValue(txtSerial.getValue());
-					item.getItemProperty("interfaces").setValue(cbInterface.getItem(cbInterface.getValue()).getItemProperty("name").getValue());
+					
+					if(cbInterface.getValue() != null){
+						item.getItemProperty("interfaces").setValue(cbInterface.getItem(cbInterface.getValue()).getItemProperty("name").getValue());
+					}
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
 						item.getItemProperty("signal_strength").setValue("-120..120");	
@@ -1486,7 +1496,10 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					fieldGroup.commit();
 					item.getItemProperty("material").setValue(material_selecionado);
 					item.getItemProperty("endereco_mac").setValue(txtSerial.getValue());
-					item.getItemProperty("interfaces").setValue(cbInterface.getItem(cbInterface.getValue()).getItemProperty("name").getValue());
+					
+					if(cbInterface.getValue() != null){
+						item.getItemProperty("interfaces").setValue(cbInterface.getItem(cbInterface.getValue()).getItemProperty("name").getValue());
+					}
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
 						item.getItemProperty("signal_strength").setValue("-120..120");

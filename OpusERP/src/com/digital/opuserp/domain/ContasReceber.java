@@ -10,8 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -79,6 +77,10 @@ public class ContasReceber {
 	private String desbloqueado;
 	@Column(name="BLOQUEADO",nullable=true, unique=false)
 	private String bloqueado;
+	
+	@Column(name="NEGATIVADO",nullable=true, unique=false)
+	private String negativado;
+	
 	@Column(name="TIPO_TITULO",nullable=true, unique=false)
 	private String tipo_titulo;
 	
@@ -666,6 +668,14 @@ public class ContasReceber {
 
 	public void setCodigo_cartao(String codigo_cartao) {
 		this.codigo_cartao = codigo_cartao;
+	}
+
+	public String getNegativado() {
+		return negativado;
+	}
+
+	public void setNegativado(String negativado) {
+		this.negativado = negativado;
 	}
 	
 	

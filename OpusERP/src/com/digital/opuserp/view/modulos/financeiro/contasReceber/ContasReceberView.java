@@ -61,6 +61,7 @@ import com.digital.opuserp.domain.Endereco;
 import com.digital.opuserp.domain.HaverCab;
 import com.digital.opuserp.domain.HaverDetalhe;
 import com.digital.opuserp.domain.LogAcoes;
+import com.digital.opuserp.domain.NotificacoesGerenciaNet;
 import com.digital.opuserp.domain.Ose;
 import com.digital.opuserp.domain.Osi;
 import com.digital.opuserp.domain.ParametrosBoleto;
@@ -1386,10 +1387,15 @@ public class ContasReceberView extends VerticalLayout {
 																
 																ContasReceber cr = em.find(ContasReceber.class, Integer.parseInt(tb.getItem(object).getItemProperty("Cod.").getValue().toString()));
 																cr.setStatus(event.getStatusNegativado());
+																cr.setNegativado("SIM");
+																//cr.setNegativado("s");
+																
+																
 																em.merge(cr);	
 																em.merge((new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date())));
+																
+																
 																//AlteracoesContasReceberDAO.save(new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
-				
 														}
 														
 														em.getTransaction().commit();
@@ -2694,7 +2700,14 @@ public class ContasReceberView extends VerticalLayout {
 	
 	private boolean cancelarTransacao(String transacao) {
 		
-		if(transacao != null && !transacao.equals("")){
+		EntityManager em  = ConnUtil.getEntity();
+		Query q = em.createQuery("select n from NotificacoesGerenciaNet n where n.cod_transacao=:transacao and n.status='canceled'", NotificacoesGerenciaNet.class);
+		q.setParameter("transacao", transacao);
+		
+		List<NotificacoesGerenciaNet> notifys_transaction_canceled = q.getResultList();
+		
+		
+		if(transacao != null && !transacao.equals("") && notifys_transaction_canceled.size() == 0){
 		
 				try{
 					
@@ -2756,6 +2769,19 @@ public class ContasReceberView extends VerticalLayout {
 						e.printStackTrace();
 						return false;
 					}
+		}else{
+			
+			if(notifys_transaction_canceled.size() > 0){
+				boolean check = ContasReceberDAO.retirarTransacaoBoleto(transacao);
+            	
+            	if(check){
+            		Notify.Show("Boleto cancelado com Sucesso!", Notify.TYPE_SUCCESS);
+            	}else{
+            		Notify.Show("Transação não encontrada no banco de dados..", Notify.TYPE_WARNING);
+            	}
+            	
+            	return true;
+			}
 		}
 		
 		return false;

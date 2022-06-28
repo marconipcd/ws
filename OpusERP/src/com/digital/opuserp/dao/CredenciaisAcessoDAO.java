@@ -29,6 +29,7 @@ import com.digital.opuserp.domain.RadAcct;
 import com.digital.opuserp.domain.RadCheck;
 import com.digital.opuserp.domain.RadReply;
 import com.digital.opuserp.domain.RadUserGgroup;
+import com.digital.opuserp.domain.RadUserGroupDAO;
 import com.digital.opuserp.domain.RegistroTrocaMaterial;
 import com.digital.opuserp.domain.SerialProduto;
 import com.digital.opuserp.util.ConnUtil;
@@ -185,7 +186,19 @@ public class CredenciaisAcessoDAO {
 					emr.remove(rr); 
 				}
 				
-				emr.persist(new RadReply(null, acesso.getLogin(), "Framed-Pool", "=", "BLOQUEADO_TOTAL"));					
+				emr.persist(new RadReply(null, acesso.getLogin(), "Framed-Pool", "=", "BLOQUEADO_TOTAL"));			
+				
+				Query q3 = emr.createQuery("select rug from RadUserGgroup rug where rug.username=:username", RadUserGgroup.class);
+				q3.setParameter("username", acesso.getLogin());
+				for (RadUserGgroup rr : (List<RadUserGgroup>)q3.getResultList()) {
+					emr.remove(rr); 
+				}
+				
+				//Coloca plano de bloqueio
+				String groupName = acesso.getPlano().getPlano_bloqueio().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getPlano_bloqueio().getNome();
+				emr.persist(new RadUserGgroup(null, acesso.getLogin(), groupName, "1"));
+				
+				
 				
 				//Derruba Cliente Caso Esteja Logado
 				//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
@@ -248,6 +261,8 @@ public class CredenciaisAcessoDAO {
 					}
 				}
 				
+				
+				//possivelmente remover depois
 				Query qrr2 = emr.createQuery("select rr from RadReply rr where rr.username = :usuario and rr.attribute = 'Framed-Pool' and rr.value = 'BLOQUEADO_TOTAL'", RadReply.class);
 				qrr2.setParameter("usuario", acesso.getLogin());						
 				if(qrr2.getResultList().size() >0){
@@ -258,7 +273,21 @@ public class CredenciaisAcessoDAO {
 					}
 				}
 				
+				//Remove planos antigos
+				Query qrr3 = emr.createQuery("select rug from RadUserGgroup rug where rug.username = :usuario", RadUserGgroup.class);
+				qrr3.setParameter("usuario", acesso.getLogin());
+				if(qrr3.getResultList().size()>0){
+					List<RadUserGgroup> marcacoes_planos_antigas = qrr3.getResultList();
+					for (RadUserGgroup rug : marcacoes_planos_antigas) {
+						emr.remove(rug);
+					}
+				}
 				
+				//Cria planos originais novamente
+				String groupName = acesso.getPlano().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getNome();
+				emr.persist(new RadUserGgroup(null, acesso.getLogin(), groupName, "1"));
+										
+								
 				if(acesso.getEndereco_ip() != null && !acesso.getEndereco_ip().equals("")){
 					emr.persist(new RadReply(null, acesso.getLogin(), "Framed-IP-Address", "=", acesso.getEndereco_ip()));
 				}
