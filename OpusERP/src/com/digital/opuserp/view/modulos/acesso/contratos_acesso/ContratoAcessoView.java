@@ -1754,7 +1754,7 @@ public class ContratoAcessoView extends VerticalLayout {
 				
 
 				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
-						OpusERP4UI.getUsuarioLogadoUI().getId(), "Visualizar Contrato"))				
+						OpusERP4UI.getUsuarioLogadoUI().getId(), "Visualizar Info Tecnicas"))				
 				{
 					if (tb.getValue() != null){		
 						item = tb.getItem(tb.getValue());
@@ -4535,6 +4535,60 @@ public class ContratoAcessoView extends VerticalLayout {
         winSubMenuImprimir.setPositionY(event.getClientY() - event.getRelativeY());
         winSubMenuImprimir.setCloseShortcut(KeyCode.ESCAPE, null);
 
+        
+        Button bt0 = new Button("Termo de Adesão/Benefício",new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Imprimir Contrato"))				
+				{			
+					try{
+						window = new Window();
+						window.setCaption("Termo de Adesão/Benefício");
+				        window.setWidth("800px");
+				        window.setHeight("600px");
+				        window.setResizable(true);
+				        window.center();
+				        window.setModal(true);
+				        window.setStyleName("disable_scroolbar");		
+				        window.setCloseShortcut(KeyCode.ESCAPE, null);
+				        
+				        Integer codAc = Integer.parseInt(tb.getItem(tb.getValue()).getItemProperty("id").getValue().toString()); 
+				        String nomeCliente = tb.getItem(tb.getValue()).getItemProperty("cliente.nome_razao").getValue().toString();
+				        String codCliente = tb.getItem(tb.getValue()).getItemProperty("cliente.id").getValue().toString();
+				        StreamResource resource = new StreamResource(new ImprimirAdesaoBeneficio(codAc), "TERMO ADESAO "+String.valueOf(codAc)+"-"+nomeCliente+".pdf");
+				        resource.getStream();			        
+				        resource.setMIMEType("application/pdf");
+				        resource.setCacheTime(0);
+				        
+				        Embedded e = new Embedded();
+				        e.setSizeFull();
+				        e.setType(Embedded.TYPE_BROWSER); 
+				        e.setSource(resource);			     
+				        window.setContent(e);
+				        getUI().addWindow(window);
+				        window.focus();
+				        
+				        AcessoCliente acesso = ContratosAcessoDAO.find(codAc);
+				        
+				        LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Imprimiu um Contrato de Acesso"));
+				        AlteracoesContratoDAO.save(new AlteracoesContrato(null, "IMPRIMIU CONTRATO", acesso, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+					
+					}catch(Exception e){
+						System.out.println("Deu ERRADO!");
+						e.printStackTrace();
+						
+						LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Não Conseguiu Imprimir um Contrato de Acesso"));
+					}
+				
+				}else{					
+					Notify.Show("Você não Possui Permissão para Editar Contrato", Notify.TYPE_ERROR);
+				}
+								
+			}
+		});
+        bt0.setPrimaryStyleName("btSubMenu");
+        
         Button bt1 = new Button("Termo de Adesão",new Button.ClickListener() {
 			
 			@Override
@@ -4680,6 +4734,7 @@ public class ContratoAcessoView extends VerticalLayout {
 		});
         bt3.setPrimaryStyleName("btSubMenu");
         
+        l.addComponent(bt0);
         l.addComponent(bt1);
         l.addComponent(bt3);
         l.addComponent(bt2);

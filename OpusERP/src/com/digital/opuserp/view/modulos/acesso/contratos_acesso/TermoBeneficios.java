@@ -485,19 +485,20 @@ public class TermoBeneficios implements StreamSource{
 		        
 		        double total_bene = 0;
 		        //if(acessoCliente.isBeneficio_comodato()){
-		        if(acessoCliente.getInstalacao_gratis() != null && acessoCliente.getInstalacao_gratis().equals("SIM")){		
-		        	total_bene = acessoCliente.getValor_beneficio_adesao() + acessoCliente.getValor_beneficio_comodato() + acessoCliente.getIsencao_prest_serv_manutencao() + new Double(150); 
+		        if(acessoCliente.getInstalacao_gratis() != null && acessoCliente.getInstalacao_gratis().equals("SIM") && 
+		        		acessoCliente.getCarencia() != null && acessoCliente.getCarencia().equals("SIM")){		
+		        	total_bene = 
+		        			acessoCliente.getValor_beneficio_adesao() + 
+		        			acessoCliente.getValor_beneficio_comodato() + 
+		        			acessoCliente.getIsencao_prest_serv_manutencao() + 
+		        			Real.formatStringToDBDouble(acessoCliente.getContrato().getIsencao_taxa_instalacao());
 		        }else{
-//		        	double isen_servi_manuten = 0;
-//		        	if(acessoCliente.getIsencao_prest_serv_manutencao() != null){
-//		        		isen_servi_manuten = acessoCliente.getIsencao_prest_serv_manutencao();
-//		        	}
-		        	total_bene = acessoCliente.getValor_beneficio_adesao() + acessoCliente.getValor_beneficio_comodato() + acessoCliente.getIsencao_prest_serv_manutencao();
+		        	total_bene = 
+		        			acessoCliente.getValor_beneficio_adesao() + 
+		        			acessoCliente.getValor_beneficio_comodato() + 
+		        			acessoCliente.getIsencao_prest_serv_manutencao();
 		        }
-		        //}else{
-		        	//------
-		        //}
-		        
+		     
 		        		       		        
 		        Paragraph pValorBeneficioTotalValor = new Paragraph();
 		        pValorBeneficioTotalValor.add(new Phrase("R$ "+Real.formatDbToString(String.valueOf(total_bene)),f12b));
@@ -742,6 +743,7 @@ public class TermoBeneficios implements StreamSource{
 		        pCellAvalista.addElement(new Paragraph("CPF/CNPJ: "+fiadorDoc,f12));
 		       	        
 		        PdfPTable tbAss = new PdfPTable( new float[]{2.65f,0.30f,2.30f});   
+		        tbAss.setSpacingBefore(80);
 		        tbAss.setWidthPercentage(100f);		
 		        tbAss.addCell(pCellRepresentante);
 		        tbAss.addCell(pCellVazio2);

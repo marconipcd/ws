@@ -107,10 +107,14 @@ public class FormSolicMudanEndere implements StreamSource {
 			tb_titulo.addCell(getPdfCell("SOLICITAÇÃO MUDANÇA DE ENDEREÇO", Element.ALIGN_CENTER, fTitulo, false, 25));			
 			doc.add(tb_titulo);
 			
+			
+			String cod_contrato = acesso.getId() != null ? acesso.getId().toString() : new String("000");
+			String texto_email =cliente.getEmail() != null ? " e EMAIL: "+cliente.getEmail()+" " : "";  
+			
 			PdfPTable tb_texto1 = new PdfPTable(new float[] {1f});
 			tb_texto1.setWidthPercentage(100f);
-			tb_texto1.addCell(getPdfCell("                       Eu "+cliente.getNome_razao()+", CPF: "+cliente.getDoc_cpf_cnpj()+" "
-					+ "titular do Contrato de Acesso à Internet sob o nº "+acesso.getId() != null ? acesso.getId().toString() : new String("000")+" , solicito à DIGITAL TECNOLOGIA E TELECOMUNICAÇÃO LTDA "
+			tb_texto1.addCell(getPdfCell("                       Eu "+cliente.getNome_razao()+", CPF: "+cliente.getDoc_cpf_cnpj()+texto_email
+					+ "titular do Contrato de Acesso à Internet sob o nº "+cod_contrato+" , solicito à DIGITAL TECNOLOGIA E TELECOMUNICAÇÃO LTDA "
 					+ "a mudança de endereço para o seguinte local : \n\n", Element.ALIGN_JUSTIFIED, fConteudo, false, 15));			
 			doc.add(tb_texto1);
 			

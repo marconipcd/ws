@@ -15,6 +15,7 @@ import domain.AgendamentoBloqueioDesbloqueio;
 import domain.AlterarcoesContrato;
 import domain.ContasReceber;
 import domain.RadReply;
+import domain.RadUserGroup;
 import domain.Usuario;
 
 
@@ -40,7 +41,8 @@ public class runBloqueioAuto {
 						if(a.getTipo().equals("BLOQUEIO")){
 							
 							if(podeBloquear(a.getContrato().getId().toString())){
-								bloquear(a.getContrato());
+								//bloquear(a.getContrato());
+								bloquearNoRadius(a.getContrato());
 							}
 							
 							em.getTransaction().begin();
@@ -143,4 +145,44 @@ public class runBloqueioAuto {
 
 		CredenciaisAcessoDAO.bloquearContratoClienteTotal(acesso.getId());
 	}
+	private static void bloquearNoRadius(AcessoCliente acesso){
+			
+			//Retira IPs Fixados no RADIUS
+//			Query q4 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//			q4.setParameter("username", acesso.getLogin());
+//			q4.setParameter("attribute", "Framed-IP-Address");
+//			
+//			for (RadReply rr : (List<RadReply>)q4.getResultList()) {
+//				em.remove(rr); 
+//			}
+//			
+//			Query q5 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//			q5.setParameter("username", acesso.getLogin());
+//			q5.setParameter("attribute", "Framed-Pool");
+//			
+//			for (RadReply rr : (List<RadReply>)q5.getResultList()) {
+//				em.remove(rr); 
+//			}
+				
+			if(acesso.getPlano().getPlano_bloqueio() != null){
+					//Altera o Plano para plano de bloqueio
+					Query q6 = em.createQuery("select r from RadUserGroup r where r.username=:login", RadUserGroup.class);
+					q6.setParameter("login", acesso.getLogin());
+					
+					for (RadUserGroup r : (List<RadUserGroup>)q6.getResultList()) {
+						em.remove(r); 
+					}
+					
+					em.persist(new RadUserGroup(null, acesso.getLogin(), acesso.getPlano().getPlano_bloqueio().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getPlano_bloqueio().getNome(), "1"));
+			}
+			
+			
+			if(acesso.getBase().getTipo().equals("mikrotik")){
+				MikrotikUtil.derrubarConexaoPPPOE(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+			}
+			
+			if(acesso.getBase().getTipo().equals("huawei")){
+				HuaweiUtil.desconectarCliente(acesso.getLogin());
+			}
+		}
 }

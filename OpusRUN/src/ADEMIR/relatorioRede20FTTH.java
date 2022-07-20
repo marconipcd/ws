@@ -33,11 +33,11 @@ public class relatorioRede20FTTH {
 			StringBuilder sb = new StringBuilder();		
 			sb.append(new String("Cod, Cod Cartao, Cliente, Cpf, Rg, Orgao Emissor, Sexo, Telefone 1,Telefone 2,Telefone 3, "
 					+ "Telefone 4, Data nascimento, Email, Plano, Valor Plano, Vencimento, Contrato, Concentrador, "
-					+ "Onu Serial,Porta GPON,Material,Onu,Regime,Mac,Cto,Login,Usuario Endereço Fixo, Cep,Endereco, "
+					+ "Onu Serial,OLT,PON, Material,Onu,Regime,Mac,Cto,Login,Usuario Endereço Fixo, Cep,Endereco, "
 					+ "Bairro, Cidade, Ponto Referencia,Url Endereco, Status"));
 			sb.append(System.getProperty("line.separator"));
 			
-			File f = new File("F:\\ContratosRede20FTTH.csv");
+			File f = new File("F:\\ContratosRede20FTTHComGpon.csv");
 			BufferedWriter br = new BufferedWriter(new FileWriter(f));  
 			 					
 				if(f.canWrite()){
@@ -53,6 +53,7 @@ public class relatorioRede20FTTH {
 							if(c != null){			
 								
 								String nome_onu = c.getOnu() != null && c.getOnu().getNome() != null ? c.getOnu().getNome() : "";
+								String material = c.getMaterial() != null && c.getMaterial().getNome() != null ? c.getMaterial().getNome() : "";
 								
 								sb.append(new String(
 										c.getId().toString()+","+
@@ -74,8 +75,9 @@ public class relatorioRede20FTTH {
 										c.getContrato().getNome()+","+
 										c.getBase().getIdentificacao()+","+
 										c.getOnu_serial()+","+
-										c.getGpon()+","+
-										c.getMaterial().getNome()+","+
+										c.getSwith().getOlt()+","+
+										c.getSwith().getPon()+","+
+										material+","+
 										nome_onu+","+
 										c.getRegime()+","+
 										c.getEndereco_mac()+","+

@@ -127,23 +127,23 @@ public class runBloqueio {
 									//emr.persist(new RadUserGgroup(null, acesso.getLogin(), acesso.getContrato().getId().toString()+"_BLOQUEADO", "1"));
 									
 									//Retira IPs Fixados no RADIUS
-									Query q7 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
-									q7.setParameter("username", acessoCliente.getLogin());
-									q7.setParameter("attribute", "Framed-IP-Address");
+//									Query q7 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//									q7.setParameter("username", acessoCliente.getLogin());
+//									q7.setParameter("attribute", "Framed-IP-Address");
+//									
+//									for (RadReply rr : (List<RadReply>)q7.getResultList()) {
+//										em.remove(rr); 
+//									}
 									
-									for (RadReply rr : (List<RadReply>)q7.getResultList()) {
-										em.remove(rr); 
-									}
+//									Query q8 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//									q8.setParameter("username", acessoCliente.getLogin());
+//									q8.setParameter("attribute", "Framed-Pool");
+//									
+//									for (RadReply rr : (List<RadReply>)q8.getResultList()) {
+//										em.remove(rr); 
+//									}
 									
-									Query q8 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
-									q8.setParameter("username", acessoCliente.getLogin());
-									q8.setParameter("attribute", "Framed-Pool");
-									
-									for (RadReply rr : (List<RadReply>)q8.getResultList()) {
-										em.remove(rr); 
-									}
-									
-									em.persist(new RadReply(null, acessoCliente.getLogin(), "Framed-Pool", "=", "BLOQUEADO"));					
+//									em.persist(new RadReply(null, acessoCliente.getLogin(), "Framed-Pool", "=", "BLOQUEADO"));					
 									
 									//Derruba Cliente Caso Esteja Logado
 									//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
@@ -286,21 +286,21 @@ public class runBloqueio {
 	private static void bloquearNoRadius(AcessoCliente acesso){
 		
 		//Retira IPs Fixados no RADIUS
-		Query q4 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
-		q4.setParameter("username", acesso.getLogin());
-		q4.setParameter("attribute", "Framed-IP-Address");
+//		Query q4 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//		q4.setParameter("username", acesso.getLogin());
+//		q4.setParameter("attribute", "Framed-IP-Address");
+//		
+//		for (RadReply rr : (List<RadReply>)q4.getResultList()) {
+//			em.remove(rr); 
+//		}
 		
-		for (RadReply rr : (List<RadReply>)q4.getResultList()) {
-			em.remove(rr); 
-		}
-		
-		Query q5 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
-		q5.setParameter("username", acesso.getLogin());
-		q5.setParameter("attribute", "Framed-Pool");
-		
-		for (RadReply rr : (List<RadReply>)q5.getResultList()) {
-			em.remove(rr); 
-		}
+//		Query q5 = em.createQuery("select rr from RadReply rr where rr.username =:username and rr.attribute =:attribute", RadReply.class);
+//		q5.setParameter("username", acesso.getLogin());
+//		q5.setParameter("attribute", "Framed-Pool");
+//		
+//		for (RadReply rr : (List<RadReply>)q5.getResultList()) {
+//			em.remove(rr); 
+//		}
 			
 		if(acesso.getPlano().getPlano_bloqueio() != null){
 				//Altera o Plano para plano de bloqueio

@@ -1001,7 +1001,7 @@ public class NotasView extends VerticalLayout implements GenericView {
 			
 			if(cb != null && cb.getId() == 5){
 			
-			//sicred
+			    //sicred
 				emissor = Emissor.novoEmissor()  
 			        .comCedente(OpusERP4UI.getEmpresa().getRazao_social())  
 			        .comAgencia(Integer.parseInt(cb.getAgencia_banco())).comDigitoAgencia('8')  

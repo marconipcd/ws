@@ -29,6 +29,15 @@ public class UsuarioConcentradores {
 	@Column(name="GRUPO")
 	private String grupo;
 	
+	@Column(name="USUARIO_TESTE")
+	private String usuario_teste;
+	
+	@Column(name="MAC")
+	private String mac;
+	
+	@Column(name="PLANO")
+	private String plano;
+	
 	@Column(name="OPERADOR_ID")
 	private Integer operador_id;
 	
@@ -41,7 +50,7 @@ public class UsuarioConcentradores {
 	}
 
 	public UsuarioConcentradores(Integer id, String usuario, String senha,
-			Integer operador_id, Date data_alteracao, String grupo) {
+			Integer operador_id, Date data_alteracao, String grupo, String usuario_teste, String mac, String plano) {
 		super();
 		this.id = id;
 		this.usuario = usuario;
@@ -49,6 +58,9 @@ public class UsuarioConcentradores {
 		this.operador_id = operador_id;
 		this.data_alteracao = data_alteracao;
 		this.grupo = grupo;
+		this.usuario_teste = usuario_teste;
+		this.mac = mac;
+		this.plano = plano;
 	}
 
 	public Integer getId() {
@@ -99,6 +111,31 @@ public class UsuarioConcentradores {
 	public String getUsuario() {
 		return usuario;
 	}
+
+	public String getUsuario_teste() {
+		return usuario_teste;
+	}
+
+	public void setUsuario_teste(String usuario_teste) {
+		this.usuario_teste = usuario_teste;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	public String getPlano() {
+		return plano;
+	}
+
+	public void setPlano(String plano) {
+		this.plano = plano;
+	}
+	
 	
 	
 	

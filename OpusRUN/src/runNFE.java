@@ -44,7 +44,7 @@ public class runNFE {
 		EntityManager em = emf.createEntityManager();
 		
 		//c.id=11851 and
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where  c.id=12424 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'ENCERRADO' and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -54,7 +54,7 @@ public class runNFE {
 		int i = 1;
 		for (AcessoCliente contrato : lista_de_contratos) {
 
-			if(i <= 2753){
+			if(i <= 2){
 				
 				System.out.println(contrato.getId());
 				SimpleDateFormat sdfAnoMes = new SimpleDateFormat("yyMM");
@@ -65,7 +65,7 @@ public class runNFE {
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
 
-				boolean manual = false;
+				boolean manual = true;
 				
 				if(!manual){
 					Query qn = em.createNativeQuery("select * from contas_receber cr where "+				
@@ -89,14 +89,14 @@ public class runNFE {
 					qn.setParameter("rNova", regexNova);
 					qn.setParameter("rAntiga", regexAntiga);
 					qn.setParameter("rProrata", regexProrata);
-					qn.setParameter("anoMes", "2206");
+					qn.setParameter("anoMes", "2207");
 					
 					if(qn.getResultList().size()  == 1){
 						boleto = (ContasReceber)qn.getSingleResult();					
 					}
 				}else{
 					//557413->128684 - 582019 - 632154
-					boleto = em.find(ContasReceber.class, 582022 );
+					boleto = em.find(ContasReceber.class, 674893 );
 				}
 				
 				//&& boleto.getStatus().equals("ABERTO")

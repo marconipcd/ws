@@ -7,7 +7,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
-import domain.Empresa;
 import domain.EmpresaUsuario;
 import domain.ModuloUsuario;
 import domain.Permissoes;
@@ -19,8 +18,8 @@ public class criarUsuario {
 	public static void main(String[] args) {
 		
 		EntityManager em = emf.createEntityManager();
-		Integer usuarioBase = 185;
-		Integer usuarioNovo = 194;
+		Integer usuarioBase = 220;
+		Integer usuarioNovo = 237;
 		
 		Query q = em.createQuery("select e from EmpresaUsuario e where e.usuario_id=:usuario_base", EmpresaUsuario.class);
 		q.setParameter("usuario_base", usuarioBase);
@@ -40,9 +39,32 @@ public class criarUsuario {
 		
 		
 		em.getTransaction().begin();
+		
+		
+			//Limpa permissões de usuário novo, caso haja
+			Query q4_permissoes_user_novo = em.createQuery("select e from Permissoes e where e.usuario_id=:usuario_base", Permissoes.class);
+			q4_permissoes_user_novo.setParameter("usuario_base", usuarioNovo);
+			List<Permissoes> listaDePermissoesPorUsuarioNovo = q4_permissoes_user_novo.getResultList();
+			for (Permissoes permissoes : listaDePermissoesPorUsuarioNovo) {
+				em.remove(permissoes); 
+			}
 			
-			for (EmpresaUsuario eu : listaDeEmpresasPorUsuario) {
-				
+			Query q3_submodulo_user_novo = em.createQuery("select e from SubmoduloUsuario e where e.usuario_id=:usuario_base", SubmoduloUsuario.class);
+			q3_submodulo_user_novo.setParameter("usuario_base", usuarioNovo);
+			List<SubmoduloUsuario> listaDeSubModulosPorUsuarioNovo = q3_submodulo_user_novo.getResultList();
+			for (SubmoduloUsuario submoduloUsuario : listaDeSubModulosPorUsuarioNovo) {
+				em.remove(submoduloUsuario); 
+			}
+			
+			Query q2_modulo_user_novo = em.createQuery("select e from ModuloUsuario e where e.usuario_id=:usuario_base", ModuloUsuario.class);
+			q2_modulo_user_novo.setParameter("usuario_base", usuarioNovo);
+			List<ModuloUsuario> listaDeModulosPorUsuarioNovo = q2_modulo_user_novo.getResultList();
+			for (ModuloUsuario moduloUsuario : listaDeModulosPorUsuarioNovo) {
+				em.remove(moduloUsuario); 
+			}
+		
+			
+			for (EmpresaUsuario eu : listaDeEmpresasPorUsuario) {				
 				EmpresaUsuario n_eu = new EmpresaUsuario(null, usuarioNovo, eu.getEmpresa_id());				
 				em.persist(n_eu);
 			}

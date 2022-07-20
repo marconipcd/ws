@@ -10,6 +10,7 @@ import com.digital.opuserp.dao.LogDAO;
 import com.digital.opuserp.dao.UsuarioConcentradorDAO;
 import com.digital.opuserp.domain.Concentrador;
 import com.digital.opuserp.domain.LogAcoes;
+import com.digital.opuserp.domain.PlanoAcesso;
 import com.digital.opuserp.domain.UsuarioConcentradores;
 import com.digital.opuserp.interfaces.GenericView;
 import com.digital.opuserp.util.ConnUtil;
@@ -39,6 +40,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Table;
@@ -52,7 +54,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 
 	// JPA
 	JPAContainer<Concentrador> container;
-	JPAContainer<UsuarioConcentradores> containerUsuarioConcentr = JPAContainerFactory.make(UsuarioConcentradores.class, ConnUtil.getEntity());
+	JPAContainer<UsuarioConcentradores> containerUsuarioConcentr;
 	
 	Table tb;
 	TextField tfBusca;
@@ -61,6 +63,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 	Button btExcluir;
 	Button btInterface;
 	Button btUsuarios;
+	Button btUsuariosTeste;
 	
 	ComboBox cbStatus;
 		
@@ -96,7 +99,9 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 		hlButtonsRoot.setComponentAlignment(btInterface, Alignment.TOP_LEFT);
 		hlButtonsRoot.addComponent(BuildbtUsuarios());
 		hlButtonsRoot.setComponentAlignment(btUsuarios, Alignment.TOP_LEFT);
-		hlButtonsRoot.setExpandRatio(btUsuarios, 1f);
+		hlButtonsRoot.addComponent(BuildbtUsuariosTeste());
+		hlButtonsRoot.setComponentAlignment(btUsuariosTeste, Alignment.TOP_LEFT);
+		hlButtonsRoot.setExpandRatio(btUsuariosTeste, 1f);
 		
 		hlButtonsRoot.addComponent(hlButons);
 		hlButtonsRoot.setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
@@ -476,6 +481,245 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 		});
 		return btInterface;
 	}
+	public Button BuildbtUsuariosTeste(){
+		btUsuariosTeste = new Button("Usuários de teste", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Cadastrar Usuarios"))				
+				{
+					
+					containerUsuarioConcentr = JPAContainerFactory.make(UsuarioConcentradores.class, ConnUtil.getEntity());
+					 containerUsuarioConcentr.addContainerFilter(Filters.eq("usuario_teste", "SIM"));
+													
+					Window w = new Window("Usuários de teste");
+					w.setContent(new VerticalLayout(){
+						{
+							setSizeFull();
+							setMargin(true);
+							setSpacing(true);
+							
+							addComponent(new FormLayout(){
+								{
+									setWidth("100%");
+									
+									final TextField txtUsuario = new TextField("Usuário");
+									txtUsuario.setWidth("100%");
+									txtUsuario.setRequired(true);
+									txtUsuario.setEnabled(false);
+									addComponent(txtUsuario);
+									
+									final TextField txtSenha = new TextField("Senha");
+									txtSenha.setWidth("100%");
+									txtSenha.setRequired(true);	
+									txtSenha.setEnabled(false);
+									addComponent(txtSenha);
+									
+									final TextField txtMac = new TextField("Mac");
+									txtMac.setWidth("100%");
+									txtMac.setRequired(false);	
+									txtMac.setEnabled(false);
+									txtMac.setId("txtMac");
+									JavaScript.getCurrent().execute("$('#txtMac').mask('AA:AA:AA:AA:AA:AA')");									
+									addComponent(txtMac);
+									
+									
+									JPAContainer<PlanoAcesso> containerPlano = JPAContainerFactory.makeReadOnly(PlanoAcesso.class, ConnUtil.getEntity());
+									containerPlano.addContainerFilter(Filters.eq("status", "ATIVO"));
+									
+									final ComboBox cbPlano = new ComboBox("Plano", containerPlano);									
+									cbPlano.setNullSelectionAllowed(false);									
+									cbPlano.setWidth("200px");								
+									cbPlano.setEnabled(false);
+									cbPlano.setItemCaptionPropertyId("nome");
+									addComponent(cbPlano);
+									
+									final Button btNovo = new Button("Novo", new Button.ClickListener() {
+										
+										@Override
+										public void buttonClick(ClickEvent event) {
+											
+											if(event.getButton().getCaption().equals("Novo")){
+												event.getButton().setCaption("Salvar");
+												
+												txtUsuario.setEnabled(true);
+												txtUsuario.focus();
+												
+												txtSenha.setEnabled(true);
+												txtMac.setEnabled(true);
+												cbPlano.setEnabled(true); 										
+												
+												
+											}else{
+												
+												
+												 if(txtUsuario.isValid() && txtSenha.isValid() && txtMac.isValid()){
+													 
+													 if(!UsuarioConcentradorDAO.buscarUsuarioRadius(txtUsuario.getValue())){
+														 
+														 String groupname = null;
+														 
+														 if(cbPlano.getValue() != null){
+															 EntityItem<PlanoAcesso> ei = (EntityItem<PlanoAcesso>)cbPlano.getItem(cbPlano.getValue());
+														 	groupname = ei.getEntity().getContrato_acesso().getId().toString()+"_"+ei.getEntity().getNome();
+														 }
+														 
+														 String plano = cbPlano.getValue() != null ? cbPlano.getValue().toString() : null;
+														 
+														 boolean check = UsuarioConcentradorDAO.cadastrarUsuario(txtUsuario.getValue(), txtSenha.getValue(), 
+																 plano,"SIM", groupname, txtMac.getValue());
+														 
+														 if(check){
+															 Notify.Show("Usuário de teste cadastrado com sucesso!", Notify.TYPE_SUCCESS);
+															 event.getButton().setCaption("Novo");
+															 
+															 txtUsuario.setValue("");
+															 txtUsuario.setEnabled(false);
+															 
+															 txtSenha.setValue("");
+															 txtSenha.setEnabled(false);
+															 
+															 txtMac.setValue("");
+															 txtMac.setEnabled(false);
+															 
+															 cbPlano.select(null);
+															 cbPlano.setEnabled(false);
+															 
+															 containerUsuarioConcentr.refresh();														 
+														 }
+													 }else{ 
+														 Notify.Show("Não é possível salvar, Usuário de teste já existe no Radius!", Notify.TYPE_WARNING);														 
+													 }
+													 
+												 }
+											}
+											
+											
+										}
+									});
+									Button btCancelar = new Button("Cancelar", new Button.ClickListener() {
+										
+										@Override
+										public void buttonClick(ClickEvent event) {
+											 
+											 txtUsuario.setEnabled(true); 
+											 txtUsuario.setValue("");
+											 txtUsuario.setEnabled(false);
+											 
+											 txtMac.setEnabled(true);
+											 txtMac.setValue("");
+											 txtMac.setEnabled(false);
+											 
+											 cbPlano.setEnabled(true);
+											 cbPlano.select("");
+											 cbPlano.setEnabled(false);
+											 
+											 btNovo.setCaption("Novo");
+										}
+									});
+									
+									HorizontalLayout hl = new HorizontalLayout();
+									hl.setWidth("100%");
+									hl.addComponent(btNovo);
+									hl.addComponent(btCancelar);
+									hl.setComponentAlignment(btNovo, Alignment.MIDDLE_RIGHT);
+									hl.setComponentAlignment(btCancelar, Alignment.MIDDLE_RIGHT);
+									hl.setExpandRatio(btNovo, 1f);
+									
+									addComponent(hl); 
+									
+								}
+							});
+							
+							VerticalLayout vl1 = new VerticalLayout(){
+								{
+									setSizeFull();
+									
+									TextField txtBuscar = new TextField();
+									txtBuscar.addTextChangeListener(new FieldEvents.TextChangeListener() {
+										
+										@Override
+										public void textChange(TextChangeEvent event) {
+											containerUsuarioConcentr.removeAllContainerFilters();
+											containerUsuarioConcentr.addContainerFilter(new Like("usuario", "%"+event.getText()+"%", false));
+											containerUsuarioConcentr.addContainerFilter(Filters.eq("usuario_teste", "SIM"));
+											containerUsuarioConcentr.applyFilters();
+										}
+									});
+									txtBuscar.setInputPrompt("buscar...");
+									txtBuscar.setWidth("100%");
+									addComponent(txtBuscar); 
+									
+									
+									final Table tb = new Table(null,containerUsuarioConcentr);
+									tb.setSelectable(true);
+									
+									tb.setSizeFull();
+									tb.setVisibleColumns(new Object[]{"usuario","senha","mac","plano","data_alteracao"});
+									
+									tb.setColumnHeader("usuario", "Usuário");
+									tb.setColumnHeader("senha", "Senha");
+									tb.setColumnHeader("mac", "Mac");
+									tb.setColumnHeader("plano", "Plano");
+									tb.setColumnHeader("data_alteracao", "Data Alteração");
+									
+									tb.addGeneratedColumn("e", new Table.ColumnGenerator() {
+										
+										@Override
+										public Object generateCell(final Table source,final Object itemId, Object columnId) {
+
+											Button btExcluir = new Button("excluir", new Button.ClickListener() {
+												
+												@Override
+												public void buttonClick(ClickEvent event) {
+													GenericDialog gd = new GenericDialog("Confirme para continuar!", "Deseja realmente excluir o usuario ?", true, true);
+													gd.addListerner(new GenericDialog.DialogListerner() {
+														
+														@Override
+														public void onClose(DialogEvent event) {
+															if(event.isConfirm()){
+																EntityItem<UsuarioConcentradores> uItem = (EntityItem<UsuarioConcentradores>)source.getItem(itemId);
+																boolean check = UsuarioConcentradorDAO.excluirUsuario(uItem.getEntity());
+																
+																if(check){
+																	Notify.Show("Usuário Excluído com sucesso!", Notify.TYPE_SUCCESS); 
+																	containerUsuarioConcentr.refresh();
+																}
+															}
+														}
+													});
+													getUI().addWindow(gd);
+													
+												}
+											});
+											btExcluir.setStyleName(Reindeer.BUTTON_LINK);
+											
+											return btExcluir;
+										}
+									});
+									
+									addComponent(tb); 
+									setExpandRatio(tb, 1f);
+								}
+							};
+							addComponent(vl1);
+							setExpandRatio(vl1, 1f);
+						}
+					});
+					w.setWidth("834px");
+					w.setHeight("576px");
+					w.center();
+					w.setModal(true); 
+					
+					getUI().addWindow(w);
+
+				}else{					
+					Notify.Show("Você não Possui Permissão para Cadastrar Usuários", Notify.TYPE_ERROR);
+				}
+			}
+		});
+		return btUsuariosTeste;
+	}
 	public Button BuildbtUsuarios(){
 		btUsuarios = new Button("Usuários", new Button.ClickListener() {
 			
@@ -483,6 +727,9 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 			public void buttonClick(ClickEvent event) {
 				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Cadastrar Usuarios"))				
 				{
+					
+					 containerUsuarioConcentr = JPAContainerFactory.make(UsuarioConcentradores.class, ConnUtil.getEntity());
+					 containerUsuarioConcentr.addContainerFilter(Filters.eq("usuario_teste", "NAO"));
 													
 					Window w = new Window("Usuários");
 					w.setContent(new VerticalLayout(){
@@ -537,7 +784,8 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 												 if(txtUsuario.isValid() && txtSenha.isValid() && cbGrupo.isValid()){
 													 
 													 if(!UsuarioConcentradorDAO.buscarUsuarioRadius(txtUsuario.getValue())){
-														 boolean check = UsuarioConcentradorDAO.cadastrarUsuario(txtUsuario.getValue(), txtSenha.getValue(), cbGrupo.getValue().toString());
+														 boolean check = UsuarioConcentradorDAO.cadastrarUsuario(txtUsuario.getValue(), txtSenha.getValue(), 
+																 cbGrupo.getValue().toString(),"NAO", null, null);
 														 
 														 if(check){
 															 Notify.Show("Usuário cadastrado com sucesso!", Notify.TYPE_SUCCESS);
@@ -609,6 +857,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 										public void textChange(TextChangeEvent event) {
 											containerUsuarioConcentr.removeAllContainerFilters();
 											containerUsuarioConcentr.addContainerFilter(new Like("usuario", "%"+event.getText()+"%", false));
+											containerUsuarioConcentr.addContainerFilter(Filters.eq("usuario_teste", "NAO"));
 											containerUsuarioConcentr.applyFilters();
 										}
 									});
@@ -670,8 +919,8 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 							setExpandRatio(vl1, 1f);
 						}
 					});
-					w.setWidth("386px");
-					w.setHeight("351px");
+					w.setWidth("406px");
+					w.setHeight("576px");
 					w.center();
 					w.setModal(true); 
 					

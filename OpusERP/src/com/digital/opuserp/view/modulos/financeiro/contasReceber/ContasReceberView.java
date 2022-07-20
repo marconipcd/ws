@@ -1350,16 +1350,32 @@ public class ContasReceberView extends VerticalLayout {
 								boolean check_datas = false;
 								
 							    ContasReceber cr = ContasReceberDAO.find(Integer.parseInt(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cod.").getValue().toString()));
-							    if(cr.getN_doc().split("-")[1].equals("01/12") ){
-								    String cod_contrato = cr.getN_doc().split("-")[0].split("/")[0];
-								    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
-								    Date data_instalacao = contrato.getData_instalacao();
-								    Date data_vencimento = cr.getData_vencimento();
-								    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
-								    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
-								    
-								    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
-								    	check_datas = true;
+							    
+							    try{
+								    if(cr.getN_doc().split("-")[1].equals("01/12") ){
+									    String cod_contrato = cr.getN_doc().split("-")[0].split("/")[0];
+									    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
+									    Date data_instalacao = contrato.getData_instalacao();
+									    Date data_vencimento = cr.getData_vencimento();
+									    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
+									    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
+									    
+									    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
+									    	check_datas = true;
+									    }
+								    }
+							    }catch(Exception e){
+							    	if(cr.getN_doc().split("/")[1].equals("PRORATA") ){
+									    String cod_contrato = cr.getN_doc().split("/")[0];
+									    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
+									    Date data_instalacao = contrato.getData_instalacao();
+									    Date data_vencimento = cr.getData_vencimento();
+									    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
+									    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
+									    
+									    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
+									    	check_datas = true;
+									    }
 								    }
 							    }
 							    
@@ -3030,8 +3046,9 @@ public class ContasReceberView extends VerticalLayout {
 				}
 			
 				
-				if(OpusERP4UI.getEmpresa().getId().equals(1) || OpusERP4UI.getEmpresa().getId().equals(3) || OpusERP4UI.getEmpresa().getId().equals(5)
-						|| OpusERP4UI.getEmpresa().getId().equals(6)){
+				if(OpusERP4UI.getEmpresa().getId().equals(1) || OpusERP4UI.getEmpresa().getId().equals(3) || 
+						OpusERP4UI.getEmpresa().getId().equals(5)
+						|| OpusERP4UI.getEmpresa().getId().equals(6) || OpusERP4UI.getEmpresa().getId().equals(8)){
 					try{
 						
 						ContasReceber c = ContasReceberDAO.find(codBoleto);
