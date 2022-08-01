@@ -9,21 +9,42 @@ import javax.persistence.Query;
 import com.digital.opuserp.OpusERP4UI;
 import com.digital.opuserp.domain.RadCheck;
 import com.digital.opuserp.domain.RadReply;
+import com.digital.opuserp.domain.RadUserGgroup;
 import com.digital.opuserp.domain.UsuarioConcentradores;
 import com.digital.opuserp.util.ConnUtil;
 
 public class UsuarioConcentradorDAO {
 
-	public static boolean cadastrarUsuario(String usuario, String senha, String grupo){
+	public static boolean cadastrarUsuario(String usuario, String senha, String grupo, String teste, String groupname, String mac, String ip){
 		
 		try{
 			EntityManager em  = ConnUtil.getEntity();
 			
 			em.getTransaction().begin();
 				
-				em.persist(	new UsuarioConcentradores(null, usuario, senha, OpusERP4UI.getUsuarioLogadoUI().getId(), new Date(), grupo));
+				em.persist(new UsuarioConcentradores(null, usuario, senha, OpusERP4UI.getUsuarioLogadoUI().getId(), new Date(), grupo, teste, mac, groupname, ip));
 				em.persist(new RadCheck(null, usuario, "Password", "==", senha));
-				em.persist(new RadReply(null,usuario, "Mikrotik-Group", "=", grupo));
+				
+				if(teste.equals("SIM")){
+					
+					if(groupname != null){
+						em.persist(new RadUserGgroup(null, usuario, groupname, "1"));
+					}
+					
+					if(mac != null){
+						em.persist(new RadCheck(null, usuario, "Calling-Station-ID", ":=", mac));
+					}
+					
+					if(ip != null){
+						em.persist(new RadReply(null, usuario, "Framed-IP-Address", "=", ip));
+					}
+					
+					
+				}
+				
+				if(teste.equals("NAO")){
+					em.persist(new RadReply(null,usuario, "Mikrotik-Group", "=", grupo));
+				}
 				
 			em.getTransaction().commit();
 			
@@ -121,8 +142,12 @@ public class UsuarioConcentradorDAO {
 			Query q2 = em.createQuery("select r from RadReply r where r.username =:u",RadReply.class);
 			q2.setParameter("u", usuario.getUsuario());
 			
+			Query q3 = em.createQuery("select r from RadUserGgroup r where r.username =:u",RadUserGgroup.class);
+			q3.setParameter("u", usuario.getUsuario());
+			
 			List<RadCheck> listRadChecks = q1.getResultList();
 			List<RadReply> listRadReply = q2.getResultList();
+			List<RadUserGgroup> listRadUserGroup = q3.getResultList();
 			
 			em.getTransaction().begin();
 			
@@ -133,6 +158,10 @@ public class UsuarioConcentradorDAO {
 				
 				for (RadCheck radCheck : listRadChecks) {
 					em.remove(radCheck);
+				}
+				
+				for (RadUserGgroup radUserGroup : listRadUserGroup) {
+					em.remove(radUserGroup);
 				}
 			
 				em.remove(em.find(UsuarioConcentradores.class, usuario.getId()));

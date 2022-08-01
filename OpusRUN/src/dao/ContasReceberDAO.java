@@ -20,6 +20,7 @@ import javax.persistence.Query;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import util.HuaweiUtil;
 import util.MikrotikUtil;
 import util.Real;
 import domain.AcessoCliente;
@@ -33,6 +34,7 @@ import domain.CreditoCliente;
 import domain.Empresa;
 import domain.LogAcoes;
 import domain.RadReply;
+import domain.RadUserGroup;
 
 public class ContasReceberDAO {
 	
@@ -241,6 +243,11 @@ public class ContasReceberDAO {
 								em.remove(rr);
 							}
 						}
+						
+						
+						
+						
+						
 						Query qrr2 = em.createQuery("select rr from RadReply rr where rr.username = :usuario and rr.attribute = 'Framed-Pool' and rr.value = 'BLOQUEADO_TOTAL'", RadReply.class);
 						qrr2.setParameter("usuario", acesso.getLogin());						
 						if(qrr2.getResultList().size() >0){
@@ -251,6 +258,23 @@ public class ContasReceberDAO {
 							}
 						}
 						
+						
+						//Remove planos antigos
+						Query qrr3 = em.createQuery("select rug from RadUserGroup rug where rug.username = :usuario", RadUserGroup.class);
+						qrr3.setParameter("usuario", acesso.getLogin());
+						if(qrr3.getResultList().size()>0){
+							List<RadUserGroup> marcacoes_planos_antigas = qrr3.getResultList();
+							for (RadUserGroup rug : marcacoes_planos_antigas) {
+								em.remove(rug);
+							}
+						}
+						
+						//Cria planos originais novamente
+						String groupName = acesso.getPlano().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getNome();
+						em.persist(new RadUserGroup(null, acesso.getLogin(), groupName, "1"));
+						
+						
+						
 						if(acesso.getEndereco_ip() != null && !acesso.getEndereco_ip().equals("")){
 							em.persist(new RadReply(null, acesso.getLogin(), "Framed-IP-Address", "=", acesso.getEndereco_ip()));
 						}
@@ -259,9 +283,17 @@ public class ContasReceberDAO {
 						em.merge(cr);
 						
 						//Derruba Conexão do Cliente
-						if(acesso != null && acesso.getBase() != null && acesso.getBase().getUsuario() != null && acesso.getBase().getSenha() != null && acesso.getBase().getEndereco_ip() != null && acesso.getBase().getPorta_api() != null && acesso.getLogin() != null){
+						if(acesso != null && acesso.getBase() != null && acesso.getBase().getUsuario() != null && 
+								acesso.getBase().getSenha() != null && acesso.getBase().getEndereco_ip() != null && 
+								acesso.getBase().getPorta_api() != null && acesso.getLogin() != null &&
+								acesso.getBase().getTipo().equals("mikrotik")){
 							MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
 						}
+						
+						if(acesso != null && acesso.getBase().getTipo().equals("huawei")){
+							HuaweiUtil.desconectarCliente(acesso.getLogin());
+						}
+						
 						
 						//Notify.Show("Contrato de Acesso Desbloqueado!", Notify.TYPE_NOTICE);				
 					}										

@@ -435,7 +435,7 @@ public class AlterarIpFixoEditor extends Window {
 							ip = MikrotikUtil.getRemoteIpPPOE(acesso.getBase().getEndereco_ip(),acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getLogin());
 						}
 						
-						if(base.getTipo().equals("huawei")){
+						if(base.getTipo().equals("huawei") && info != null && info.length > 1){
 							ip = info[2];
 						}
 						

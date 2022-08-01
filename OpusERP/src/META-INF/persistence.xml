@@ -201,6 +201,7 @@
 		<class>com.digital.opuserp.domain.FichaCegaCab</class>
 		<class>com.digital.opuserp.domain.FichaCegaDet</class>
 		<class>com.digital.opuserp.domain.Beneficio</class>
+		<class>com.digital.opuserp.domain.NotificacoesGerenciaNet</class>
 	
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

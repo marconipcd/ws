@@ -1551,11 +1551,12 @@ public class RoteirizacaoView extends VerticalLayout {
 									ClienteDAO.saveCliente(cliente);
 									
 									//Atualiza Endereço
-									EnderecoDAO.save((Endereco)item.getItemProperty("end").getValue());									
-									
+									EnderecoDAO.save((Endereco)item.getItemProperty("end").getValue());
 									String valor = Real.formatDbToString(String.valueOf(ose.getTipo_subgrupo().getValor()));									
 										
-									if(ose.getContrato() != null && ose.getContrato().getInstalacao_gratis() != null && ose.getContrato().getInstalacao_gratis().equals("SIM") && ose.getGrupo().getNome().equals("INSTALACAO")){
+									if(ose.getContrato() != null && ose.getContrato().getInstalacao_gratis() != null && 
+											ose.getContrato().getInstalacao_gratis().equals("SIM") && 
+											ose.getGrupo().getNome().equals("INSTALACAO")){
 										valor = "0,00";
 									}
 									

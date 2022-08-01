@@ -3061,8 +3061,8 @@ public class RoteirizacaoEditor extends Window implements GenericEditor {
 							
 							
 							
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");							
 							if(cbHora.getValue() != null){
-								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");							
 								item.getItemProperty("data_ex").setValue(sdf.parse(sdf.format(dfPrevisao.getValue()).replaceAll("00:00:00", "")+""+cbHora.getValue()+":00"));
 							}else{
 								item.getItemProperty("data_ex").setValue(dfPrevisao.getValue());
@@ -3079,7 +3079,7 @@ public class RoteirizacaoEditor extends Window implements GenericEditor {
 	
 							if(item.getItemProperty("id").getValue() == null){
 								item.getItemProperty("status").setValue("ABERTO");
-								item.getItemProperty("data_abertura").setValue(new Date());
+								item.getItemProperty("data_abertura").setValue(sdf.parse(sdf.format(new Date())));
 								item.getItemProperty("operador_abertura").setValue(OpusERP4UI.getUsuarioLogadoUI().getUsername());
 							}
 							

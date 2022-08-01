@@ -28,6 +28,9 @@ public class Swith {
 	@JoinColumn(name="CONCENTRADOR_ID")
 	private Concentrador concentrador;
 	
+	@Column(name="INTERFACE")
+	private String interfaces;
+	
 	@Column(name="MODELO")
 	private String modelo;
 	
@@ -62,6 +65,8 @@ public class Swith {
 	
 	@Column(name="SITUACAO")
 	private String situacao;
+	
+	
 	
 	public Swith(){
 		
@@ -223,6 +228,14 @@ public class Swith {
 
 	public void setOlt_id(Olts olt_id) {
 		this.olt_id = olt_id;
+	}
+
+	public String getInterfaces() {
+		return interfaces;
+	}
+
+	public void setInterfaces(String interfaces) {
+		this.interfaces = interfaces;
 	}
 
 	

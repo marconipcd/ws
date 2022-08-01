@@ -53,11 +53,15 @@ import com.digital.opuserp.domain.LogAcoes;
 import com.digital.opuserp.domain.NfeMestre;
 import com.digital.opuserp.domain.Ose;
 import com.digital.opuserp.domain.PlanoAcesso;
+import com.digital.opuserp.domain.RadGroupReply;
 import com.digital.opuserp.domain.RadReply;
+import com.digital.opuserp.domain.RadUserGgroup;
+import com.digital.opuserp.domain.RadUserGroupDAO;
 import com.digital.opuserp.domain.RegistroLiquidado;
 import com.digital.opuserp.domain.RemessaBanco;
 import com.digital.opuserp.util.CheckNdocUtil;
 import com.digital.opuserp.util.ConnUtil;
+import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.util.Notify;
@@ -821,6 +825,20 @@ public class ContasReceberDAO {
 							}
 						}
 						
+						//Remove planos antigos
+						Query qrr3 = em.createQuery("select rug from RadUserGgroup rug where rug.username = :usuario", RadUserGgroup.class);
+						qrr3.setParameter("usuario", acesso.getLogin());
+						if(qrr3.getResultList().size()>0){
+							List<RadUserGgroup> marcacoes_planos_antigas = qrr3.getResultList();
+							for (RadUserGgroup rug : marcacoes_planos_antigas) {
+								em.remove(rug);
+							}
+						}
+						
+						//Cria planos originais novamente
+						String groupName = acesso.getPlano().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getNome();
+						em.persist(new RadUserGgroup(null, acesso.getLogin(), groupName, "1"));
+												
 						if(acesso.getEndereco_ip() != null && !acesso.getEndereco_ip().equals("")){
 							em.persist(new RadReply(null, acesso.getLogin(), "Framed-IP-Address", "=", acesso.getEndereco_ip()));
 						}
@@ -830,7 +848,15 @@ public class ContasReceberDAO {
 						
 						//Derruba Conexão do Cliente
 						if(acesso != null && acesso.getBase() != null && acesso.getBase().getUsuario() != null && acesso.getBase().getSenha() != null && acesso.getBase().getEndereco_ip() != null && acesso.getBase().getPorta_api() != null && acesso.getLogin() != null){
-							MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+							
+							if(acesso.getBase().getTipo().equals("mikrotik")){
+									MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+							}
+							
+							if(acesso.getBase().getTipo().equals("huawei")){
+									HuaweiUtil.desconectarCliente(acesso.getLogin());
+							}
+							
 						}
 						
 						//Muda status do ITTV para ativo
@@ -838,6 +864,8 @@ public class ContasReceberDAO {
 							String s = IttvDAO.atualizarStatus(acesso.getIttv_id(), "ACTIVE");
 							System.out.println(s);
 						}
+						
+						//Faltando desbloquear Paramount
 						
 						Notify.Show("Contrato de Acesso Desbloqueado!", Notify.TYPE_NOTICE);				
 					}										

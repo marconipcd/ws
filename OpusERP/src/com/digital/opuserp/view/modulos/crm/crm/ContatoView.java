@@ -65,6 +65,7 @@ import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -73,7 +74,10 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -97,6 +101,7 @@ public class ContatoView extends VerticalLayout{
 	Button btTratar;
 	Button btExcluir;
 	Button btHistorico;
+	Button btRelatorioRecorrencia;
 	Button btLog;
 	Button btAtualizar;
 	Button btAnalisar;
@@ -140,6 +145,7 @@ public class ContatoView extends VerticalLayout{
 			hlButons.addComponent(BuildbtAnalisar());
 			hlButons.addComponent(BuildbtExcluir());
 			hlButons.addComponent(BuildbtHistorico());
+			hlButons.addComponent(BuildbtRelatorioRecorrencia());
 			hlButons.addComponent(BuildbtLog());
 			
 			
@@ -1986,6 +1992,165 @@ public class ContatoView extends VerticalLayout{
 		btVisualizar.setEnabled(false);
 		return btVisualizar;
 	}
+	
+	private Component BuildbtRelatorioRecorrencia() {
+		btRelatorioRecorrencia = new Button("Relatório recorr.", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, 
+						OpusERP4UI.getEmpresa().getId(), 
+						OpusERP4UI.getUsuarioLogadoUI().getId(), "Relatorio Recorrencia")){				
+				
+					try {
+						
+						final Window win0 = new Window("Relatório de CRMs Recorrentes");
+						win0.setWidth("320px");
+						win0.setHeight("230px");
+						win0.setResizable(false);
+						win0.center();
+						win0.setModal(true);
+						win0.setStyleName("disable_scroolbar");
+												
+						
+						win0.setContent(new VerticalLayout(){
+							{
+								setSizeFull();
+								setMargin(true);
+								setStyleName("border-form");
+								
+								JPAContainer<Setores> containerSetor = JPAContainerFactory.makeReadOnly(Setores.class, ConnUtil.getEntity());
+								final ComboBox cbSetores= new ComboBox("Setor", containerSetor);
+								cbSetores.setItemCaptionPropertyId("nome");
+								cbSetores.setStyleName("caption-align-cep");
+																
+								final DateField dt0 = new DateField("Data inicial");
+								dt0.setStyleName("caption-align-cep");
+								
+								final DateField dt1 = new DateField("Data final");
+								dt1.setStyleName("caption-align-cep");
+								
+								final TextField txtRecorrencias = new TextField("Qtd (>)");
+								txtRecorrencias.setStyleName("caption-align-cep");
+								txtRecorrencias.setId("txtRecorrencias");
+								JavaScript.getCurrent().execute("$('#txtRecorrencias').mask('000')");
+								
+								final Button bt = new Button("Gerar", new Button.ClickListener() {
+									
+									@Override
+									public void buttonClick(ClickEvent event) {
+										
+											if(dt0.getValue() != null && dt1.getValue() != null && cbSetores.getValue() != null){
+												
+												EntityItem<Setores> eiSe = (EntityItem<Setores>)cbSetores.getItem(cbSetores.getValue());
+												Setores setor_selecionado = eiSe.getEntity();
+												
+												Integer qtd_recorrencia = Integer.parseInt(txtRecorrencias.getValue());
+												
+												
+												try{
+														// INSTANCIA UMA NOVA JANELA E ADICIONA SUAS PROPRIEDADES
+														Window win = new Window("Relatório de CRMs Recorrentes");
+														win.setWidth("800px");
+														win.setHeight("600px");
+														win.setResizable(true);
+														win.center();
+														win.setModal(true);
+														win.setStyleName("disable_scroolbar");
+														
+														StreamResource resource;
+														resource = new StreamResource(new ExportRelatorioCrmRecorrente(setor_selecionado, dt0.getValue(), dt1.getValue(),qtd_recorrencia), "RELATORIO DE CRMs RECORRENTES");
+														resource.getStream();
+														resource.setMIMEType("application/pdf");
+														resource.setCacheTime(0);
+														
+														Embedded e = new Embedded();
+														e.setSizeFull();
+														e.setType(Embedded.TYPE_BROWSER);
+														e.setSource(resource);
+														
+														win.setContent(e);
+														getUI().addWindow(win);
+														win0.close();
+												}catch(Exception e){
+													e.printStackTrace();
+												}
+											}
+									}
+								});
+								
+								addComponent(new FormLayout(){					
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);										
+										addComponent(cbSetores);										
+									}
+								});
+								
+								addComponent(new FormLayout(){					
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);										
+										addComponent(dt0);										
+									}
+								});
+								
+								addComponent(new FormLayout(){					
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);										
+										addComponent(dt1);										
+									}
+								});
+								
+								addComponent(new FormLayout(){					
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);										
+										addComponent(txtRecorrencias);										
+									}
+								});
+								
+								addComponent(new FormLayout(){					
+									{
+										setStyleName("form-cutom");
+										setMargin(true);
+										setSpacing(true);										
+										addComponent(new HorizontalLayout(){
+											{
+												setWidth("100%");
+												addComponent(bt);
+												setComponentAlignment(bt, Alignment.MIDDLE_RIGHT);
+											}
+										});										
+									}
+								});
+							}
+						});
+						
+						getUI().addWindow(win0); 
+						
+						
+						
+						
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else{
+					Notify.Show("Você não Possui Permissão para emitir relatório de recorrência de crm.", Notify.TYPE_ERROR);
+				}
+			}
+			
+		});
+		btRelatorioRecorrencia.setEnabled(true);
+		return btRelatorioRecorrencia;
+	 }
 	
 	private Component BuildbtHistorico() {
 		btHistorico = new Button("Histórico", new Button.ClickListener() {

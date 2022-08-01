@@ -39,6 +39,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -405,12 +406,12 @@ public class NovoRelatorioCrm extends Window {
 		dFValorFiltro.setLenient(true);
 		dFValorFiltro.setTextFieldEnabled(true);
 
-		if(coluna.equals("Data Conclusão")){
-//			dFValorFiltro.setDateFormat("dd/MM/yyyy HH:mm:ss");		
-//			dFValorFiltro.setResolution(DateField.RESOLUTION_HOUR);
-//			dFValorFiltro.setResolution(DateField.RESOLUTION_MIN);
-//		}else{
-			dFValorFiltro.setDateFormat("dd/MM/yyyy");
+		if(coluna.equals("Data Conclusão")){		
+			dFValorFiltro.setDateFormat("dd/MM/yyyy HH:mm:ss");
+			dFValorFiltro.setResolution(DateField.RESOLUTION_HOUR);
+			dFValorFiltro.setResolution(DateField.RESOLUTION_MIN);
+		}else{
+			dFValorFiltro.setDateFormat("dd/MM/yyyy");			
 		}
 		
 		dFValorFiltro.addValueChangeListener(new Property.ValueChangeListener() {
@@ -440,7 +441,14 @@ public class NovoRelatorioCrm extends Window {
 		if(v != null){
 			
 			try{
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); 
+				SimpleDateFormat sdf;
+				
+				if(coluna.equals("Data Conclusão")){
+					sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+				}else{
+					sdf = new SimpleDateFormat("dd/MM/yyyy");
+				}
+								
 				dFValorFiltro.setValue(sdf.parse(v));
 				dFValorFiltro.setReadOnly(true);
 			}catch(Exception e){
@@ -860,7 +868,14 @@ public class NovoRelatorioCrm extends Window {
 														
 							String idSearch = String.valueOf(listaParametros.size())+dFValorFiltro.getValue().toString();
 							
-							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+							SimpleDateFormat sdf; 
+							
+							if(cbFiltro.getValue().toString().equals("Data Conclusão")){
+								sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+							}else{
+								sdf = new SimpleDateFormat("dd/MM/yyyy");
+							}						
+														
 							listaParametros.add(new SearchParameters(idSearch, selectFiltro(cbFiltro.getValue().toString()), cbOperador.getValue().toString(), sdf.format(dFValorFiltro.getValue())));
 							
 							

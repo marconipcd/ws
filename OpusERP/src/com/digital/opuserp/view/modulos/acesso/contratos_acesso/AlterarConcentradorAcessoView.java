@@ -95,7 +95,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 	private TextField txtSinalDbCaixa;
 	
 	String[] info = null;
-	String tipo_concentrador_selecionado;
+	String tipo_concentrador_selecionado = "";
 	
 	public AlterarConcentradorAcessoView(Item item, String title, boolean modal){
 		this.item = item;
@@ -108,8 +108,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 			
 			if(base != null && base.getTipo().equals("huawei")){
 				info = HuaweiUtil.pegarInformacoes(ac.getLogin());
-			}
-			
+			}			
 		}
 		
 		if (item.getItemProperty("endereco_ip").getValue() != null) {
@@ -466,7 +465,6 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 												txtSinalDb.setEnabled(false);
 												txtSinalDb.setRequired(false);
 												
-												
 												txtGpon.setEnabled(true);
 												txtGpon.setValue("");
 												txtGpon.setEnabled(false);
@@ -550,15 +548,20 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 						String ip = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("endereco_ip").getValue().toString();
 						Integer porta = Integer.parseInt(cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("porta_api").getValue().toString());
 						
-						result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);						
-						
-						
+						result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);				
 					}
 					
 					
 					cbInterface = new ComboBox("Interface");
 					cbInterface.setNullSelectionAllowed(false);
-					cbInterface.setRequired(true);
+					
+					if(base != null && base.getTipo().equals("mikrotik")){
+						cbInterface.setRequired(true);
+					}else{
+						cbInterface.setRequired(false);
+					}
+					
+					
 					//cbInterface.setItemCaptionPropertyId("name");					
 					cbInterface.setStyleName("caption-align-contrato");
 					//cbInterface.setConverter(new SingleSelectConverter(null));
@@ -610,7 +613,10 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 								
 								@Override
 								public void valueChange(ValueChangeEvent event) {
-									if(txtPON != null && cbSwitch.getValue() != null && cbSwitch.getItem(cbSwitch.getValue()).getItemProperty("pon").getValue() != null){
+									if(txtPON != null && 
+										cbSwitch.getValue() != null && 
+										cbSwitch.getItem(cbSwitch.getValue()).getItemProperty("pon").getValue() != null){
+										
 										txtPON.setEnabled(true);
 										txtPON.setValue(cbSwitch.getItem(cbSwitch.getValue()).getItemProperty("pon").getValue().toString());
 										txtPON.setEnabled(false);
@@ -706,6 +712,12 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 				
 				txtOLT = new TextField("OLT");
 				txtOLT.setStyleName("caption-align-contrato");
+				
+				if(cbSwitch != null && cbSwitch.getValue() != null && cbSwitch.getItem(cbSwitch.getValue()) != null && 
+						cbSwitch.getItem(cbSwitch.getValue()).getItemProperty("olt").getValue() != null){
+					txtOLT.setValue(cbSwitch.getItem(cbSwitch.getValue()).getItemProperty("olt").getValue().toString());
+				}
+								
 				txtOLT.setEnabled(false);
 				
 				addComponent(txtOLT);
@@ -735,7 +747,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 								
 				txtGpon = new TextField();
 				txtGpon.setNullRepresentation("");			
-				txtGpon.setMaxLength(2);
+				txtGpon.setMaxLength(3);
 				txtGpon.setStyleName("input-concentrador-gpon-correcao");
 				txtGpon.setWidth("75px");				
 				txtGpon.setId("txtGpon");
@@ -751,7 +763,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 				});
 				
 				
-				JavaScript.getCurrent().execute("$('#txtGpon').mask('99')");
+				JavaScript.getCurrent().execute("$('#txtGpon').mask('999')");
 				
 				
 				FormLayout fl1 = new FormLayout();

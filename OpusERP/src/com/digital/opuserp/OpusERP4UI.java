@@ -654,7 +654,7 @@ public class OpusERP4UI extends UI implements BroadcastListener {
 								String senhaNova = tfSenhaNova.getValue();
 								if(valid == true && !tfSenhaNova.getValue().equals("")){
 									UsuarioDAO uDAO = new UsuarioDAO();
-									getUsuarioLogadoUI().setPassword(StringUtil.md5(tfSenhaNova.getValue()));
+									getUsuarioLogadoUI().setPassword(senhaNova);
 									uDAO.changePassword(getUsuarioLogadoUI());
 									win.close();
 								}else{									

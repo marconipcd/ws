@@ -137,7 +137,7 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 		////1366x768
 		//if(OpusERP4UI.browser.getScreenWidth() >= 1024 && OpusERP4UI.browser.getScreenHeight() >= 768){
 				setWidth("723px");
-				setHeight("472px");
+				setHeight("501px");
 		//}
 	}
 	
@@ -198,12 +198,10 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 			});
 		
 		vlRoot.addComponent(new FormLayout(){					
-				{
-					
+				{					
 					setMargin(true);
 					setSpacing(true);
 					setStyleName("form-cutom");						
-									
 					
 					JPAContainer<Concentrador> bases = JPAContainerFactory.make(Concentrador.class, ConnUtil.getEntity());
 					bases.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
@@ -216,11 +214,29 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 					cbConcentrador.setStyleName("caption-align-concentrador");
 					cbConcentrador.setWidth("300px");
 					
-					
 					addComponent(cbConcentrador);
 					fieldGroup.bind(cbConcentrador, "concentrador");
 				}
-			});
+		});
+		
+		vlRoot.addComponent(new FormLayout(){					
+			{					
+				setMargin(true);
+				setSpacing(true);
+				setStyleName("form-cutom");						
+								
+				TextField txtVlan = new TextField("Vlan");				
+				txtVlan.setRequired(true);																			
+				txtVlan.setStyleName("caption-align-concentrador");
+				txtVlan.setWidth("300px");
+				txtVlan.setNullRepresentation("");	
+				
+				addComponent(txtVlan);
+				fieldGroup.bind(txtVlan, "interfaces");
+			}
+		});
+
+		
 		
 		vlRoot.addComponent(new FormLayout(){					
 				{

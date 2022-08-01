@@ -169,7 +169,9 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			tb.setSizeFull();
 			tb.setSelectable(true);
 			tb.setColumnCollapsingAllowed(true);
-			tb.setVisibleColumns(new Object[] {"id","identificacao","olt","pon","sinal_db","concentrador.identificacao","modelo","contrato_monitoramento.id","ip_monitoramento","endereco","numero","referencia","situacao"});
+			tb.setVisibleColumns(new Object[] {"id","identificacao","olt","pon","sinal_db","concentrador.identificacao","interfaces","modelo",
+					"contrato_monitoramento.id","ip_monitoramento","endereco","numero","referencia","situacao"});
+			
 			tb.setColumnCollapsed("id", true);
 			tb.setColumnCollapsed("referencia", true);
 						
@@ -177,6 +179,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			tb.setColumnHeader("ip_monitoramento", "Ip Monitoramento");
 			tb.setColumnHeader("id", "Cod");
 			tb.setColumnHeader("concentrador.identificacao", "Concentrador");
+			tb.setColumnHeader("interfaces", "Vlan");
 			tb.setColumnHeader("identificacao", "Indentificação");
 			tb.setColumnHeader("modelo", "Modelo");
 			tb.setColumnHeader("pon", "PON");

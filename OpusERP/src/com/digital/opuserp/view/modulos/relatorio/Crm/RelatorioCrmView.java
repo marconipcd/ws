@@ -593,16 +593,22 @@ public String selectFiltro(String s) {
 					}
 				}else if(sp.getOperador().equals("MAIOR IGUAL QUE")){
 										
-					if(container.getType(sp.getCampo()) == Date.class){
-						
+					if(container.getType(sp.getCampo()) == Date.class && sp.getCampo().equals("data_efetuado")){						
 						try {
-							check = true;						
-							
-							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");							
-							container.addContainerFilter(new GreaterOrEqual(sp.getCampo(), sdf.parse(sp.getValor())));
-							
+							check = true;				
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");							
+							container.addContainerFilter(new GreaterOrEqual(sp.getCampo(), sdf.parse(sp.getValor())));							
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}						
+					}
+					
+					if(container.getType(sp.getCampo()) == Date.class && !sp.getCampo().equals("data_efetuado")){						
+						try {
+							check = true;				
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");							
+							container.addContainerFilter(new GreaterOrEqual(sp.getCampo(), sdf.parse(sp.getValor())));							
+						} catch (Exception e) {
 							e.printStackTrace();
 						}						
 					}
@@ -611,22 +617,26 @@ public String selectFiltro(String s) {
 						check = true;						
 						container.addContainerFilter(new GreaterOrEqual(sp.getCampo(), Integer.parseInt(sp.getValor())));					
 					}
-				}else if(sp.getOperador().equals("MENOR IGUAL QUE")){
-					
+				}else if(sp.getOperador().equals("MENOR IGUAL QUE")){					
 										
-					if(container.getType(sp.getCampo()) == Date.class){
-						
-						
+					if(container.getType(sp.getCampo()) == Date.class && sp.getCampo().equals("data_efetuado")){		
 						try {
-							check = true;							
-							
+							check = true;						
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");						
+							container.addContainerFilter(new LessOrEqual(sp.getCampo(), sdf.parse(sp.getValor())));						
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}						
+					}
+					if(container.getType(sp.getCampo()) == Date.class && !sp.getCampo().equals("data_efetuado")){		
+						try {
+							check = true;						
 							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");						
 							container.addContainerFilter(new LessOrEqual(sp.getCampo(), sdf.parse(sp.getValor())));						
 						} catch (ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}
-						
+						}						
 					}
 					
 					if(container.getType(sp.getCampo()) == Integer.class){

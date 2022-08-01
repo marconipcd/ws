@@ -1153,7 +1153,7 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 							public void onSelected(UsuarioUtil.UsuarioEvent event) {
 									if(event.getUsuario() != null ){
 										
-										validarUsuario = false;
+											validarUsuario = true;
 											
 											tfCodUsuario.setValue(event.getUsuario().getId().toString());
 											tfDescricaoUsuario.setReadOnly(false);
@@ -1165,7 +1165,9 @@ public class NovoCadastroAcessoEditor extends Window implements GenericEditor {
 												 
 											tfCodUsuario.removeStyleName("invalid-txt");
 										
-									}	
+									}else{
+										validarUsuario = false;
+									}
 							}
 						});
 						
