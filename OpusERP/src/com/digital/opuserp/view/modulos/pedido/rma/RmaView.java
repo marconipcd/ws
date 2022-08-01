@@ -25,7 +25,6 @@ import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.util.Real;
 import com.digital.opuserp.view.modulos.pedido.rma.RmaNew.RmaNewEvent;
 import com.digital.opuserp.view.util.Notify;
-import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
@@ -475,7 +474,7 @@ public class RmaView extends VerticalLayout {
 			@Override
 			public void buttonClick(ClickEvent event) {
 
-				GenericDialog gd = new GenericDialog("Confirme para Continuar", "Deseja realmente Excluir este RMA ?", true, true);
+				GenericDialog gd = new GenericDialog("Confirme para Continuar", "Deseja realmente Fechar este RMA ?", true, true);
 				gd.addListerner(new GenericDialog.DialogListerner() {
 					
 					@Override

@@ -523,6 +523,13 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 									JavaScript.getCurrent().execute("$('#txtMac').mask('AA:AA:AA:AA:AA:AA')");									
 									addComponent(txtMac);
 									
+									final TextField txtIp = new TextField("IP");
+									txtIp.setWidth("100%");
+									txtIp.setRequired(false);	
+									txtIp.setEnabled(false);
+									txtIp.setId("txtIp");																		
+									addComponent(txtIp);
+									
 									
 									JPAContainer<PlanoAcesso> containerPlano = JPAContainerFactory.makeReadOnly(PlanoAcesso.class, ConnUtil.getEntity());
 									containerPlano.addContainerFilter(Filters.eq("status", "ATIVO"));
@@ -547,7 +554,8 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 												
 												txtSenha.setEnabled(true);
 												txtMac.setEnabled(true);
-												cbPlano.setEnabled(true); 										
+												cbPlano.setEnabled(true);
+												txtIp.setEnabled(true); 		
 												
 												
 											}else{
@@ -567,7 +575,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 														 String plano = cbPlano.getValue() != null ? cbPlano.getValue().toString() : null;
 														 
 														 boolean check = UsuarioConcentradorDAO.cadastrarUsuario(txtUsuario.getValue(), txtSenha.getValue(), 
-																 plano,"SIM", groupname, txtMac.getValue());
+																 plano,"SIM", groupname, txtMac.getValue(), txtIp.getValue());
 														 
 														 if(check){
 															 Notify.Show("Usuário de teste cadastrado com sucesso!", Notify.TYPE_SUCCESS);
@@ -581,6 +589,9 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 															 
 															 txtMac.setValue("");
 															 txtMac.setEnabled(false);
+															 
+															 txtIp.setValue("");
+															 txtIp.setEnabled(false);
 															 
 															 cbPlano.select(null);
 															 cbPlano.setEnabled(false);
@@ -655,11 +666,12 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 									tb.setSelectable(true);
 									
 									tb.setSizeFull();
-									tb.setVisibleColumns(new Object[]{"usuario","senha","mac","plano","data_alteracao"});
+									tb.setVisibleColumns(new Object[]{"usuario","senha","mac","ip","plano","data_alteracao"});
 									
 									tb.setColumnHeader("usuario", "Usuário");
 									tb.setColumnHeader("senha", "Senha");
 									tb.setColumnHeader("mac", "Mac");
+									tb.setColumnHeader("ip", "Endereco Ip");
 									tb.setColumnHeader("plano", "Plano");
 									tb.setColumnHeader("data_alteracao", "Data Alteração");
 									
@@ -785,7 +797,7 @@ public class ConcentradorView extends VerticalLayout implements GenericView{
 													 
 													 if(!UsuarioConcentradorDAO.buscarUsuarioRadius(txtUsuario.getValue())){
 														 boolean check = UsuarioConcentradorDAO.cadastrarUsuario(txtUsuario.getValue(), txtSenha.getValue(), 
-																 cbGrupo.getValue().toString(),"NAO", null, null);
+																 cbGrupo.getValue().toString(),"NAO", null, null, null);
 														 
 														 if(check){
 															 Notify.Show("Usuário cadastrado com sucesso!", Notify.TYPE_SUCCESS);

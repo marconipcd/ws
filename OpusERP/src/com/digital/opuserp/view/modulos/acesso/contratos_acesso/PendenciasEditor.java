@@ -134,55 +134,55 @@ public class PendenciasEditor extends Window implements GenericEditor {
 			}
 		});
 		
-		tb.addGeneratedColumn("x", new Table.ColumnGenerator() {
-			
-			@Override
-			public Object generateCell(final Table source, final Object itemId, Object columnId) {
-
-				String status = source.getItem(itemId).getItemProperty("status").getValue().toString();
-				if(status.equals("ABERTO")){
-				
-					Button btConcluir = new Button("Concluir", new Button.ClickListener() {
-						
-						@Override
-						public void buttonClick(ClickEvent event) {
-							Item item = source.getItem(itemId);
-							EntityManager em = ConnUtil.getEntity();
-							Pendencias pendencia = em.find(Pendencias.class, item.getItemProperty("id").getValue());
-							pendencia.setStatus("FECHADO");
-							pendencia.setOperador_conclusao(OpusERP4UI.getUsuarioLogadoUI().getUsername());
-							pendencia.setData_conclusao(new Date());
-							
-							em.getTransaction().begin();
-							em.merge(pendencia);
-							em.getTransaction().commit();
-							
-							Query q = em.createQuery("select p from Pendencias p where p.contrato=:contrato and p.status='ABERTO' ", Pendencias.class);
-							q.setParameter("contrato", pendencia.getContrato());
-							
-							if(q.getResultList().size() == 0){
-								AcessoCliente contrato = pendencia.getContrato();
-								contrato.setTem_pendencia("NAO");
-								
-								em.getTransaction().begin();
-								em.merge(contrato);
-								em.getTransaction().commit();
-							}
-							
-							vlRoot.replaceComponent(tb, buildTable());
-							
-							Notify.Show("Ok, marcado como concluído",  Notify.TYPE_SUCCESS);
-						}
-					});
-					
-					btConcluir.setStyleName(Reindeer.BUTTON_LINK);
-					return btConcluir;
-				}else{
-					return null;
-				}
-				
-			}
-		});
+//		tb.addGeneratedColumn("x", new Table.ColumnGenerator() {
+//			
+//			@Override
+//			public Object generateCell(final Table source, final Object itemId, Object columnId) {
+//
+//				String status = source.getItem(itemId).getItemProperty("status").getValue().toString();
+//				if(status.equals("ABERTO")){
+//				
+//					Button btConcluir = new Button("Concluir", new Button.ClickListener() {
+//						
+//						@Override
+//						public void buttonClick(ClickEvent event) {
+//							Item item = source.getItem(itemId);
+//							EntityManager em = ConnUtil.getEntity();
+//							Pendencias pendencia = em.find(Pendencias.class, item.getItemProperty("id").getValue());
+//							pendencia.setStatus("FECHADO");
+//							pendencia.setOperador_conclusao(OpusERP4UI.getUsuarioLogadoUI().getUsername());
+//							pendencia.setData_conclusao(new Date());
+//							
+//							em.getTransaction().begin();
+//							em.merge(pendencia);
+//							em.getTransaction().commit();
+//							
+//							Query q = em.createQuery("select p from Pendencias p where p.contrato=:contrato and p.status='ABERTO' ", Pendencias.class);
+//							q.setParameter("contrato", pendencia.getContrato());
+//							
+//							if(q.getResultList().size() == 0){
+//								AcessoCliente contrato = pendencia.getContrato();
+//								contrato.setTem_pendencia("NAO");
+//								
+//								em.getTransaction().begin();
+//								em.merge(contrato);
+//								em.getTransaction().commit();
+//							}
+//							
+//							vlRoot.replaceComponent(tb, buildTable());
+//							
+//							Notify.Show("Ok, marcado como concluído",  Notify.TYPE_SUCCESS);
+//						}
+//					});
+//					
+//					btConcluir.setStyleName(Reindeer.BUTTON_LINK);
+//					return btConcluir;
+//				}else{
+//					return null;
+//				}
+//				
+//			}
+//		});
 		
 		tb.setColumnWidth("x", 59);
 		

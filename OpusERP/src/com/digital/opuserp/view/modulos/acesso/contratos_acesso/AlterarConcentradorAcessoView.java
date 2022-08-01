@@ -747,7 +747,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 								
 				txtGpon = new TextField();
 				txtGpon.setNullRepresentation("");			
-				txtGpon.setMaxLength(2);
+				txtGpon.setMaxLength(3);
 				txtGpon.setStyleName("input-concentrador-gpon-correcao");
 				txtGpon.setWidth("75px");				
 				txtGpon.setId("txtGpon");
@@ -763,7 +763,7 @@ public class AlterarConcentradorAcessoView extends Window implements GenericEdit
 				});
 				
 				
-				JavaScript.getCurrent().execute("$('#txtGpon').mask('99')");
+				JavaScript.getCurrent().execute("$('#txtGpon').mask('999')");
 				
 				
 				FormLayout fl1 = new FormLayout();

@@ -15,14 +15,14 @@ import com.digital.opuserp.util.ConnUtil;
 
 public class UsuarioConcentradorDAO {
 
-	public static boolean cadastrarUsuario(String usuario, String senha, String grupo, String teste, String groupname, String mac){
+	public static boolean cadastrarUsuario(String usuario, String senha, String grupo, String teste, String groupname, String mac, String ip){
 		
 		try{
 			EntityManager em  = ConnUtil.getEntity();
 			
 			em.getTransaction().begin();
 				
-				em.persist(new UsuarioConcentradores(null, usuario, senha, OpusERP4UI.getUsuarioLogadoUI().getId(), new Date(), grupo, teste, mac, groupname));
+				em.persist(new UsuarioConcentradores(null, usuario, senha, OpusERP4UI.getUsuarioLogadoUI().getId(), new Date(), grupo, teste, mac, groupname, ip));
 				em.persist(new RadCheck(null, usuario, "Password", "==", senha));
 				
 				if(teste.equals("SIM")){
@@ -34,6 +34,12 @@ public class UsuarioConcentradorDAO {
 					if(mac != null){
 						em.persist(new RadCheck(null, usuario, "Calling-Station-ID", ":=", mac));
 					}
+					
+					if(ip != null){
+						em.persist(new RadReply(null, usuario, "Framed-IP-Address", "=", ip));
+					}
+					
+					
 				}
 				
 				if(teste.equals("NAO")){

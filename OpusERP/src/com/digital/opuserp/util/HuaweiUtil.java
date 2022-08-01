@@ -76,7 +76,7 @@ public class HuaweiUtil {
 		            
 		            String[] res = response.toString().split("<br />");
 		            
-		            String uptime = res[56].split(":")[3]+":"+res[56].split(":")[4]+":"+res[56].split(":")[5];
+		            String uptime = res.length > 55 ?  res[56].split(":")[3]+":"+res[56].split(":")[4]+":"+res[56].split(":")[5] : "";
 		            String mac = res[17].split(":")[1];
 		            String ip = res[18].split(":")[1];
 		            String upload = res[89].split(":")[1];

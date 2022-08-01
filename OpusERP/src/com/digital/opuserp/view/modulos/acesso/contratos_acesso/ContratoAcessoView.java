@@ -408,6 +408,10 @@ public class ContratoAcessoView extends VerticalLayout {
 	            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 	            		 winSubMenuLiberar.close();
 					 }
+	            	 
+	            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
+					 }
            	 
 				     buildSubMenuVisualizar(event);
 				     
@@ -466,6 +470,10 @@ public class ContratoAcessoView extends VerticalLayout {
 	            		 winSubMenuVisualizar.close();
 					 }
 					
+					if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
+					 }
+					
 					buildSubMenuHistorico(event);
 					
 					getUI().addWindow(winSubMenuHistorico);
@@ -493,41 +501,48 @@ public class ContratoAcessoView extends VerticalLayout {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				
-				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 	OpusERP4UI.getUsuarioLogadoUI().getId(), "Encerrar Contrato"))				
-				{							
-						if(tb.getValue() != null){
-							
-							item = tb.getItem(tb.getValue());
-							final AcessoCliente ac = ContratosAcessoDAO.find((Integer) item.getItemProperty("id").getValue());
-							Cliente cliente = (Cliente) item.getItemProperty("cliente").getValue();
-							Integer codAcesso =(Integer)item.getItemProperty("id").getValue();
-							ContasReceberDAO crDAO = new ContasReceberDAO();						
-
-							GenericDialog cdEncerrar = new GenericDialog("Confirme para Continuar", "Você deseja Realmente Encerrar este Contrato?", true, true);
-							cdEncerrar.addListerner(new GenericDialog.DialogListerner() {
-								
-								@Override
-								public void onClose(DialogEvent event) {
-										if(event.isConfirm()){
-											CredenciaisAcessoDAO caDAo = new CredenciaisAcessoDAO();
-											caDAo.encerrarContrato((Integer)item.getItemProperty("id").getValue());
-																					
-											refresh();
-											
-											LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Encerrou um Contrato de Acesso"));
-											AlteracoesContratoDAO.save(new AlteracoesContrato(null, "ENCERRAMENTO CONTRATO", ac, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
-										}
-								}
-							});
-							
-							getUI().addWindow(cdEncerrar);
-
-						
-						}
-				}else{					
-					Notify.Show("Você não Possui Permissão para Encerrar um Contrato", Notify.TYPE_ERROR);
-				}
+				if (winSubMenuEncerrar != null && winSubMenuEncerrar.getUI() != null)
+					winSubMenuEncerrar.close();
+             else {
+            	 
+            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
+            		 winSubMenuLiberar.close();
+            	 }
+            	 if(winSubMenuHistorico != null && winSubMenuHistorico.getUI() != null){
+            		 winSubMenuHistorico.close();
+            	 }	            	 
+            	 if(winSubMenuNovo != null && winSubMenuNovo.getUI() != null){
+            		 winSubMenuNovo.close();
+            	 }
+            	 if(winSubMenuImprimir != null && winSubMenuImprimir.getUI() != null){
+            		 winSubMenuImprimir.close();
+            	 }	            	 
+            	 if(winSubMenuBloqueioDesbloqueio != null && winSubMenuBloqueioDesbloqueio.getUI() != null){
+					winSubMenuBloqueioDesbloqueio.close();
+				 }	            	 
+            	 if(winSubMenuFuncoesAdministrativas != null && winSubMenuFuncoesAdministrativas.getUI() != null){
+            		 winSubMenuFuncoesAdministrativas.close();
+				 }	  
+            	 if(winSubMenuVisualizar != null && winSubMenuVisualizar.getUI() != null){
+            		 winSubMenuVisualizar.close();
+				 }
+            	 if(winSubMenuMudanca != null && winSubMenuMudanca.getUI() != null){
+            		 winSubMenuMudanca.close();
+				 }
+            	 
+			     buildSubMenuEncerrar(event);
+			     
+				 getUI().addWindow(winSubMenuEncerrar);
+				 winSubMenuEncerrar.focus();
+                 ((CssLayout) getUI().getContent()).addLayoutClickListener(new LayoutClickListener() {
+                             
+               			@Override
+                        public void layoutClick(LayoutClickEvent event) {
+               				winSubMenuEncerrar.close();
+                            ((CssLayout) getUI().getContent()).removeLayoutClickListener(this);
+                        }
+                 });
+             }						
 			}
 		});
 		btEncerrar.setEnabled(false);
@@ -569,6 +584,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					 }	  
 	            	 if(winSubMenuVisualizar != null && winSubMenuVisualizar.getUI() != null){
 	            		 winSubMenuVisualizar.close();
+					 }
+	            	 
+	            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
 					 }
 	            	 
 				     buildSubMenuMudanca(event);
@@ -623,6 +642,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					}
 					if(winSubMenuVisualizar != null && winSubMenuVisualizar.getUI() != null){
 	            		 winSubMenuVisualizar.close();
+					 }
+					
+					if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
 					 }
 					
 					buildSubMenuImprimir(event);
@@ -1382,6 +1405,10 @@ public class ContratoAcessoView extends VerticalLayout {
 				            		 winSubMenuVisualizar.close();
 								 }
 				            	 
+				            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+				            		 winSubMenuEncerrar.close();
+								 }
+				            	 
 							     buildSubMenuBloqueioDesbloqueio(event);
 							     
 								 getUI().addWindow(winSubMenuBloqueioDesbloqueio);
@@ -1485,6 +1512,10 @@ public class ContratoAcessoView extends VerticalLayout {
 	            	 if(winSubMenuVisualizar != null && winSubMenuVisualizar.getUI() != null){
 	            		 winSubMenuVisualizar.close();
 					 }
+	            	 
+	            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
+					 }
 	            	             	 
 				     buildSubMenuLogs(event);
 				     
@@ -1583,6 +1614,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					 }
 	            	 if(winSubMenuFuncoesAdministrativas != null && winSubMenuFuncoesAdministrativas.getUI() != null){
 	            		 winSubMenuFuncoesAdministrativas.close();
+					 }
+	            	 
+	            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
 					 }
 
 	            	             	 
@@ -1759,6 +1794,9 @@ public class ContratoAcessoView extends VerticalLayout {
 					if (tb.getValue() != null){		
 						item = tb.getItem(tb.getValue());
 						VisualizarContratoInfoTecnica visualizar = new VisualizarContratoInfoTecnica(item,"Visualizar Contrato", true);
+						visualizar.setResizable(true);
+						
+						
 						getUI().addWindow(visualizar);
 					}
 					
@@ -2729,6 +2767,102 @@ public class ContratoAcessoView extends VerticalLayout {
 		if(winSubMenuBloqueioDesbloqueio != null){winSubMenuBloqueioDesbloqueio.close();}
 		if(winSubMenuFuncoesAdministrativas != null){winSubMenuFuncoesAdministrativas.close();}
 	}
+	
+	
+	
+	Window winSubMenuEncerrar;
+		
+	
+	private void buildSubMenuEncerrar(ClickEvent event) {
+		winSubMenuEncerrar = new Window("Escolha uma das Opções:");
+        VerticalLayout l = new VerticalLayout();      
+        winSubMenuEncerrar.setContent(l);
+        winSubMenuEncerrar.setWidth("300px");
+        winSubMenuEncerrar.addStyleName("notifications");
+        winSubMenuEncerrar.setClosable(false);
+        winSubMenuEncerrar.setResizable(false);
+        winSubMenuEncerrar.setDraggable(false);
+        winSubMenuEncerrar.setPositionX(event.getClientX() - event.getRelativeX());
+        winSubMenuEncerrar.setPositionY(event.getClientY() - event.getRelativeY());
+        winSubMenuEncerrar.setCloseShortcut(KeyCode.ESCAPE, null);
+
+        Button btEncerrarContrato = new Button("Encerrar Contrato", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				closeAllWindows();
+				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(),OpusERP4UI.getUsuarioLogadoUI().getId(), "Encerrar Contrato")){
+					
+						if(tb.getValue() != null){
+							
+							item = tb.getItem(tb.getValue());
+							final AcessoCliente ac = ContratosAcessoDAO.find((Integer) item.getItemProperty("id").getValue());
+							Cliente cliente = (Cliente) item.getItemProperty("cliente").getValue();
+							Integer codAcesso =(Integer)item.getItemProperty("id").getValue();
+							ContasReceberDAO crDAO = new ContasReceberDAO();						
+
+							GenericDialog cdEncerrar = new GenericDialog("Confirme para Continuar", "Você deseja Realmente Encerrar este Contrato?", true, true);
+							cdEncerrar.addListerner(new GenericDialog.DialogListerner() {
+								
+								@Override
+								public void onClose(DialogEvent event) {
+										if(event.isConfirm()){
+											CredenciaisAcessoDAO caDAo = new CredenciaisAcessoDAO();
+											caDAo.encerrarContrato((Integer)item.getItemProperty("id").getValue());
+																					
+											refresh();
+											
+											LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Encerrou um Contrato de Acesso"));
+											AlteracoesContratoDAO.save(new AlteracoesContrato(null, "ENCERRAMENTO CONTRATO", ac, OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+										}
+								}
+							});
+							
+							getUI().addWindow(cdEncerrar);	
+						}
+					
+				}else{
+					Notify.Show("Você não Possui Permissão para Encerrar Contratos", Notify.TYPE_ERROR);
+				}
+			}			
+		});
+        btEncerrarContrato.setPrimaryStyleName("btSubMenu");
+        
+        Button btExcluirContrato = new Button("Excluir Contrato", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+					closeAllWindows();			
+					if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(),OpusERP4UI.getUsuarioLogadoUI().getId(), "Excluir Contrato")){
+							if(tb.getValue() != null){
+								item = tb.getItem(tb.getValue());
+								final AcessoCliente ac = ContratosAcessoDAO.find((Integer) item.getItemProperty("id").getValue());
+								
+								
+								ContasReceberDAO crDAO = new ContasReceberDAO();	
+								
+								boolean tem_boletos = crDAO.getBoletosAcessoAbertosPorContrato(ac.getId());
+								if(ac.getStatus_2().equals("PENDENTE_INSTALACAO") && !tem_boletos){
+									//AcessoDAO.excluirContrato(ac.getId())
+								}else{
+									Notify.Show("Você não Possui Permissão para Excluir Contratos", Notify.TYPE_ERROR);
+								}
+							}			
+					}else{					
+						Notify.Show("Você não Possui Permissão para Excluir Contratos", Notify.TYPE_ERROR);
+					}	
+				
+			}		
+		});       
+        btExcluirContrato.setPrimaryStyleName("btSubMenu");
+                  
+        l.addComponent(btEncerrarContrato);
+        l.addComponent(btExcluirContrato);       
+    
+    }
+	
+	
 	
 	Window winSubMenuMudanca;
 	Window winSubMenuBloqueioDesbloqueio;

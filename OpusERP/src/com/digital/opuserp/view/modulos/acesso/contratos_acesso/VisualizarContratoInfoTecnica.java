@@ -94,7 +94,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 		
 		setCaption(title);
 		setModal(modal);
-		setResizable(false);
+		setResizable(true);
 		setClosable(false);
 		center();
 		
@@ -127,6 +127,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 	}
 	
 	String url_chart = "";
+	String url_consumo = "";
 	public VerticalLayout buildVlConsumo(){
 			
 		
@@ -134,75 +135,23 @@ public class VisualizarContratoInfoTecnica extends Window {
 			{
 				try {
 					
-					URL url = new URL("http://172.17.0.15/cacti/graph_view.php?action=list&page=1&host_id=0&rows=50000000000&graph_template_id=0&filter=&graph_add=&graph_remove=");
+					url_consumo = "http://172.17.0.71/consumo/?username="+codAcesso.toString();
 					
-					BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-			        String inputLine;
-			        int i=1;
-			        String id_chart ="";
-			        while ((inputLine = in.readLine()) != null){    	
-			        	
-			        	String s = "pppoe-"+ac.getLogin();
-			        	if(inputLine.contains(s+"<")){
-			        		id_chart = inputLine.split("href=")[1].split("'")[1].split("&")[0].split("=")[1];
-			        		url_chart = "http://172.17.0.15/cacti/graph_image.php?action=view&local_graph_id="+inputLine.split("href=")[1].split("'")[1].split("&")[0].split("=")[1]+"&rra_id=";
-			        	}
-
-			        	i++;
-			        }
-			        in.close();
 			        
-			        final Embedded img5 = new Embedded("Hora",new ExternalResource(url_chart+"5"));
-			        img5.setType(Embedded.TYPE_IMAGE);
-			        img5.setWidth("595px");
-			        img5.setHeight("210px");
-			        img5.setStyleName("center-margin");
-			        			        
-			        final Embedded img1 = new Embedded("Diário",new ExternalResource(url_chart+"1"));
-			        img1.setType(Embedded.TYPE_IMAGE);
-			        img1.setWidth("595px");
-			        img1.setHeight("210px");
-			        img1.setStyleName("center-margin");
-			        
-			        final Embedded img2 = new Embedded("Semanal",new ExternalResource(url_chart+"2"));
-			        img2.setType(Embedded.TYPE_IMAGE);
-			        img2.setWidth("595px");
-			        img2.setHeight("210px");
-			        img2.setStyleName("center-margin");
-			        
-			        final Embedded img3 = new Embedded("Mensal",new ExternalResource(url_chart+"3"));
-			        img3.setType(Embedded.TYPE_IMAGE);
-			        img3.setWidth("595px");
-			        img3.setHeight("210px");
-			        img3.setStyleName("center-margin");
-			        
-			        final Embedded img4 = new Embedded("Anual",new ExternalResource(url_chart+"4"));
-			        img4.setType(Embedded.TYPE_IMAGE);
-			        img4.setWidth("595px");
-			        img4.setHeight("210px");
-			        img4.setStyleName("center-margin");
-			        
-			        
-			        Button btRealTime = new Button("Tempo Real");
-			        btRealTime.setStyleName(Reindeer.BUTTON_LINK);
-			        btRealTime.addStyleName("btRealTime");
-			       // btRealTime.addStyleName("menos-20");
+			        final Embedded consumo = new Embedded(null,new ExternalResource(url_consumo));
+			        consumo.setType(Embedded.TYPE_BROWSER);
+			        consumo.setWidth("100%");
+			        consumo.setHeight("506px");
+			        //consumo.setStyleName("center-margin");
+	
 			        
 			        Button btRefresh = new Button("Atualizar", new Button.ClickListener() {
 						
 						@Override
 						public void buttonClick(ClickEvent event) {
-							img5.setSource(null);
-							img5.setSource(new ExternalResource(url_chart+"5"));
-							img1.setSource(null);
-							img1.setSource(new ExternalResource(url_chart+"1"));
-							img2.setSource(null);
-							img2.setSource(new ExternalResource(url_chart+"2"));
-							img3.setSource(null);
-							img3.setSource(new ExternalResource(url_chart+"3"));
-							img4.setSource(null); 
-							img4.setSource(new ExternalResource(url_chart+"4"));
+							
+							consumo.setSource(null); 
+							consumo.setSource(new ExternalResource(url_consumo));
 							
 						}
 					});
@@ -210,18 +159,8 @@ public class VisualizarContratoInfoTecnica extends Window {
 			        btRefresh.addStyleName("btRealTime");
 			        
 			        
-			        BrowserWindowOpener openIpPool = new BrowserWindowOpener("http://172.17.0.15/cacti/plugins/realtime/graph_popup_rt.php?local_graph_id="+id_chart);
-					openIpPool.setFeatures("height=300,width=200");
-					openIpPool.extend(btRealTime);
-			        
-			        	
-			        //addComponent(btRefresh);
-			        addComponent(btRealTime); 	
-			        addComponent(img5);
-			        addComponent(img1);
-			        addComponent(img2);
-			        addComponent(img3);
-			        addComponent(img4);
+
+			        addComponent(consumo);
 				} catch (Exception e) {
 
 					e.printStackTrace();
@@ -524,7 +463,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 									}			
 							}
 							
-							if(base.getTipo().equals("huawei") && info != null && info.length > 0){								
+							if(base.getTipo().equals("huawei") && info != null && info.length > 1){								
 								tfEndIpPool.setValue(info[2]);
 							}
 														
@@ -552,7 +491,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 								}									
 							}
 							
-							if(base.getTipo().equals("huawei") && info != null){								
+							if(base.getTipo().equals("huawei") && info != null && info.length > 2){								
 								tfQueuesUp.setValue(info[3]);
 							}
 							
@@ -613,7 +552,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 										}							
 								}
 								
-								if(base.getTipo().equals("huawei") && info != null){								
+								if(base.getTipo().equals("huawei") && info != null && info.length > 3){								
 									tfQueuesDown.setValue(info[4]);
 								}
 								
@@ -654,7 +593,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 									}																	
 								}
 								
-								if(base.getTipo().equals("huawei") && info != null){								
+								if(base.getTipo().equals("huawei") && info != null && info.length > 0){								
 									tfMacAdress.setValue(info[1]);
 								}
 								
@@ -1194,8 +1133,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 		
 
 		tbRoot = new TabSheet();
-		tbRoot.setHeight("587px");
-		tbRoot.setWidth("900px");
+		tbRoot.setSizeFull();
 	
 		tbRoot.addTab(vlInformacoes,"Informações Técnicas");
 		tbRoot.addTab(vlRootConexao,"Conexão");

@@ -1861,7 +1861,7 @@ public class ImprimirContrato implements StreamSource{
 	        tbAssinatura.setWidthPercentage(100f);
 	        tbAssinatura.addCell(pCellVaziosBorda);
 	        tbAssinatura.addCell(pCellAssinatura);
-	        tbAssinatura.setSpacingBefore(20);
+	        tbAssinatura.setSpacingBefore(50);
 	        doc.add(tbAssinatura);
 	                
 	        Paragraph pClausla5_2 = new Paragraph();

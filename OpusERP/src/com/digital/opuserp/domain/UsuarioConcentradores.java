@@ -35,6 +35,9 @@ public class UsuarioConcentradores {
 	@Column(name="MAC")
 	private String mac;
 	
+	@Column(name="IP")
+	private String ip;
+	
 	@Column(name="PLANO")
 	private String plano;
 	
@@ -50,7 +53,7 @@ public class UsuarioConcentradores {
 	}
 
 	public UsuarioConcentradores(Integer id, String usuario, String senha,
-			Integer operador_id, Date data_alteracao, String grupo, String usuario_teste, String mac, String plano) {
+			Integer operador_id, Date data_alteracao, String grupo, String usuario_teste, String mac, String plano, String ip) {
 		super();
 		this.id = id;
 		this.usuario = usuario;
@@ -61,6 +64,7 @@ public class UsuarioConcentradores {
 		this.usuario_teste = usuario_teste;
 		this.mac = mac;
 		this.plano = plano;
+		this.ip = ip;
 	}
 
 	public Integer getId() {
@@ -134,6 +138,14 @@ public class UsuarioConcentradores {
 
 	public void setPlano(String plano) {
 		this.plano = plano;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 	
 	

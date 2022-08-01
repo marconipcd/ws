@@ -40,6 +40,22 @@ import com.digital.opuserp.view.util.Notify;
 
 
 public class AcessoDAO {
+	//632157
+	
+	public static void get_consumo(){
+//		SELECT
+//	    DATE_FORMAT(acctstarttime, '%Y-%M') AS month,
+//	    SUM(acctinputoctets)/1000/1000/1000 AS GB_in,
+//	    SUM(acctoutputoctets)/1000/1000/1000 AS GB_out
+//	FROM
+//	    radacct
+//	WHERE
+//	    username='2355' AND
+//	    acctstoptime IS NOT NULL
+//	GROUP BY
+//	    YEAR(acctstarttime), MONTH(acctstarttime)
+
+	}
 	
 	public static boolean desvincular_cartao_cliente(String cartao, AcessoCliente contrato3){
 		
