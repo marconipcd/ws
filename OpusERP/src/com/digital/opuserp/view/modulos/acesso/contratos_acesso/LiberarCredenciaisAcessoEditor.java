@@ -105,7 +105,9 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 	private TextField txtGpon;
 	private TextField txtOLT;
 	private TextField txtSinalDb;
-	private ComboBox cbConcentradores;
+	//private ComboBox cbConcentradores;
+	private TextField txtConcentradores;
+	Concentrador concentrador_selecionado;
 	
 	private JPAContainer<SerialProduto> containerSeriais;
 	private ContratosAcesso contrato;
@@ -190,9 +192,6 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					addComponent(tfCodContrato);
 				}
 		});
-					
-		
-
 		vlRoot.addComponent(new FormLayout(){					
 			{
 				setStyleName("form-cutom");
@@ -211,8 +210,6 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 				
 			}
 		});
-		
-		
 		
 		vlRoot.addComponent(new FormLayout(){					
 			{
@@ -290,7 +287,6 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 				});
 			}
 		});
-		
 		vlRoot.addComponent(new FormLayout(){					
 			{
 				setStyleName("form-cutom");
@@ -348,21 +344,9 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 			}
 		});
 		
-		
-		
-		
-		
-//		cbInterface = new ComboBox("Interface");
-//		cbInterface.setNullSelectionAllowed(false);
-//		cbInterface.setRequired(true);
-//		//cbInterface.setItemCaptionPropertyId("name");
-//		//cbInterface.setConverter(com.vaadin.data.util.converter.ConverterUtil.convertFromModel(modelValue, presentationType, converter, locale));
-//		cbInterface.setStyleName("caption-align");
-//		cbInterface.setWidth("190px");
-		
 		vlRoot.addComponent(new FormLayout(){					
 			{
-				setStyleName("form-cutom");
+				setStyleName("form-cutom-new");
 				setMargin(true);
 				setSpacing(true);
 				
@@ -387,13 +371,23 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					@Override
 					public void valueChange(ValueChangeEvent event) {
 
-						if(txtVlan != null && cbCaixaAtendimento.getValue() != null && cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue() != null){
+						if(txtVlan != null && 
+								txtConcentradores != null &&
+								cbCaixaAtendimento.getValue() != null && 
+								cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue() != null){
 							txtVlan.setReadOnly(false);
 							
 							String vlan = "";
 							if(cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("interfaces").getValue() != null){
 								vlan = cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("interfaces").getValue().toString();
 							}
+							
+							EntityItem<Swith> eiCaixa = (EntityItem<Swith>)cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue());
+							concentrador_selecionado = eiCaixa.getEntity() != null && eiCaixa.getEntity().getConcentrador() != null ? eiCaixa.getEntity().getConcentrador() : null;
+							
+							txtConcentradores.setEnabled(false);
+							txtConcentradores.setValue(concentrador_selecionado.getIdentificacao());
+							txtConcentradores.setEnabled(true);
 							
 							txtVlan.setValue(vlan);
 							txtVlan.setReadOnly(true);
@@ -416,11 +410,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 								txtPON.setEnabled(true);
 								txtPON.setValue("");
 								txtPON.setEnabled(false);
-							}
-							
-							
-							
-							
+							}							
 						}
 						
 						if(txtOLT != null && cbCaixaAtendimento.getValue() != null && cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("olt").getValue() != null){
@@ -441,7 +431,6 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 								
 			}
 	});
-		
 		vlRoot.addComponent(new FormLayout(){					
 			{
 				setStyleName("form-cutom");
@@ -456,148 +445,137 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 
 			}
 		});
-		
-		
 		vlRoot.addComponent(new FormLayout(){					
 			{
-				setStyleName("form-cutom-new");
+				setStyleName("form-cutom");
 				setMargin(true);
 				setSpacing(true);
 					
-				JPAContainer<Concentrador> containerConcentradores = JPAContainerFactory.make(Concentrador.class, ConnUtil.getEntity());
-				containerConcentradores.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
-				containerConcentradores.addContainerFilter(Filters.eq("status", "ATIVO"));
-				containerConcentradores.sort(new Object[]{"identificacao"}, new boolean[]{true});
+//				JPAContainer<Concentrador> containerConcentradores = JPAContainerFactory.make(Concentrador.class, ConnUtil.getEntity());
+//				containerConcentradores.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
+//				containerConcentradores.addContainerFilter(Filters.eq("status", "ATIVO"));
+//				containerConcentradores.sort(new Object[]{"identificacao"}, new boolean[]{true});
 				
-				cbConcentradores = new ComboBox("Concentrador", containerConcentradores);
-				cbConcentradores.setNullSelectionAllowed(false);
-				cbConcentradores.setRequired(true);
-				cbConcentradores.setImmediate(true);
-				cbConcentradores.setItemCaptionPropertyId("identificacao");
-
-				cbConcentradores.setConverter(new SingleSelectConverter(cbConcentradores));
-			
-				cbConcentradores.setStyleName("caption-align");
-				cbConcentradores.setWidth("250px");
+				txtConcentradores = new TextField("Concentrador");
+				txtConcentradores.setStyleName("caption-align");
+				txtConcentradores.setWidth("250px");
+				txtConcentradores.setEnabled(false);
 				
-				cbConcentradores.addValueChangeListener(new Property.ValueChangeListener() {
-					
-					@Override
-					public void valueChange(ValueChangeEvent event) {
-						
-						try{		
-							if(cbConcentradores != null && cbConcentradores.getValue() != null){
-								EntityItem<Concentrador> eItemConc = (EntityItem<Concentrador>)cbConcentradores.getItem(cbConcentradores.getValue());
-								concentrador = eItemConc.getEntity();
-								if(btPool != null){
-									btPool.setEnabled(true);
-								}
-								
-								String usuario = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("usuario").getValue().toString();
-								String senha = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("senha").getValue().toString();
-								String ip = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("endereco_ip").getValue().toString();
-								Integer porta = Integer.parseInt(cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("porta_api").getValue().toString());
-								String fibra = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue() != null && 
-										!cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString().equals("") ? 
-												cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString() : "NAO";
-												
-								if(fibra.equals("SIM")){
-									if(txtSinalDb != null){
-										txtSinalDb.setEnabled(true);
-										txtSinalDb.setRequired(true);
-									}
-									
-									if(txtGpon != null){
-										txtGpon.setEnabled(true);
-										txtGpon.setRequired(true);
-									}
-								}else{
-									if(txtSinalDb != null){
-										txtSinalDb.setEnabled(true);
-										txtSinalDb.setValue("");
-										txtSinalDb.setEnabled(false);
-										txtSinalDb.setRequired(false);
-									}
-									
-									
-									if(txtGpon != null){
-										
-										txtGpon.setEnabled(true);
-										txtGpon.setValue("");
-										txtGpon.setEnabled(false);
-										txtGpon.setRequired(false);
-									}
-								}
-								
-								
-								if(concentrador != null && concentrador.getTipo().equals("mikrotik")){								
-								
-										List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
-										BeanItemContainer<WirelessInterface> interfaces = new BeanItemContainer<>(WirelessInterface.class);
-										
-										if(result != null){
-											for (Map<String, String> wirelessInterface : result) {
-										
-												String mtu = wirelessInterface.get("mtu");
-												if(mtu.equals("1500")){								
-													WirelessInterface wire = new WirelessInterface();
-													wire.setName(wirelessInterface.get("name")); 
-													interfaces.addBean(wire);
-												}
-				
-											}						
-										}
-										interfaces.size();
-										
-//										cbInterface.setContainerDataSource(interfaces);
-//										cbInterface.setItemCaptionPropertyId("name");
-								}else{
-//									cbInterface.setEnabled(false);
-//									cbInterface.setRequired(false);  
-								}
-								
-								
-//								Integer codConcentrador = (Integer)cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("id").getValue();
-//								List<Swith> swiths = SwithDAO.getSwithsbyConcentrador(codConcentrador);
+//				cbConcentradores.addValueChangeListener(new Property.ValueChangeListener() {
+//					
+//					@Override
+//					public void valueChange(ValueChangeEvent event) {
+//						
+//						try{		
+//							if(cbConcentradores != null && cbConcentradores.getValue() != null){
+//								EntityItem<Concentrador> eItemConc = (EntityItem<Concentrador>)cbConcentradores.getItem(cbConcentradores.getValue());
+//								concentrador = eItemConc.getEntity();
+//								if(btPool != null){
+//									btPool.setEnabled(true);
+//								}
 //								
-//								if(swiths != null && swiths.size() > 0){
-//								
-//									JPAContainer<Swith> swithsContainer = JPAContainerFactory.make(Swith.class, ConnUtil.getEntity());
-//									swithsContainer.addContainerFilter(Filters.eq("concentrador", new Concentrador(codConcentrador)));
-//									swithsContainer.sort(new Object[]{"identificacao"}, new boolean[]{true});
-//									
-//									if(cbCaixaAtendimento != null){
-//										cbCaixaAtendimento.setEnabled(true);
-//										cbCaixaAtendimento.setRequired(true);
-//										cbCaixaAtendimento.setContainerDataSource(swithsContainer);
-//										cbCaixaAtendimento.setItemCaptionPropertyId("identificacao");
-//										cbCaixaAtendimento.setConverter(new SingleSelectConverter(cbCaixaAtendimento));
-//										fieldGroup.bind(cbCaixaAtendimento, "swith");
+//								String usuario = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("usuario").getValue().toString();
+//								String senha = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("senha").getValue().toString();
+//								String ip = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("endereco_ip").getValue().toString();
+//								Integer porta = Integer.parseInt(cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("porta_api").getValue().toString());
+//								String fibra = cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue() != null && 
+//										!cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString().equals("") ? 
+//												cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString() : "NAO";
+//												
+//								if(fibra.equals("SIM")){
+//									if(txtSinalDb != null){
+//										txtSinalDb.setEnabled(true);
+//										txtSinalDb.setRequired(true);
 //									}
 //									
+//									if(txtGpon != null){
+//										txtGpon.setEnabled(true);
+//										txtGpon.setRequired(true);
+//									}
 //								}else{
-//									cbCaixaAtendimento.setEnabled(false);
-//									cbCaixaAtendimento.setRequired(false);
+//									if(txtSinalDb != null){
+//										txtSinalDb.setEnabled(true);
+//										txtSinalDb.setValue("");
+//										txtSinalDb.setEnabled(false);
+//										txtSinalDb.setRequired(false);
+//									}
+//									
+//									
+//									if(txtGpon != null){
+//										
+//										txtGpon.setEnabled(true);
+//										txtGpon.setValue("");
+//										txtGpon.setEnabled(false);
+//										txtGpon.setRequired(false);
+//									}
 //								}
-							
-							
-							}
-						}catch(Exception e){
-							e.printStackTrace();							
-							Notify.Show("ERRO: "+e.getLocalizedMessage(), Notify.TYPE_ERROR);
-						}
-						
-					}
-				});
+//								
+//								
+//								if(concentrador != null && concentrador.getTipo().equals("mikrotik")){								
+//								
+//										List<Map<String, String>> result  = MikrotikUtil.listarInterfacesWireless(usuario, senha, ip, porta);
+//										BeanItemContainer<WirelessInterface> interfaces = new BeanItemContainer<>(WirelessInterface.class);
+//										
+//										if(result != null){
+//											for (Map<String, String> wirelessInterface : result) {
+//										
+//												String mtu = wirelessInterface.get("mtu");
+//												if(mtu.equals("1500")){								
+//													WirelessInterface wire = new WirelessInterface();
+//													wire.setName(wirelessInterface.get("name")); 
+//													interfaces.addBean(wire);
+//												}
+//				
+//											}						
+//										}
+//										interfaces.size();
+//										
+////										cbInterface.setContainerDataSource(interfaces);
+////										cbInterface.setItemCaptionPropertyId("name");
+//								}else{
+////									cbInterface.setEnabled(false);
+////									cbInterface.setRequired(false);  
+//								}
+//								
+//								
+////								Integer codConcentrador = (Integer)cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("id").getValue();
+////								List<Swith> swiths = SwithDAO.getSwithsbyConcentrador(codConcentrador);
+////								
+////								if(swiths != null && swiths.size() > 0){
+////								
+////									JPAContainer<Swith> swithsContainer = JPAContainerFactory.make(Swith.class, ConnUtil.getEntity());
+////									swithsContainer.addContainerFilter(Filters.eq("concentrador", new Concentrador(codConcentrador)));
+////									swithsContainer.sort(new Object[]{"identificacao"}, new boolean[]{true});
+////									
+////									if(cbCaixaAtendimento != null){
+////										cbCaixaAtendimento.setEnabled(true);
+////										cbCaixaAtendimento.setRequired(true);
+////										cbCaixaAtendimento.setContainerDataSource(swithsContainer);
+////										cbCaixaAtendimento.setItemCaptionPropertyId("identificacao");
+////										cbCaixaAtendimento.setConverter(new SingleSelectConverter(cbCaixaAtendimento));
+////										fieldGroup.bind(cbCaixaAtendimento, "swith");
+////									}
+////									
+////								}else{
+////									cbCaixaAtendimento.setEnabled(false);
+////									cbCaixaAtendimento.setRequired(false);
+////								}
+//							
+//							
+//							}
+//						}catch(Exception e){
+//							e.printStackTrace();							
+//							Notify.Show("ERRO: "+e.getLocalizedMessage(), Notify.TYPE_ERROR);
+//						}
+//						
+//					}
+//				});
 				
-				addComponent(cbConcentradores);		
+				addComponent(txtConcentradores);		
 				
-				fieldGroup.bind(cbConcentradores, "base");
+				//fieldGroup.bind(txtConcentradores, "base");
 			}
 		});
-		
-		
-		
 		vlRoot.addComponent(new FormLayout(){					
 				{
 					setStyleName("form-cutom");
@@ -631,149 +609,218 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					});	
 				}
 		});
+		vlRoot.addComponent(new FormLayout(){					
+			{
+				setStyleName("form-cutom");
+				setMargin(true);
+				setSpacing(true);
+				
+				txtOLT = new TextField("OLT");
+				txtOLT.setStyleName("caption-align");
+				txtOLT.setEnabled(false);
+				
+				addComponent(txtOLT);
+								
+			}
+		});	
+		
+		if(item.getItemProperty("regime").getValue().toString().equals("PROPRIO (PARCIAL)") || 
+				item.getItemProperty("regime").getValue().toString().equals("COMODATO (TOTAL)")){
+		vlRoot.addComponent(new FormLayout(){					
+			{
+				setStyleName("form-cutom");
+				setMargin(true);
+				setSpacing(true);
+								
+				txtPON = new TextField("GPON");
+				txtPON.setStyleName("caption-align-concentrador-gpon-liberar");
+				txtPON.setEnabled(false);
+				txtPON.setWidth("37px");
+				
+				if(cbCaixaAtendimento.getValue() != null && cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue() != null){
+					txtPON.setEnabled(true);
+					txtPON.setValue(cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue().toString());
+					txtPON.setEnabled(false);
+				}
+								
+				txtGpon = new TextField();
+				txtGpon.setNullRepresentation("");			
+				txtGpon.setMaxLength(2);
+				txtGpon.setStyleName("input-concentrador-gpon-correcao-liberar");
+				txtGpon.setWidth("75px");				
+				txtGpon.setId("txtGpon");
+				JavaScript.getCurrent().execute("$('#txtGpon').mask('99')");
+				
+				
+				FormLayout fl1 = new FormLayout();
+				fl1.setStyleName("form-cutom");
+				fl1.setMargin(true);
+				fl1.setSpacing(true);
+				fl1.addComponent(txtPON);
+				
+				FormLayout fl2 = new FormLayout();
+				fl2.setStyleName("form-cutom");
+				fl2.setMargin(true);
+				fl2.setSpacing(true);
+				fl2.addComponent(txtGpon);
+						
+				HorizontalLayout hl = new HorizontalLayout();
+				hl.setWidth("100%");
+				hl.setSpacing(false);
+				hl.setMargin(false); 
+				hl.addComponent(fl1);
+				hl.addComponent(fl2);
+							
+				addComponent(hl);	
+								
+				fieldGroup.bind(txtGpon, "gpon");
+			}
+		});
+				
+		}
+		
 		
 		vlRoot.addComponent(new HorizontalLayout(){					
-				{
-					setStyleName("form-cutom-new");
-					setMargin(true);
-					setSpacing(true);
-					
-					final TextField txtEnderecoIP = new TextField("Endereço Fixo");
-					addComponent(new FormLayout(){
-						{							
-							txtEnderecoIP.setNullRepresentation("");
-							txtEnderecoIP.setStyleName("caption-align");
-							txtEnderecoIP.setMaxLength(100);
-							txtEnderecoIP.setDescription("Informar o IP do Cliente");
-							
-							addComponent(txtEnderecoIP);						
-						}
-					});
-					
-					
-					btPool = new Button("Pools", new Button.ClickListener() {
+			{
+				setStyleName("form-cutom-new");
+				setMargin(true);
+				setSpacing(true);
+				
+				final TextField txtEnderecoIP = new TextField("Endereço Fixo");
+				addComponent(new FormLayout(){
+					{							
+						txtEnderecoIP.setNullRepresentation("");
+						txtEnderecoIP.setStyleName("caption-align");
+						txtEnderecoIP.setMaxLength(100);
+						txtEnderecoIP.setDescription("Informar o IP do Cliente");
 						
-						@Override
-						public void buttonClick(ClickEvent event) {
-							
-							Window w = new Window("Informações do Concentrador "+concentrador.getIdentificacao());
-							//w.setHeight("120px");
-							w.setWidth("600px");
-							w.setModal(true);
-							w.center();
-							
-							final Table tbPool = new Table("Pools");
-							tbPool.setWidth("100%");
-							tbPool.setHeight("120px");
-							tbPool.setSelectable(true);
-							tbPool.addContainerProperty("Nome", String.class, "");
-							tbPool.addContainerProperty("Ranges", String.class, "");
-							tbPool.addContainerProperty("Next-Pool", String.class, "");
-
-							List<Map<String, String>> list =	MikrotikUtil.getInfoPool(concentrador.getUsuario(), concentrador.getSenha(), concentrador.getEndereco_ip(), Integer.parseInt(concentrador.getPorta_api()));
-						    
-							for(Map<String, String> mItem : list){								
-								tbPool.addItem(new Object[]{mItem.get("name"),mItem.get("ranges"),mItem.get("next-pool")}, tbPool.getItemIds().size()+1);
-							}
-							
-							final Table tbOspfNetworks = new Table("Networks");
-							tbOspfNetworks.setWidth("100%");
-							tbOspfNetworks.setHeight("120px");
-							tbOspfNetworks.setSelectable(true);
-							tbOspfNetworks.addContainerProperty("Network", String.class, "");
-							tbOspfNetworks.addContainerProperty("Area", String.class, "");							
-
-							List<Map<String, String>> listOspfNetwork =	MikrotikUtil.getInfoOspfNetwork(concentrador.getUsuario(), concentrador.getSenha(), concentrador.getEndereco_ip(), Integer.parseInt(concentrador.getPorta_api()));
-						    
-							for(Map<String, String> mItem : listOspfNetwork){								
-								tbOspfNetworks.addItem(new Object[]{mItem.get("network"),mItem.get("area")}, tbOspfNetworks.getItemIds().size()+1);
-							}
-							
-							JPAContainer<AcessoCliente> containerAcesso = JPAContainerFactory.make(AcessoCliente.class, ConnUtil.getEntity());
-							containerAcesso.addContainerFilter(Filters.isNotEmpty("endereco_ip"));
-							containerAcesso.setReadOnly(true); 
-							
-							final Table tbIpsFixados = new Table("Ips Indisponíveis", containerAcesso);
-							tbIpsFixados.setWidth("100%");
-							tbIpsFixados.setHeight("120px");
-							tbIpsFixados.setSelectable(true);
-							tbIpsFixados.setVisibleColumns(new Object[]{"endereco_ip"});
-							tbIpsFixados.setColumnHeader("endereco_ip", "Endereço IP");
-							tbIpsFixados.sort(new Object[]{"endereco_ip"},new boolean[]{true});
-						    
-							w.setContent(new VerticalLayout(){
-								{
-									setMargin(true);
-									setSpacing(true);
-									
-									addComponent(tbPool);
-									addComponent(tbOspfNetworks);
-									addComponent(tbIpsFixados); 
-								}
-							});
-							
-							getUI().addWindow(w);
-							
-						}
-					});
-					btPool.setEnabled(false);
-					btPool.addStyleName(Reindeer.BUTTON_SMALL);					
-					addComponent(btPool);					
-					setComponentAlignment(btPool, Alignment.MIDDLE_CENTER);
-					
-					fieldGroup.bind(txtEnderecoIP, "endereco_ip");
-									
-					if(item.getItemProperty("endereco_ip") != null &&
-							item.getItemProperty("endereco_ip").getValue() != null &&
-							!item.getItemProperty("endereco_ip").getValue().toString().isEmpty() && 
-							!item.getItemProperty("endereco_ip").getValue().toString().equals("")){
-						
-						if(txtEnderecoIP.getValue() != ipAtual){
-							
-							if(Validator.IPAddress(((TextField)fieldGroup.getField("endereco_ip")).getValue())){
-								txtEnderecoIP.setStyleName("valid-cpf");
-								valid_ip = true;
-							}else{
-								txtEnderecoIP.setStyleName("invalid-cpf");
-								valid_ip = false;
-							}
-						}else{
-							txtEnderecoIP.setStyleName("valid-cpf");
-							valid_ip = true;						
-						}
+						addComponent(txtEnderecoIP);						
 					}
+				});
+				
+				
+				btPool = new Button("Pools", new Button.ClickListener() {
 					
-					txtEnderecoIP.setTextChangeEventMode(TextChangeEventMode.LAZY);
-					txtEnderecoIP.setId("txtEnderecoIP");
-					
-					JavaScript.getCurrent().execute("$('#txtEnderecoIP').mask('0ZZ.0ZZ.0ZZ.0ZZ', {translation: {'Z': \"[0-9]?\"}})");
-					
-					txtEnderecoIP.addListener(new FieldEvents.TextChangeListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
 						
-						@Override
-						public void textChange(TextChangeEvent event) {
+						Window w = new Window("Informações do Concentrador "+concentrador.getIdentificacao());
+						//w.setHeight("120px");
+						w.setWidth("600px");
+						w.setModal(true);
+						w.center();
 						
-							if(!event.getText().equals("") && event.getText() != null){
-															
-								if(Validator.IPAddress(event.getText())){
-									
-									if(CredenciaisAcessoDAO.ipDisponibility(event.getText())){
-										event.getComponent().setStyleName("valid-cpf");
-										valid_ip = true;
-									}else{
-										event.getComponent().setStyleName("invalid-cpf");
-										valid_ip = false;
-									}
+						final Table tbPool = new Table("Pools");
+						tbPool.setWidth("100%");
+						tbPool.setHeight("120px");
+						tbPool.setSelectable(true);
+						tbPool.addContainerProperty("Nome", String.class, "");
+						tbPool.addContainerProperty("Ranges", String.class, "");
+						tbPool.addContainerProperty("Next-Pool", String.class, "");
+						
+						List<Map<String, String>> list =	MikrotikUtil.getInfoPool(concentrador.getUsuario(), concentrador.getSenha(), concentrador.getEndereco_ip(), Integer.parseInt(concentrador.getPorta_api()));
+						
+						for(Map<String, String> mItem : list){								
+							tbPool.addItem(new Object[]{mItem.get("name"),mItem.get("ranges"),mItem.get("next-pool")}, tbPool.getItemIds().size()+1);
+						}
+						
+						final Table tbOspfNetworks = new Table("Networks");
+						tbOspfNetworks.setWidth("100%");
+						tbOspfNetworks.setHeight("120px");
+						tbOspfNetworks.setSelectable(true);
+						tbOspfNetworks.addContainerProperty("Network", String.class, "");
+						tbOspfNetworks.addContainerProperty("Area", String.class, "");							
+						
+						List<Map<String, String>> listOspfNetwork =	MikrotikUtil.getInfoOspfNetwork(concentrador.getUsuario(), concentrador.getSenha(), concentrador.getEndereco_ip(), Integer.parseInt(concentrador.getPorta_api()));
+						
+						for(Map<String, String> mItem : listOspfNetwork){								
+							tbOspfNetworks.addItem(new Object[]{mItem.get("network"),mItem.get("area")}, tbOspfNetworks.getItemIds().size()+1);
+						}
+						
+						JPAContainer<AcessoCliente> containerAcesso = JPAContainerFactory.make(AcessoCliente.class, ConnUtil.getEntity());
+						containerAcesso.addContainerFilter(Filters.isNotEmpty("endereco_ip"));
+						containerAcesso.setReadOnly(true); 
+						
+						final Table tbIpsFixados = new Table("Ips Indisponíveis", containerAcesso);
+						tbIpsFixados.setWidth("100%");
+						tbIpsFixados.setHeight("120px");
+						tbIpsFixados.setSelectable(true);
+						tbIpsFixados.setVisibleColumns(new Object[]{"endereco_ip"});
+						tbIpsFixados.setColumnHeader("endereco_ip", "Endereço IP");
+						tbIpsFixados.sort(new Object[]{"endereco_ip"},new boolean[]{true});
+						
+						w.setContent(new VerticalLayout(){
+							{
+								setMargin(true);
+								setSpacing(true);
+								
+								addComponent(tbPool);
+								addComponent(tbOspfNetworks);
+								addComponent(tbIpsFixados); 
+							}
+						});
+						
+						getUI().addWindow(w);
+						
+					}
+				});
+				btPool.setEnabled(false);
+				btPool.addStyleName(Reindeer.BUTTON_SMALL);					
+				addComponent(btPool);					
+				setComponentAlignment(btPool, Alignment.MIDDLE_CENTER);
+				
+				fieldGroup.bind(txtEnderecoIP, "endereco_ip");
+				
+				if(item.getItemProperty("endereco_ip") != null &&
+						item.getItemProperty("endereco_ip").getValue() != null &&
+						!item.getItemProperty("endereco_ip").getValue().toString().isEmpty() && 
+						!item.getItemProperty("endereco_ip").getValue().toString().equals("")){
+					
+					if(txtEnderecoIP.getValue() != ipAtual){
+						
+						if(Validator.IPAddress(((TextField)fieldGroup.getField("endereco_ip")).getValue())){
+							txtEnderecoIP.setStyleName("valid-cpf");
+							valid_ip = true;
+						}else{
+							txtEnderecoIP.setStyleName("invalid-cpf");
+							valid_ip = false;
+						}
+					}else{
+						txtEnderecoIP.setStyleName("valid-cpf");
+						valid_ip = true;						
+					}
+				}
+				
+				txtEnderecoIP.setTextChangeEventMode(TextChangeEventMode.LAZY);
+				txtEnderecoIP.setId("txtEnderecoIP");
+				
+				JavaScript.getCurrent().execute("$('#txtEnderecoIP').mask('0ZZ.0ZZ.0ZZ.0ZZ', {translation: {'Z': \"[0-9]?\"}})");
+				
+				txtEnderecoIP.addListener(new FieldEvents.TextChangeListener() {
+					
+					@Override
+					public void textChange(TextChangeEvent event) {
+						
+						if(!event.getText().equals("") && event.getText() != null){
+							
+							if(Validator.IPAddress(event.getText())){
+								
+								if(CredenciaisAcessoDAO.ipDisponibility(event.getText())){
+									event.getComponent().setStyleName("valid-cpf");
+									valid_ip = true;
 								}else{
 									event.getComponent().setStyleName("invalid-cpf");
 									valid_ip = false;
 								}
+							}else{
+								event.getComponent().setStyleName("invalid-cpf");
+								valid_ip = false;
 							}
 						}
-					});
-				}
-			});
-		
+					}
+				});
+			}
+		});
 		vlRoot.addComponent(new FormLayout(){					
 				{
 					setStyleName("form-cutom-new");
@@ -966,71 +1013,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 				}
 			});
 			
-			vlRoot.addComponent(new FormLayout(){					
-				{
-					setStyleName("form-cutom");
-					setMargin(true);
-					setSpacing(true);
-					
-					txtOLT = new TextField("OLT");
-					txtOLT.setStyleName("caption-align");
-					txtOLT.setEnabled(false);
-					
-					addComponent(txtOLT);
-									
-				}
-			});	
 			
-			vlRoot.addComponent(new FormLayout(){					
-				{
-					setStyleName("form-cutom");
-					setMargin(true);
-					setSpacing(true);
-									
-					txtPON = new TextField("GPON");
-					txtPON.setStyleName("caption-align-concentrador-gpon-liberar");
-					txtPON.setEnabled(false);
-					txtPON.setWidth("37px");
-					
-					if(cbCaixaAtendimento.getValue() != null && cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue() != null){
-						txtPON.setEnabled(true);
-						txtPON.setValue(cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue()).getItemProperty("pon").getValue().toString());
-						txtPON.setEnabled(false);
-					}
-									
-					txtGpon = new TextField();
-					txtGpon.setNullRepresentation("");			
-					txtGpon.setMaxLength(2);
-					txtGpon.setStyleName("input-concentrador-gpon-correcao-liberar");
-					txtGpon.setWidth("75px");				
-					txtGpon.setId("txtGpon");
-					JavaScript.getCurrent().execute("$('#txtGpon').mask('99')");
-					
-					
-					FormLayout fl1 = new FormLayout();
-					fl1.setStyleName("form-cutom");
-					fl1.setMargin(true);
-					fl1.setSpacing(true);
-					fl1.addComponent(txtPON);
-					
-					FormLayout fl2 = new FormLayout();
-					fl2.setStyleName("form-cutom");
-					fl2.setMargin(true);
-					fl2.setSpacing(true);
-					fl2.addComponent(txtGpon);
-							
-					HorizontalLayout hl = new HorizontalLayout();
-					hl.setWidth("100%");
-					hl.setSpacing(false);
-					hl.setMargin(false); 
-					hl.addComponent(fl1);
-					hl.addComponent(fl2);
-								
-					addComponent(hl);	
-									
-					fieldGroup.bind(txtGpon, "gpon");
-				}
-			});
 			
 			vlRoot.addComponent(new FormLayout(){
 				{
@@ -1038,12 +1021,12 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					setMargin(true);
 					setSpacing(true);
 					
-					String fibra = cbConcentradores.getValue() != null && cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue() != null && 
-							!cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString().equals("") ? 
-									cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString() : "NAO";
+//					String fibra = cbConcentradores.getValue() != null && cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue() != null && 
+//							!cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString().equals("") ? 
+//									cbConcentradores.getItem(cbConcentradores.getValue()).getItemProperty("fibra").getValue().toString() : "NAO";
 									
 									
-					
+					String fibra = concentrador_selecionado != null ? concentrador.getFibra() : "NAO";
 					
 					txtSinalDb = (TextField)fieldGroup.buildAndBind("Sinal Db", "sinal_db");	
 					txtSinalDb.setId("txtSinalDb");
@@ -1398,6 +1381,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					}
 					
 					item.getItemProperty("interfaces").setValue(txtVlan.getValue());
+					item.getItemProperty("base").setValue(concentrador_selecionado);
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
 						item.getItemProperty("signal_strength").setValue("-120..120");	
@@ -1446,6 +1430,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					
 					//if(cbInterface.getValue() != null){
 						item.getItemProperty("interfaces").setValue(txtVlan.getValue());
+						item.getItemProperty("base").setValue(concentrador_selecionado);
 					//}
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
@@ -1492,6 +1477,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					item.getItemProperty("onu_serial").setValue(cbSerialMaterialComodato.getItem(cbSerialMaterialComodato.getValue()).getItemProperty("serial").getValue().toString());
 					item.getItemProperty("endereco_mac").setValue(cbSerial.getItem(cbSerial.getValue()).getItemProperty("serial").getValue().toString());
 					item.getItemProperty("interfaces").setValue(txtVlan.getValue());
+					item.getItemProperty("base").setValue(concentrador_selecionado);
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){
 						item.getItemProperty("signal_strength").setValue("-120..120");	
@@ -1534,6 +1520,7 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 					
 					//if(cbInterface.getValue() != null){
 						item.getItemProperty("interfaces").setValue(txtVlan.getValue());
+						item.getItemProperty("base").setValue(concentrador_selecionado);
 					//}
 					
 					if(fieldGroup.getField("signal_strength").getValue() == null || fieldGroup.getField("signal_strength").getValue().equals("")){

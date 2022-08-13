@@ -23,6 +23,9 @@ public class Swith {
 	@Column(name="EMPRESA_ID")
 	private Integer empresa_id;
 	
+	@Column(name="INTERFACE")
+	private String interfaces;
+	
 	@Column(name="IDENTIFICACAO")
 	private String identificacao;
 	
@@ -185,6 +188,14 @@ public class Swith {
 
 	public void setSinal_db(String sinal_db) {
 		this.sinal_db = sinal_db;
+	}
+
+	public String getInterfaces() {
+		return interfaces;
+	}
+
+	public void setInterfaces(String interfaces) {
+		this.interfaces = interfaces;
 	}
 	
 	

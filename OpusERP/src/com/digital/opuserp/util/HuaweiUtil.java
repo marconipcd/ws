@@ -77,10 +77,10 @@ public class HuaweiUtil {
 		            String[] res = response.toString().split("<br />");
 		            
 		            String uptime = res.length > 55 ?  res[56].split(":")[3]+":"+res[56].split(":")[4]+":"+res[56].split(":")[5] : "";
-		            String mac = res[17].split(":")[1];
-		            String ip = res[18].split(":")[1];
-		            String upload = res[89].split(":")[1];
-		            String download = res[94].split(":")[1];	
+		            String mac = res.length > 16 ? res[17].split(":")[1] : "";
+		            String ip = res.length > 17 ? res[18].split(":")[1] : "";
+		            String upload = res.length > 88 ? res[89].split(":")[1] : "";
+		            String download = res.length > 93 ? res[94].split(":")[1] : "";	
 		            
 		            rrr = new String[]{uptime,mac,ip,upload,download};
 		        }   

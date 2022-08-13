@@ -594,7 +594,8 @@ public class ContasReceberDAO {
 						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{2}-[0-9]{2}/[0-9]{2}' "+							
 						
 						"or cr.status_2 ='ABERTO' " +
-						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{1,}/[0-9]{2}-[0-9]{2}/[0-9]{2}' ",	
+						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{1,}/[0-9]{2}-[0-9]{2}/[0-9]{2}' "
+								+ "ORDER by cr.DATA_VENCIMENTO ASC",	
 												
 						ContasReceber.class);				
 								
