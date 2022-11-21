@@ -61,8 +61,8 @@ public class EmailUtil {
 				email.setHostName(valueDefaultNfe.getServer_email()); 
 				email.setSmtpPort(Integer.parseInt(valueDefaultNfe.getPorta_email()));
 				email.setSSLOnConnect(true);
-				//email.addTo(endEmail,nomeCliente);
-				email.addTo("marconipcd@gmail.com");
+				email.addTo(endEmail,nomeCliente);
+				//email.addTo("marconipcd@gmail.com");
 				email.setFrom(valueDefaultNfe.getLogin(), "DIGITAL"); 
 				email.setSubject("Boleto Serviço de Comunicação");
 				email.setCharset("UTF-8");
@@ -82,11 +82,10 @@ public class EmailUtil {
 				
 				//email.attach(attachment);
 				
-				email.setMsg(valueDefaultNfe.getMsg_email()); 
-				
-				email.setAuthentication(valueDefaultNfe.getLogin(),valueDefaultNfe.getSenha());
-				
+				email.setMsg(valueDefaultNfe.getMsg_email()); 				
+				email.setAuthentication(valueDefaultNfe.getLogin(),valueDefaultNfe.getSenha());				
 				email.send(); //envia o e-mail
+				
 			}else{
 				if(q.getResultList().size() == 1){
 						ConfigNfe valueDefaultNfe = NfeDAO.getDefaultValue();
@@ -95,8 +94,8 @@ public class EmailUtil {
 						email.setHostName(valueDefaultNfe.getServer_email()); 
 						email.setSmtpPort(Integer.parseInt(valueDefaultNfe.getPorta_email()));
 						email.setSSLOnConnect(true);
-						//email.addTo(endEmail,nomeCliente);
-						email.addTo("marconipcd@gmail.com");
+						email.addTo(endEmail,nomeCliente);
+						//email.addTo("marconipcd@gmail.com");
 						email.setFrom(valueDefaultNfe.getLogin(), "DIGITAL"); 
 						email.setSubject("Nfe Serviço de Comunicação");
 						email.setCharset("UTF-8");

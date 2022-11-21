@@ -66,6 +66,9 @@ public class Swith {
 	@Column(name="SITUACAO")
 	private String situacao;
 	
+	@Column(name="STATUS")
+	private String status;
+	
 	
 	
 	public Swith(){
@@ -236,6 +239,14 @@ public class Swith {
 
 	public void setInterfaces(String interfaces) {
 		this.interfaces = interfaces;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	

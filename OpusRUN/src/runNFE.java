@@ -23,28 +23,24 @@ public class runNFE {
 	//9386  - EMPAC
 	//11834 - EMPAC
 	//4393  - ACUMULADORES MOURA S A *
-	//8890  - VALENCA CONSTRUCOES LTDA 
-	//9007  - EVANDRO VALENCA BATISTA E CIA LTDA	
-	//10222 - MILLENA COMERCIO VAREJISTA DE MOVEIS E ELETRO EIRELI	
+	//8890  - VALENCA CONSTRUCOES LTDA 	
 	//10435 - SUPRAMAX  
 	//10550 - ACUMULADORES MOURA *
-	//11085 - UNIVERSIDADE FEDERAL RURAL 
-	//11425 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
-	//11426 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
+	//11085 - UNIVERSIDADE FEDERAL RURAL 	
 	//8892 - SINDICATO DOS TRABALHADORES RURAIS DE B. JARDIM
 	//11268 - 
 	//12053 - KATHARYNE RAYLLE BEZERRA DA SILVA *
-	//12200 - 
-	//11851 - 
-	//
+	//12200 - ORDEM DOS ADVOGADOS DO BRASIL SECCAO DE PERNAMBUCO
+	//11851 - LEONIDAS BARBOSA DA SILVA
+	//12424 - HUGHES TELECOMUNICACOES DO BRASIL LTDA
+	//12965 - ANTONIO GEAN ALEXANDRE GOMES
 	
 
 	public static void main(String[] args) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 		
-		//c.id=11851 and
-		Query qcontratos = em.createQuery("select c from AcessoCliente c where  c.id=12424 and "
+		Query qcontratos = em.createQuery("select c from AcessoCliente c where c.id=12965 and "
 				+ "c.emitir_nfe_automatico = 'SIM' and "
 				+ "c.status_2 != 'ENCERRADO' and c.cfop_nfe != null", AcessoCliente.class);
 		List<AcessoCliente> lista_de_contratos = qcontratos.getResultList();
@@ -54,7 +50,7 @@ public class runNFE {
 		int i = 1;
 		for (AcessoCliente contrato : lista_de_contratos) {
 
-			if(i <= 2){
+			if(i <= 2838){
 				
 				System.out.println(contrato.getId());
 				SimpleDateFormat sdfAnoMes = new SimpleDateFormat("yyMM");
@@ -64,7 +60,6 @@ public class runNFE {
 				String regexAntiga = "^"+contrato.getId().toString()+"/[0-9]{2}/[0-9]{2}";
 				String regexProrata = "^"+contrato.getId().toString()+"/PRORATA";
 				
-
 				boolean manual = true;
 				
 				if(!manual){
@@ -89,14 +84,14 @@ public class runNFE {
 					qn.setParameter("rNova", regexNova);
 					qn.setParameter("rAntiga", regexAntiga);
 					qn.setParameter("rProrata", regexProrata);
-					qn.setParameter("anoMes", "2207");
+					qn.setParameter("anoMes", "2210");
 					
 					if(qn.getResultList().size()  == 1){
 						boleto = (ContasReceber)qn.getSingleResult();					
 					}
 				}else{
 					//557413->128684 - 582019 - 632154
-					boleto = em.find(ContasReceber.class, 674893 );
+					boleto = em.find(ContasReceber.class, 715842 );
 				}
 				
 				//&& boleto.getStatus().equals("ABERTO")

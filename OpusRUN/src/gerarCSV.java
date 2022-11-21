@@ -20,7 +20,7 @@ public class gerarCSV {
 			
 			Query q = em.createNativeQuery("SELECT c.NOME_RAZAO, c.CELULAR1  FROM acesso_cliente ac, clientes c, planos_acesso p "
 					+ "WHERE ac.CLIENTES_ID = c.ID  "
-					+ "AND ac.STATUS_2 NOT LIKE 'ENCERRADO' AND p.ID = ac.PLANOS_ACESSO_ID and p.NOME LIKE '%100M FIBRA UP%' ");
+					+ "AND ac.STATUS_2 NOT LIKE 'ENCERRADO' AND p.ID = ac.PLANOS_ACESSO_ID and p.NOME LIKE '%100M FIBRA TOP%' ");
 			
 			//200M GAMER FIBRA TOP
 			//200M COMERCIO

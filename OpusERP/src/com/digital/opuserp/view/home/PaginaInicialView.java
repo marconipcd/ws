@@ -29,6 +29,7 @@ import com.digital.opuserp.view.home.apps.notepad.NotepadApp;
 import com.digital.opuserp.view.home.apps.plano_acao.PlanoAcaoApp;
 import com.digital.opuserp.view.home.apps.resumo_semanal.ResumoCRM;
 import com.digital.opuserp.view.home.apps.roteirizacoes.RoteirizacoesVisaoGeral;
+import com.digital.opuserp.view.home.apps.topUsuariosDesconectados.TopUsuariosDesconectados;
 import com.digital.opuserp.view.util.Notify;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
@@ -131,6 +132,8 @@ public class PaginaInicialView extends VerticalLayout implements View {
         		c = new PlanoAcaoApp();
         	}else if(p.getApp().equals(IndicadoresApp.class.toString())  && checkPermission("Indicadores")){
         		c = new IndicadoresApp();
+        	}else if(p.getApp().equals(TopUsuariosDesconectados.class.toString())  && checkPermission("Top Usuarios Desconectados")){
+        		c = new TopUsuariosDesconectados();
         	}else{
         		c = null;
         	}
@@ -211,6 +214,8 @@ public class PaginaInicialView extends VerticalLayout implements View {
 			PrefeDashDAO.remove(PlanoAcaoApp.class.toString());
 		}else if(nomeSubmodulo.equals("Indicadores")){			
 			PrefeDashDAO.remove(IndicadoresApp.class.toString());
+		}else if(nomeSubmodulo.equals("Top Usuarios Desconectados")){			
+			PrefeDashDAO.remove(TopUsuariosDesconectados.class.toString());
 		}
     	
     	
@@ -386,6 +391,8 @@ public class PaginaInicialView extends VerticalLayout implements View {
 	                        			componentApp = new PlanoAcaoApp();
 	                        		}else if(s.getSubmodulo().getNome().equals("Indicadores")){
 	                        			componentApp = new IndicadoresApp();
+	                        		}else if(s.getSubmodulo().getNome().equals("Top Usuarios Desconectados")){
+	                        			componentApp = new TopUsuariosDesconectados();
 	                        		}else{
 	                        			componentApp = null;
 	                        		}

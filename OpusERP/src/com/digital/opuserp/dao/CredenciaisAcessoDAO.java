@@ -1017,7 +1017,13 @@ public class CredenciaisAcessoDAO {
 		
 		//Desconectar Cliente
 		if(ac.getBase() != null){
-			MikrotikUtil.desconectarCliente(ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()), ac.getLogin());
+			if(ac.getBase().getTipo().equals("mikrotik")){
+				MikrotikUtil.desconectarCliente(ac.getBase().getUsuario(), ac.getBase().getSenha(), ac.getBase().getEndereco_ip(), Integer.parseInt(ac.getBase().getPorta_api()), ac.getLogin());
+			}
+			
+			if(ac.getBase().getTipo().equals("huawei")){
+				HuaweiUtil.desconectarCliente(ac.getLogin());
+			}
 		}
 
 		

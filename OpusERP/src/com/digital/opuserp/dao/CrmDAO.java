@@ -21,6 +21,28 @@ import com.digital.opuserp.util.ConnUtil;
 public class CrmDAO {
 
 	
+	public static CrmAssunto getAssuntoEmAtendimentoPorSetor(Integer setor){
+		
+		EntityManager em = ConnUtil.getEntity();
+		
+		Setores s= em.find(Setores.class, setor);
+		
+		Query q = em.createQuery("select c from CrmAssunto c where c.setor=:s and "
+				+ "c.status='ATIVO' and c.empresa_id=:e and "
+				+ "c.nome like 'EM ATENDIMENTO'", CrmAssunto.class);
+		q.setParameter("s", s);
+		q.setParameter("e", OpusERP4UI.getEmpresa().getId());
+		
+		if(q.getResultList().size() == 1){
+			return (CrmAssunto)q.getSingleResult();
+		}
+		
+		
+		return null;
+		
+		
+	}
+	
 	public static boolean registrarAtendimento(Crm crm){
 		
 		try{

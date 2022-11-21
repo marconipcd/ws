@@ -20,10 +20,10 @@ public class runCriarUsuario {
 		EntityManager em = emf.createEntityManager();
 		
 		String usuario_novo = "ezequiel";
-		String senha_usuario_novo = "123456";
+		String senha_usuario_novo = "Ez94575815";
 		String email = "ezequiel@digitalonline.com.br";
 		
-		String usuario_modelo = "claudiaalana";
+		String usuario_modelo = "raquel";
 		
 		Usuario u = new Usuario();
 		u.setUsername(usuario_novo);

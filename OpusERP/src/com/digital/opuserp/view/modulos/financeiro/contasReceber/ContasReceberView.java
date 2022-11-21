@@ -91,6 +91,7 @@ import com.github.wolfie.refresher.Refresher;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.filter.Filters;
+import com.vaadin.client.ui.calendar.schedule.DateUtil;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItem;
@@ -1334,6 +1335,112 @@ public class ContasReceberView extends VerticalLayout {
 		return btExcluir;
 	}
 	
+	private void negativar_boleto(ContasReceber cr, final Set<Object> selecteds){
+				
+		boolean check_datas = false;
+	
+		try{
+    		if(cr.getN_doc().split("-")[1].equals("01/12") ){
+    			String cod_contrato = cr.getN_doc().split("-")[0].split("/")[0];
+    			AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
+    			Date data_instalacao = contrato.getData_instalacao();
+    			Date data_vencimento = cr.getData_vencimento();
+    			Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
+    			Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
+    			
+    			if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
+    				check_datas = true;									    										    	
+    			}
+    			
+    			Date data_hoje = new Date();
+    			//Integer qtd_dias_venc = DateTime.mi
+    			
+    		}
+    	}catch(Exception e){
+    		if(cr.getN_doc().split("/")[1].equals("PRORATA") ){
+    			String cod_contrato = cr.getN_doc().split("/")[0];
+    			AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
+    			Date data_instalacao = contrato.getData_instalacao();
+    			Date data_vencimento = cr.getData_vencimento();
+    			Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
+    			Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
+    			
+    			if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
+    				check_datas = true;
+    			}
+    		}
+    	}
+    	
+    	if(check_datas){
+    		Notify.Show("Não é possível negativar esse boleto, consulte o Jurídico", Notify.TYPE_WARNING);
+    	}else{
+    		
+    		NegativarTituloEditor gd = new NegativarTituloEditor("Negativar Título(s)",true);
+    		gd.addListerner(new NegativarTituloEditor.NegativarTituloListerner() {
+    			
+    			@Override
+    			public void onClose(NegativarTituloEvent event) {
+    				if(event.isConfirm()){								
+    					
+    					
+    					EntityManager em = ConnUtil.getEntity();						
+    					
+    					
+    					
+    					try {
+    						
+    						em.getTransaction().begin();
+    						for (Object object : selecteds) {
+    							
+    							
+    							ContasReceber cr = em.find(ContasReceber.class, Integer.parseInt(tb.getItem(object).getItemProperty("Cod.").getValue().toString()));
+    							cr.setStatus(event.getStatusNegativado());
+    							cr.setNegativado("SIM");
+    							//cr.setNegativado("s");
+    							
+    							
+    							em.merge(cr);	
+    							em.merge((new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date())));
+    							
+    							
+    							//AlteracoesContasReceberDAO.save(new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
+    						}
+    						
+    						em.getTransaction().commit();
+    						tfBusca.setValue(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cliente").getValue().toString());
+    						refresh(tfBusca.getValue());										
+    						Notification.show("Boleto(s) Negativado com Sucesso !");
+    						
+    						LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Negativou um ou Mais Boleto(s)"));
+    						
+    					} catch (Exception e) {
+    						
+    						if(em.getTransaction().isActive()){
+    							em.getTransaction().rollback();
+    						}
+    						
+    						Notification.show("Não foi Possivel Concluir a Negativado de Boleto(s)");
+    						//e.printStackTrace();
+    					}			
+    					
+    					
+    					
+    				}
+    			}
+    		});
+    		
+    		
+    		gd.addCloseListener(new Window.CloseListener() {
+    			
+    			@Override
+    			public void windowClose(CloseEvent e) {						
+    				tb.focus();						
+    			}
+    		});
+    		
+    		getUI().addWindow(gd);
+    	}
+	}
 		
 	public Button BuildbtNegativar() {
 		btNegativar= new Button("Negativar", new Button.ClickListener() {
@@ -1346,110 +1453,35 @@ public class ContasReceberView extends VerticalLayout {
 					final Set<Object> selecteds = (Set<Object>)tb.getValue();
 					
 						if(selecteds.size() == 1){
-							
-								boolean check_datas = false;
-								
-							    ContasReceber cr = ContasReceberDAO.find(Integer.parseInt(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cod.").getValue().toString()));
+																						
+							    final ContasReceber cr = ContasReceberDAO.find(Integer.parseInt(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cod.").getValue().toString()));
 							    
-							    try{
-								    if(cr.getN_doc().split("-")[1].equals("01/12") ){
-									    String cod_contrato = cr.getN_doc().split("-")[0].split("/")[0];
-									    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
-									    Date data_instalacao = contrato.getData_instalacao();
-									    Date data_vencimento = cr.getData_vencimento();
-									    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
-									    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
-									    
-									    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
-									    	check_datas = true;
-									    }
-								    }
-							    }catch(Exception e){
-							    	if(cr.getN_doc().split("/")[1].equals("PRORATA") ){
-									    String cod_contrato = cr.getN_doc().split("/")[0];
-									    AcessoCliente contrato = ContratosAcessoDAO.find(Integer.parseInt(cod_contrato));
-									    Date data_instalacao = contrato.getData_instalacao();
-									    Date data_vencimento = cr.getData_vencimento();
-									    Date data_1 = new DateTime(data_instalacao).plusMonths(11).toDate();
-									    Date data_2 = new DateTime(data_instalacao).plusMonths(14).toDate();
-									    
-									    if(data_vencimento.after(data_1) && data_vencimento.before(data_2)){
-									    	check_datas = true;
-									    }
-								    }
-							    }
+							    DateTime dt1 = new DateTime(cr.getData_vencimento());
+							    DateTime dt2 = new DateTime();							    
+							    Integer dias = Days.daysBetween(dt1, dt2).getDays();
 							    
-							    if(check_datas){
-							    	Notify.Show("Não é possível negativar esse boleto, consulte o Jurídico", Notify.TYPE_WARNING);
-							    }else{
-							    
-									NegativarTituloEditor gd = new NegativarTituloEditor("Negativar Título(s)",true);
-									gd.addListerner(new NegativarTituloEditor.NegativarTituloListerner() {
+							    if(dias < 15){
+							    	
+							    	GenericDialog gd = new GenericDialog("Confirme para continuar!", "Deseja realmente negativar um boleto com menos de 15 dias de atraso ?", true, true);
+							    	gd.addListerner(new GenericDialog.DialogListerner() {
 										
 										@Override
-										public void onClose(NegativarTituloEvent event) {
-											if(event.isConfirm()){								
-												
-												
-													EntityManager em = ConnUtil.getEntity();						
-													
-													
-													
-													try {
-													
-														em.getTransaction().begin();
-														for (Object object : selecteds) {
-															
-																
-																ContasReceber cr = em.find(ContasReceber.class, Integer.parseInt(tb.getItem(object).getItemProperty("Cod.").getValue().toString()));
-																cr.setStatus(event.getStatusNegativado());
-																cr.setNegativado("SIM");
-																//cr.setNegativado("s");
-																
-																
-																em.merge(cr);	
-																em.merge((new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date())));
-																
-																
-																//AlteracoesContasReceberDAO.save(new AlteracoesContasReceber(null, "NEGATIVOU UM BOLETO", cr,OpusERP4UI.getEmpresa(), OpusERP4UI.getUsuarioLogadoUI(), new Date()));
-														}
-														
-														em.getTransaction().commit();
-														tfBusca.setValue(tb.getItem(selecteds.toArray()[0]).getItemProperty("Cliente").getValue().toString());
-														refresh(tfBusca.getValue());										
-														Notification.show("Boleto(s) Negativado com Sucesso !");
-														
-														LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Negativou um ou Mais Boleto(s)"));
-													
-													} catch (Exception e) {
-														
-														if(em.getTransaction().isActive()){
-															em.getTransaction().rollback();
-														}
-														
-														Notification.show("Não foi Possivel Concluir a Negativado de Boleto(s)");
-														//e.printStackTrace();
-													}			
-													
-													
-												
+										public void onClose(DialogEvent event) {
+											if(event.isConfirm()){
+												negativar_boleto(cr, selecteds);												
 											}
 										}
 									});
-									
-									
-									gd.addCloseListener(new Window.CloseListener() {
-										
-										@Override
-										public void windowClose(CloseEvent e) {						
-											tb.focus();						
-										}
-									});
-									
-									getUI().addWindow(gd);
+							    	gd.setCustomStyle("GenericDialogRed");
+							    	
+							    	getUI().addWindow(gd);
+							    	
+							    }else{							    	
+							    	negativar_boleto(cr, selecteds);							    		
+							    }
+						}
+							    
 								
-								}
-						}		
 					}else{
 						Notification.show("Atenção", "Você não Possui Permissão para Negativar um Boleto", Type.ERROR_MESSAGE);
 					}

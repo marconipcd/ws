@@ -13,6 +13,7 @@ import com.digital.opuserp.domain.Cliente;
 import com.digital.opuserp.domain.CreditoCliente;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.Real;
+import com.digital.opuserp.view.util.Notify;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.BlurEvent;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -106,6 +107,7 @@ public class DefinirLimiteCreditoEditor extends Window {
 				hlButtons.setMargin(true);
 
 				hlButtons.addComponent(buildBtAplicar());
+				hlButtons.addComponent(buildBtZerarLimite());
 				hlButtons.addComponent(buildBtCancelar());
 				hlButtons.addComponent(buildBtSalvar());
 				
@@ -124,7 +126,7 @@ public class DefinirLimiteCreditoEditor extends Window {
 	
 	public void buildLayout(){
 		
-		
+		vlRoot.removeAllComponents();
 					
 		vlRoot.addComponent(
 				new FormLayout(){					
@@ -287,6 +289,42 @@ public class DefinirLimiteCreditoEditor extends Window {
 		
 	}
 
+	Button btZerarLimite;
+	public Button buildBtZerarLimite() {
+		
+		btZerarLimite = new Button("Zerar limite", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+						
+					Query q = em.createQuery("select cc from CreditoCliente cc where cc.cliente =:cliente", CreditoCliente.class);
+					q.setParameter("cliente", new Cliente(codCliente));
+				
+					List<CreditoCliente> creditos = q.getResultList();
+					em.getTransaction().begin();
+					for (CreditoCliente creditoCliente : creditos) {
+							em.remove(creditoCliente);								
+					}	
+					em.getTransaction().commit();
+					
+					txtLimiteCredito.setValue("0");
+					
+					txtDisponivel.setReadOnly(false);
+					txtDisponivel.setValue("0");
+					txtDisponivel.setReadOnly(true);
+					
+					valor_credito= "0";
+					valor_saldo= "0";
+										
+					Notify.Show("Limite zerado com sucesso!", Notify.TYPE_SUCCESS);
+					
+			}
+		});
+		
+		
+		//btAplicar.setStyleName("default");
+		return btZerarLimite;
+	}
 	
 	
 	public Button buildBtAplicar() {
@@ -353,8 +391,6 @@ public class DefinirLimiteCreditoEditor extends Window {
 				
 			}
 		});
-		
-
 		
 		
 		//btAplicar.setStyleName("default");

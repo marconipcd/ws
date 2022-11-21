@@ -145,6 +145,17 @@ public class AcessoCliente {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date desbloqueio_tmp;
 	
+	@Column(name="SENHA_PARAMOUNT")
+	private String senha_paramount;
+	
+	public String getSenha_paramount() {
+		return senha_paramount;
+	}
+
+	public void setSenha_paramount(String senha_paramount) {
+		this.senha_paramount = senha_paramount;
+	}
+	
 	
 //	@Transient
 //	private String vlr_carencia;

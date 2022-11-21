@@ -20,10 +20,9 @@ public class runCSVClientesInativos {
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 			EntityManager em = emf.createEntityManager();
 		
-Query q = em.createNativeQuery("SELECT * FROM clientes c WHERE EXISTS(SELECT * "
-+ "FROM acesso_cliente a WHERE  "
-+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 256 AND a.STATUS_2 NOT LIKE 'ENCERRADO' or "
-+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 203 AND a.STATUS_2 NOT LIKE 'ENCERRADO')", Cliente.class);
+			Query q = em.createNativeQuery("SELECT * FROM clientes c WHERE EXISTS(SELECT * "
+			+ "FROM acesso_cliente a WHERE  "
+			+ "a.CLIENTES_ID =  c.ID AND a.PLANOS_ACESSO_ID = 294 AND a.STATUS_2 NOT LIKE 'ENCERRADO')", Cliente.class);
 
 			
 			List<Cliente> contratosEncerrado = q.getResultList();
@@ -33,7 +32,7 @@ Query q = em.createNativeQuery("SELECT * FROM clientes c WHERE EXISTS(SELECT * "
 			sb.append(new String("Name,Given Name,Additional Name,Family Name,Yomi Name,Given Name Yomi,Additional Name Yomi,Family Name Yomi,Name Prefix,Name Suffix,Initials,Nickname,Short Name,Maiden Name,Birthday,Gender,Location,Billing Information,Directory Server,Mileage,Occupation,Hobby,Sensitivity,Priority,Subject,Notes,Group Membership,E-mail 1 - Type,E-mail 1 - Value,E-mail 2 - Type,E-mail 2 - Value,Phone 1 - Type,Phone 1 - Value,Phone 2 - Type,Phone 2 - Value,Phone 3 - Type,Phone 3 - Value,Website 1 - Type,Website 1 - Value"));
 			sb.append(System.getProperty("line.separator"));
 			
-			File f = new File("F:\\100MFIBRAupEultramais.csv");
+			File f = new File("F:\\100MFIBRAtOP.csv");
 			BufferedWriter br = new BufferedWriter(new FileWriter(f));  
 			 					
 				if(f.canWrite()){
@@ -55,8 +54,7 @@ Query q = em.createNativeQuery("SELECT * FROM clientes c WHERE EXISTS(SELECT * "
 								String tipo4 = cel4 != null ? "Celular" : "";
 									
 								Query q2 = em.createNativeQuery("select * from acesso_cliente a where "									
-										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=256 OR "
-										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=203 ",  AcessoCliente.class);
+										+ "a.CLIENTES_ID=:c and a.PLANOS_ACESSO_ID=294",  AcessoCliente.class);
 								q2.setParameter("c", c);
 								
 								AcessoCliente contrato = null;

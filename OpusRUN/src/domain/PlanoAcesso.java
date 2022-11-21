@@ -23,11 +23,6 @@ public class PlanoAcesso {
 	@OneToOne
 	@JoinColumn(name="contratos_id")
 	private ContratosAcesso contrato_acesso;
-	
-	@Column(name="RATE_LIMIT_HUAWEI_UP",nullable=false, unique=false, length=100)
-	private String rate_limit_huawei_up;	
-	@Column(name="RATE_LIMIT_HUAWEI_DOWN",nullable=false, unique=false, length=100)
-	private String rate_limit_huawei_down;	
 		
 	@Column(name="NOME",nullable=false, unique=false, length=50)
 	private String nome;
@@ -37,6 +32,15 @@ public class PlanoAcesso {
 	private String upload;
 	@Column(name="RATE_LIMIT",nullable=false, unique=false, length=100)
 	private String rate_limit;
+	
+	@Column(name="RATE_LIMIT_HUAWEI_UP",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_up;	
+	@Column(name="RATE_LIMIT_HUAWEI_DOWN",nullable=false, unique=false, length=100)
+	private String rate_limit_huawei_down;	
+	@Column(name="MIN_RATE_LIMIT",nullable=false, unique=false, length=100)
+	private String min_rate_limit;	
+	@Column(name="PRIORIDADE", nullable=false,length=1)
+	private String prioridade;
 	@Column(name="SHARED_USERS",nullable=false, unique=false, length=10)
 	private String shared_users;
 	@Column(name="SESSION_TIMEOUT",nullable=false, unique=false, length=50)
@@ -65,14 +69,33 @@ public class PlanoAcesso {
 	@JoinColumn(name="PLANO_RENOVACAO", nullable=true)
 	private PlanoAcesso plano_Renovacao;
 	
-	@Column(name="SERVICO_PLANO_ID")
-	private Integer servico_plano_id;
+	@OneToOne
+	@JoinColumn(name="SERVICO_PLANO_ID")
+	private ServicoPlano servico_plano;
+	
+	@Column(name="INSTALACAO_GRATIS")
+	private String instalacao_gratis;
+	
+	@Column(name="PERMITIR_COMODATO_TOTAL")
+	private String permitir_comodato_total;
+	
+	@Column(name="PERMITIR_SERVICO_MANUTENCAO")
+	private String permitir_servico_manutencao;
+	
+	@Column(name="POSSUI_ITTV")
+	private String possui_ittv;
+	
+	@Column(name="POSSUI_APPNEO")
+	private String possui_appneo;
+	
+	
+	@Column(name="PLANO_ITTV")
+	private String plano_ittv;
 	
 	@OneToOne
 	@JoinColumn(name="PLANO_BLOQUEIO")
 	private PlanoAcesso plano_bloqueio;
-	
-	
+			
 	public PlanoAcesso(){
 		
 	}
@@ -241,12 +264,69 @@ public class PlanoAcesso {
 		this.plano_Renovacao = plano_Renovacao;
 	}
 
-	public Integer getServico_plano_id() {
-		return servico_plano_id;
+	public ServicoPlano getServico_plano() {
+		return servico_plano;
 	}
 
-	public void setServico_plano_id(Integer servico_plano_id) {
-		this.servico_plano_id = servico_plano_id;
+	public void setServico_plano(ServicoPlano servico_plano) {
+		this.servico_plano = servico_plano;
+	}
+
+	public String getMin_rate_limit() {
+		return min_rate_limit;
+	}
+
+	public void setMin_rate_limit(String min_rate_limit) {
+		this.min_rate_limit = min_rate_limit;
+	}
+	
+	
+	public String getPrioridade(){
+		return prioridade;
+	}
+	public void setPrioridade(String prioridade){
+		this.prioridade = prioridade;
+	}
+
+	public String getInstalacao_gratis() {
+		return instalacao_gratis;
+	}
+
+	public void setInstalacao_gratis(String instalacao_gratis) {
+		this.instalacao_gratis = instalacao_gratis;
+	}
+
+	public String getPermitir_comodato_total() {
+		return permitir_comodato_total;
+	}
+
+	public void setPermitir_comodato_total(String permitir_comodato_total) {
+		this.permitir_comodato_total = permitir_comodato_total;
+	}
+
+	
+	public String getPlano_ittv() {
+		return plano_ittv;
+	}
+
+	public void setPlano_ittv(String plano_ittv) {
+		this.plano_ittv = plano_ittv;
+	}
+
+	public String getPossui_ittv() {
+		return possui_ittv;
+	}
+
+	public void setPossui_ittv(String possui_ittv) {
+		this.possui_ittv = possui_ittv;
+	}
+
+	public String getPermitir_servico_manutencao() {
+		return permitir_servico_manutencao;
+	}
+
+	public void setPermitir_servico_manutencao(String permitir_servico_manutencao) {
+		this.permitir_servico_manutencao = permitir_servico_manutencao;
 	}
 
 	public PlanoAcesso getPlano_bloqueio() {
@@ -255,6 +335,14 @@ public class PlanoAcesso {
 
 	public void setPlano_bloqueio(PlanoAcesso plano_bloqueio) {
 		this.plano_bloqueio = plano_bloqueio;
+	}
+
+	public String getPossui_appneo() {
+		return possui_appneo;
+	}
+
+	public void setPossui_appneo(String possui_appneo) {
+		this.possui_appneo = possui_appneo;
 	}
 
 	public String getRate_limit_huawei_up() {
@@ -273,8 +361,6 @@ public class PlanoAcesso {
 		this.rate_limit_huawei_down = rate_limit_huawei_down;
 	}
 	
-	
-  
 	
 	
 	

@@ -16,6 +16,7 @@ public class GenericDialog extends Window {
 
 	private String customStyle = "GenericDialog";
 	
+	
 	private String captionWin = "Confirme para Continuar!";
 	private String message = "Realmente Deseja Seguir Nessa Ação?";
 	private String captionOK = "SIM";
@@ -56,7 +57,10 @@ public class GenericDialog extends Window {
 		
 		init();
 	}
-		
+	
+	
+	
+	Label lbMesage;
 	private void init(){
 		
 		setStyleName(this.customStyle);
@@ -78,7 +82,7 @@ public class GenericDialog extends Window {
 		vlroot.setSizeFull();
 		vlroot.setStyleName(this.customStyle);
 		
-		Label lbMesage = new Label(this.message);
+		lbMesage = new Label(this.message);
 		lbMesage.addStyleName(this.customStyle);
 		vlroot.addComponent(lbMesage);
 		vlroot.setExpandRatio(lbMesage, 2);
@@ -162,7 +166,9 @@ public class GenericDialog extends Window {
 		this.center = center;
 	}	
 	public void setCustomStyle(String customStyle) {
-		this.customStyle = customStyle;
+		//this.customStyle = customStyle;
+		lbMesage.removeStyleName(this.customStyle);
+		lbMesage.addStyleName(customStyle);
 	}	
 	public void setBloquearTela(boolean bloquearTela) {
 		this.bloquearTela = bloquearTela;

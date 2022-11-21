@@ -25,7 +25,7 @@ public class relatorioRede20FTTH {
 			EntityManager em = emf.createEntityManager();
 		
 			Query q = em.createNativeQuery("SELECT * FROM acesso_cliente ac WHERE ac.STATUS_2 !='ENCERRADO' AND "
-					+ "ac.STATUS_2 !='SUSPENSO' AND ac.BASES_ID=108", AcessoCliente.class);
+					+ "ac.STATUS_2 !='SUSPENSO' AND ac.BASES_ID=35", AcessoCliente.class);
 			
 			List<AcessoCliente> contratos = q.getResultList();
 			System.out.println("Quantidade de Contratos: "+contratos.size());
@@ -37,7 +37,7 @@ public class relatorioRede20FTTH {
 					+ "Bairro, Cidade, Ponto Referencia,Url Endereco, Status"));
 			sb.append(System.getProperty("line.separator"));
 			
-			File f = new File("F:\\ContratosRede20FTTHComGpon.csv");
+			File f = new File("F:\\ContratosRede11.csv");
 			BufferedWriter br = new BufferedWriter(new FileWriter(f));  
 			 					
 				if(f.canWrite()){
@@ -48,7 +48,9 @@ public class relatorioRede20FTTH {
 							ContasReceber boleto = boletos.get(0);
 							
 							SimpleDateFormat sdf = new SimpleDateFormat("dd");
-							String dia_vencimento = sdf.format(boleto.getData_vencimento());
+							SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+							//String dia_vencimento = sdf.format(boleto.getData_vencimento());
+							String dia_vencimento =sdf2.format(boleto.getData_vencimento());
 											
 							if(c != null){			
 								

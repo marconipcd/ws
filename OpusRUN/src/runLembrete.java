@@ -57,7 +57,7 @@ public class runLembrete {
 				//if(i < 1){
 					//if(contasReceber2.getCliente().getEmail() != null && !contasReceber2.getCliente().getEmail().equals("") && EmailUtil.validate(contasReceber2.getCliente().getEmail())){
 						enviarEmail(boleto);					
-						System.out.println(boleto.getCliente().getNome_razao());
+						//System.out.println(boleto.getCliente().getNome_razao());
 						i++;
 					//}
 				//}else{
@@ -116,8 +116,8 @@ public class runLembrete {
 			Cliente cliente =boleto.getCliente();
 			if(cliente.getEmail() != null && !cliente.getEmail().equals("") && EmailUtil.validate(cliente.getEmail())){
 				
-				boolean check = EmailUtil.Send(boleto, cliente.getNome_razao(),"marconipcd@gmail.com", pathFull);					
-				//boolean check = EmailUtil.Send(boleto, cliente.getNome_razao(),cliente.getEmail(), pathFull);
+				//boolean check = EmailUtil.Send(boleto, cliente.getNome_razao(),"marconipcd@gmail.com", pathFull);					
+				boolean check = EmailUtil.Send(boleto, cliente.getNome_razao(),cliente.getEmail(), pathFull);
 				
 				if(check){
 					System.out.println("ENVIADO");
@@ -403,28 +403,16 @@ public class runLembrete {
 		
 		String regexProrata = "[0-9]/PRORATA";
 		String regexNova = "[0-9]/[0-9]{2}-[0-9]{2}/[0-9]{2}";
-		//String regexAntiga = "[0-9]/[0-9]{2}/[0-9]{2}";
+	
+		Query qn = em.createNativeQuery("SELECT * FROM contas_receber cr WHERE "
+				+ "cr.status_2 ='ABERTO' AND "
+				+ "cr.n_doc REGEXP :n_doc AND "
+				+ "cr.data_vencimento =:vencimento "
+				+ "ORDER BY cr.data_vencimento ASC",ContasReceber.class);
 		
-		Query qn = em.createNativeQuery("select * from contas_receber cr where " +				
-				"cr.status_2 ='ABERTO' " +				
-				"and cr.n_doc REGEXP :rNova " +
-				"and cr.data_vencimento = :dataVencimento "+			
-				 "ORDER BY cr.data_vencimento ASC ",
-				
-				ContasReceber.class);
-		
-		//qn.setParameter("rNovaProrata", regexProrata);
-		qn.setParameter("rNova", regexNova);
-		//qn.setParameter("rAntiga", regexAntiga);
-		qn.setParameter("dataVencimento", "2021-01-27");
-		
-//		Query qn = em.createNativeQuery("SELECT * FROM contas_receber cr WHERE "
-//				+ "cr.status_2 ='ABERTO' AND "
-//				+ "cr.n_doc REGEXP '[0-9]/[0-9]{2}-[0-9]{2}/[0-9]{2}' AND "
-//				+ "cr.data_vencimento =:vencimento "
-//				+ "ORDER BY cr.data_vencimento ASC",ContasReceber.class);
-//		
-//		qn.setParameter("vencimento", DataUtil.parseDataUs(new DateTime().plus(10).toDate()));
+		qn.setParameter("vencimento", "2022-11-01"); 
+		//qn.setParameter("vencimento", DataUtil.parseDataUs(new DateTime().plus(10).toDate()));
+		qn.setParameter("n_doc", regexNova);
 		
 		if(qn.getResultList().size()>0){
 			return  qn.getResultList();

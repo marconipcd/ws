@@ -767,9 +767,23 @@ public class NotasView extends VerticalLayout implements GenericView {
 						        cad.substring(24, 28).toUpperCase()+"."+
 								cad.substring(28, 32).toUpperCase();
 						
-														
-						final String url = "http://172.17.0.13/boletoNovo/gerarNfe.php?url="+boleto.getN_numero_gerencianet()+"&&hash="+pronto;
-						                        //http://172.17.0.13/boletoNovo/gerarNfe.php?url2=https://visualizacao.gerencianet.com.br/emissao/177311_13338_PAMEH7/A4XB-177311-7179-LUALO3
+							
+						String u = boleto.getN_numero_gerencianet();
+//						String url_completa = "";
+//						
+//						if(u.contains("download")){
+//							
+//						
+//			                String u2 = u.replace("https://download.gerencianet.com.br/v1/",
+//			                                                "https://download.gerencianet.com.br/emissao/");
+//
+//			                String[] urls2 = u2.split("/emissao/");
+//			                String[] urls3 = urls2[1].split("/");
+//			                url_completa = urls2[0]+"/emissao/"+urls3[0]+"/A4XB-"+urls3[1];   
+//			              
+//			            }
+						       						        
+						final String url = "http://172.17.0.13/boletoNovo/gerarNfe.php?url="+u+"&&hash="+pronto;
 
 						Window wVideo  = new Window("Imprimir NFe");
 				        wVideo.setResizable(true); 

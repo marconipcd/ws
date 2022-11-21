@@ -244,11 +244,8 @@ public class ContasReceberDAO {
 							}
 						}
 						
-						
-						
-						
-						
-						Query qrr2 = em.createQuery("select rr from RadReply rr where rr.username = :usuario and rr.attribute = 'Framed-Pool' and rr.value = 'BLOQUEADO_TOTAL'", RadReply.class);
+						Query qrr2 = em.createQuery("select rr from RadReply rr where rr.username = :usuario and rr.attribute = 'Framed-Pool' and "
+								+ "rr.value = 'BLOQUEADO_TOTAL'", RadReply.class);
 						qrr2.setParameter("usuario", acesso.getLogin());						
 						if(qrr2.getResultList().size() >0){
 									
@@ -257,7 +254,6 @@ public class ContasReceberDAO {
 								em.remove(rr);
 							}
 						}
-						
 						
 						//Remove planos antigos
 						Query qrr3 = em.createQuery("select rug from RadUserGroup rug where rug.username = :usuario", RadUserGroup.class);
@@ -273,8 +269,6 @@ public class ContasReceberDAO {
 						String groupName = acesso.getPlano().getContrato_acesso().getId().toString()+"_"+acesso.getPlano().getNome();
 						em.persist(new RadUserGroup(null, acesso.getLogin(), groupName, "1"));
 						
-						
-						
 						if(acesso.getEndereco_ip() != null && !acesso.getEndereco_ip().equals("")){
 							em.persist(new RadReply(null, acesso.getLogin(), "Framed-IP-Address", "=", acesso.getEndereco_ip()));
 						}
@@ -287,11 +281,21 @@ public class ContasReceberDAO {
 								acesso.getBase().getSenha() != null && acesso.getBase().getEndereco_ip() != null && 
 								acesso.getBase().getPorta_api() != null && acesso.getLogin() != null &&
 								acesso.getBase().getTipo().equals("mikrotik")){
-							MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
+							MikrotikUtil.desconectarCliente(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), 
+									acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());
 						}
 						
 						if(acesso != null && acesso.getBase().getTipo().equals("huawei")){
 							HuaweiUtil.desconectarCliente(acesso.getLogin());
+						}
+						
+						//
+						if(acesso.getPlano().getPossui_ittv() != null && 
+								acesso.getPlano().getPossui_ittv().equals("SIM") && 
+								acesso.getIttv_id() != null){ 
+							
+							IttvDAO.atualizarStatus(acesso.getIttv_id(), "ACTIVE");
+							
 						}
 						
 						
@@ -594,7 +598,8 @@ public class ContasReceberDAO {
 						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{2}-[0-9]{2}/[0-9]{2}' "+							
 						
 						"or cr.status_2 ='ABERTO' " +
-						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{1,}/[0-9]{2}-[0-9]{2}/[0-9]{2}' ",	
+						"and cr.n_doc REGEXP '^"+codContrato+"/[0-9]{1,}/[0-9]{2}-[0-9]{2}/[0-9]{2}' "
+								+ "ORDER by cr.DATA_VENCIMENTO ASC",	
 												
 						ContasReceber.class);				
 								

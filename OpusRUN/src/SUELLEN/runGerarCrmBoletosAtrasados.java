@@ -33,7 +33,9 @@ public class runGerarCrmBoletosAtrasados {
 			 	Query q2 = em.createQuery("select c from Crm c where c.tipo_rotina LIKE :tipo", Crm.class);
 				q2.setParameter("tipo", "BA45/"+boleto.getId().toString());
 				
-				if(q2.getResultList().size() == 0){		
+				if(q2.getResultList().size() == 0){
+					
+					
 			 
 					Crm crm = new Crm();
 					crm.setEmpresa_id(boleto.getEmpresa_id());

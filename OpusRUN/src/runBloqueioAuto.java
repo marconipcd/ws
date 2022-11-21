@@ -25,28 +25,42 @@ public class runBloqueioAuto {
 	static EntityManager em = emf.createEntityManager();
 	
 	public static void main(String[] args){
+				
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
-		
-		Query q = em.createQuery("select a from AgendamentoBloqueioDesbloqueio a where a.status=:s", AgendamentoBloqueioDesbloqueio.class);
+		Date data = new Date();
+//		try{
+//			data = sdf.parse("25/09/2022");
+//		}catch(Exception e){
+//			
+//		}
+		Query q = em.createQuery("select a from AgendamentoBloqueioDesbloqueio a where a.status=:s and a.data_agendado =:d", AgendamentoBloqueioDesbloqueio.class);
 		q.setParameter("s", "PENDENTE");
+		q.setParameter("d", data);
 		
 		for (AgendamentoBloqueioDesbloqueio a : (List<AgendamentoBloqueioDesbloqueio>)q.getResultList()) {
 			
 			try{				
 			
-					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 					
-					if(sdf.parse(sdf.format(a.getData_agendado())).equals(sdf.parse(sdf.format(new Date())))){
+					//if(sdf.parse(sdf.format(a.getData_agendado())).equals(sdf.parse(sdf.format(new Date())))){
 						
 						if(a.getTipo().equals("BLOQUEIO")){
 							
-							if(podeBloquear(a.getContrato().getId().toString())){
+							boolean podeBloquear =podeBloquear(a.getContrato().getId().toString()); 
+							if(podeBloquear){
 								//bloquear(a.getContrato());
 								bloquearNoRadius(a.getContrato());
 							}
 							
 							em.getTransaction().begin();
 								
+								if(podeBloquear){
+									AcessoCliente contrato = a.getContrato();
+									contrato.setStatus_2("BLOQUEADO");
+									em.merge(contrato);
+								}
+							
 								a.setData_execucao(new Date());
 								a.setStatus("EXECUTADO");
 								em.persist(new AlterarcoesContrato(null, "BLOQUEIO CONTRATO", a.getContrato(), new Usuario(100), new Date()));
@@ -70,7 +84,7 @@ public class runBloqueioAuto {
 							System.out.println("Contrato Desbloqueado");
 						}
 						
-					}
+					//}
 			
 			}catch(Exception e){
 				e.printStackTrace();

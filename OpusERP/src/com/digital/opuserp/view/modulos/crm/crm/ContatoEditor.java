@@ -1326,6 +1326,12 @@ public class ContatoEditor extends Window {
 								if(fieldGroup.getField("crm_assuntos") != null){
 									((ComboBox)fieldGroup.getField("crm_assuntos")).setContainerDataSource(buildContainerAssunto());
 									((ComboBox)fieldGroup.getField("crm_assuntos")).setEnabled(true);
+																
+									Integer setor_selecionado = (Integer)cbSetor.getValue();
+									CrmAssunto assunto = CrmDAO.getAssuntoEmAtendimentoPorSetor(setor_selecionado);
+									if(assunto != null){
+										((ComboBox)fieldGroup.getField("crm_assuntos")).setValue(assunto.getId()); 
+									}
 								}
 							}
 						}
@@ -2206,7 +2212,7 @@ public class ContatoEditor extends Window {
 						
 						addComponent(cbAssunto);					
 						fieldGroup.bind(cbAssunto,"crm_assuntos");
-						cbAssunto.setReadOnly(true);
+						//cbAssunto.setReadOnly(true);
 					}
 				});
 					
@@ -3283,7 +3289,7 @@ public class ContatoEditor extends Window {
 					
 					addComponent(cbAssunto);					
 					fieldGroup.bind(cbAssunto,"crm_assuntos");
-					cbAssunto.setReadOnly(true);
+					//cbAssunto.setReadOnly(true);
 				}
 			});
 				
