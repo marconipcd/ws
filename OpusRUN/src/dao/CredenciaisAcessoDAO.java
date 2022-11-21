@@ -25,6 +25,7 @@ import domain.ControleTitulo;
 import domain.Empresa;
 import domain.PlanoAcesso;
 import domain.RadReply;
+import domain.RadUserGroup;
 
 
 public class CredenciaisAcessoDAO {
@@ -120,7 +121,24 @@ public class CredenciaisAcessoDAO {
 					em.remove(rr); 
 				}
 				
-				em.persist(new RadReply(null, acesso.getLogin(), "Framed-Pool", "=", "BLOQUEADO_TOTAL"));					
+				em.persist(new RadReply(null, acesso.getLogin(), "Framed-Pool", "=", "BLOQUEADO_TOTAL"));			
+				
+				PlanoAcesso planoBloqueio = em.find(PlanoAcesso.class, 48);
+				
+				if(planoBloqueio != null){
+				
+					//Altera o Plano para plano de bloqueio
+					Query q6 = em.createQuery("select r from RadUserGroup r where r.username=:login", RadUserGroup.class);
+					q6.setParameter("login", acesso.getLogin());
+					
+					for (RadUserGroup r : (List<RadUserGroup>)q6.getResultList()) {
+						em.remove(r); 
+					}
+					
+					em.persist(new RadUserGroup(null, acesso.getLogin(), planoBloqueio.getContrato_acesso().getId().toString()+"_"+planoBloqueio.getNome(), "1"));
+				
+				}
+				
 				
 				//Derruba Cliente Caso Esteja Logado
 				//MikrotikUtil.derrubarConexaoHOTSPOT(acesso.getBase().getUsuario(), acesso.getBase().getSenha(), acesso.getBase().getEndereco_ip(), Integer.parseInt(acesso.getBase().getPorta_api()), acesso.getLogin());

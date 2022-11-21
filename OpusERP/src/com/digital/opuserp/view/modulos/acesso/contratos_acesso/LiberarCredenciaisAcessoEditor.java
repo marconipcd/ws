@@ -123,10 +123,14 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 		
 		setWidth("755px");
 		
-		if(item.getItemProperty("regime").getValue().toString().equals("PROPRIO (PARCIAL)") || item.getItemProperty("regime").getValue().toString().equals("COMODATO (TOTAL)") ){
+		if(item.getItemProperty("regime").getValue().toString().equals("PROPRIO (PARCIAL)") || 
+				item.getItemProperty("regime").getValue().toString().equals("COMODATO (TOTAL)") ||
+				item.getItemProperty("regime").getValue().toString().equals("COMODATO")){
 			setHeight("686px");
-		}else{		
-			setHeight("548px");
+		}if(item.getItemProperty("regime").getValue().toString().equals("COMODATO")){
+			setHeight("586px");
+		}else{
+			setHeight("548px");			
 		}
 				
 		setCaption(title);
@@ -385,9 +389,9 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 							EntityItem<Swith> eiCaixa = (EntityItem<Swith>)cbCaixaAtendimento.getItem(cbCaixaAtendimento.getValue());
 							concentrador_selecionado = eiCaixa.getEntity() != null && eiCaixa.getEntity().getConcentrador() != null ? eiCaixa.getEntity().getConcentrador() : null;
 							
-							txtConcentradores.setEnabled(false);
-							txtConcentradores.setValue(concentrador_selecionado.getIdentificacao());
 							txtConcentradores.setEnabled(true);
+							txtConcentradores.setValue(concentrador_selecionado.getIdentificacao());
+							txtConcentradores.setEnabled(false);
 							
 							txtVlan.setValue(vlan);
 							txtVlan.setReadOnly(true);
@@ -625,7 +629,10 @@ public class LiberarCredenciaisAcessoEditor extends Window implements GenericEdi
 		});	
 		
 		if(item.getItemProperty("regime").getValue().toString().equals("PROPRIO (PARCIAL)") || 
-				item.getItemProperty("regime").getValue().toString().equals("COMODATO (TOTAL)")){
+				item.getItemProperty("regime").getValue().toString().equals("COMODATO (TOTAL)") || 
+			item.getItemProperty("regime").getValue().toString().equals("COMODATO")){
+			
+			
 		vlRoot.addComponent(new FormLayout(){					
 			{
 				setStyleName("form-cutom");

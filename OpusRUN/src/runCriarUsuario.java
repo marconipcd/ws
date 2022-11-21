@@ -19,11 +19,11 @@ public class runCriarUsuario {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("OpusBloqueio");
 		EntityManager em = emf.createEntityManager();
 		
-		String usuario_novo = "italo.armando";
-		String senha_usuario_novo = "4517246@A123";
-		String email = "italo.armando@digitalonline.com.br";
+		String usuario_novo = "ezequiel";
+		String senha_usuario_novo = "Ez94575815";
+		String email = "ezequiel@digitalonline.com.br";
 		
-		String usuario_modelo = "priscilla";
+		String usuario_modelo = "raquel";
 		
 		Usuario u = new Usuario();
 		u.setUsername(usuario_novo);

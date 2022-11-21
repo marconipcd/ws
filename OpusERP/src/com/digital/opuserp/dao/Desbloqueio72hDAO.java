@@ -39,36 +39,7 @@ public class Desbloqueio72hDAO {
 //		boolean allow = false;												
 //		
 		EntityManager em = ConnUtil.getEntity();
-//		//Pegar a Data do Ultimo desbloqueio por 72h
-//		Query q1 = em.createQuery("select h from HistoricoDesbloqueio72Horas h where h.contrato_id =:contrato_id order by h.id desc", HistoricoDesbloqueio72Horas.class);
-//		q1.setParameter("contrato_id", codAcesso);
-//		q1.setMaxResults(1);
-//				
-//		HistoricoDesbloqueio72Horas desbloAnt = null;
-//		if(q1.getResultList().size() > 0){
-//			desbloAnt = (HistoricoDesbloqueio72Horas) q1.getResultList().get(0); 
-//		}
-//		
-//		if(desbloAnt == null){
-//			allow = true;
-//		}
-//		
-//		if(desbloAnt != null){
-//			
-//			DateTime data1  = new DateTime(new Date());
-//			DateTime data2 = new DateTime(desbloAnt.getData());
-//			
-//			Integer dias = Days.daysBetween(data2, data1).getDays();
-//																
-//			if(dias >= 30){
-//				allow =  true;
-//			}else{
-//				Notify.Show("Não é possível realizar um desbloqueio por 72h em menos de 30 dias!", Notify.TYPE_WARNING);
-//			}
-//			
-//		}
-//		
-//		if(allow){
+
 try{
 				final AcessoCliente ac = ContratosAcessoDAO.find(codAcesso);
 				ac.setDesbloqueio_tmp(new Date());

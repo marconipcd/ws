@@ -1809,6 +1809,10 @@ public class ContatoView extends VerticalLayout{
 										crm.setData_efetuado(new Date());
 										crm.setOperador_tratamento(OpusERP4UI.getUsuarioLogadoUI().getUsername());
 										
+										if(event.getItem().getItemProperty("crm_assuntos").getValue() != null){
+											crm.setCrm_assuntos((CrmAssunto)event.getItem().getItemProperty("crm_assuntos").getValue());
+										}
+										
 										DateTime dt1 = new DateTime(crm.getData_inicio_tratamento());
 										DateTime dt2 = new DateTime(crm.getData_efetuado());
 										

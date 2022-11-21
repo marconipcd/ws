@@ -1,11 +1,7 @@
 package com.digital.opuserp.view.modulos.acesso.contratos_acesso;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -18,18 +14,14 @@ import com.digital.opuserp.dao.ContasReceberDAO;
 import com.digital.opuserp.dao.CredenciaisAcessoDAO;
 import com.digital.opuserp.domain.AcessoCliente;
 import com.digital.opuserp.domain.Concentrador;
-import com.digital.opuserp.domain.FiltroAcesso;
 import com.digital.opuserp.domain.RadAcct;
 import com.digital.opuserp.domain.RadUserGroupDAO;
 import com.digital.opuserp.util.ConnUtil;
 import com.digital.opuserp.util.HuaweiUtil;
 import com.digital.opuserp.util.MikrotikUtil;
 import com.digital.opuserp.util.Real;
-import com.vaadin.data.Item;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -48,12 +40,13 @@ import com.vaadin.ui.themes.Reindeer;
 
 public class VisualizarContratoInfoTecnica extends Window {
 
-	private Item item;
+	//private Item item;
 	Button btCancelar;
 	Button btAtualizar;
 	Button btDesconectar;
+	Button btTempoReal;
 	VerticalLayout vlRoot;
-	FieldGroup fieldGroup;
+	//FieldGroup fieldGroup;
 	Integer codAcesso;
 	AcessoCliente ac;
 	Concentrador base; 
@@ -75,18 +68,18 @@ public class VisualizarContratoInfoTecnica extends Window {
 	EntityManager em = ConnUtil.getEntity();
 	
 	String[] info = null;
-	
-	public VisualizarContratoInfoTecnica(Item item, String title, boolean modal){
-		this.item = item;
-		
-		
-		if (item.getItemProperty("id").getValue() != null) {
-			codAcesso = (Integer) item.getItemProperty("id").getValue();
-			ac = em.find(AcessoCliente.class,codAcesso);
-			if(item.getItemProperty("base").getValue()!=null){
-				base = (Concentrador) item.getItemProperty("base").getValue();					
+	String vlan;
+	public VisualizarContratoInfoTecnica(Integer cod_acesso,String vlan, String title, boolean modal){
+			
+			if(vlan != null){
+				this.vlan = vlan;
 			}
-		}
+		
+			codAcesso = cod_acesso;
+			ac = em.find(AcessoCliente.class,codAcesso);
+			base = ac.getBase();			
+			
+		
 		
 		setWidth("950px");
 		setHeight("729px");
@@ -324,7 +317,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 						public void buttonClick(ClickEvent event) {
 							
 							boolean check = false;
-							if(item != null && base!=null){
+							if(base!=null){
 								
 								if(base.getTipo().equals("mikrotik")){
 									check = MikrotikUtil.desconectarCliente(base.getUsuario(), base.getSenha(), base.getEndereco_ip(), Integer.parseInt(base.getPorta_api()),ac.getLogin());
@@ -349,12 +342,43 @@ public class VisualizarContratoInfoTecnica extends Window {
 					
 					btDesconectar.setStyleName("atualizar");
 					
+					
+					
+					btTempoReal = new Button("Tempo Real", new Button.ClickListener() {
+						
+						@Override
+						public void buttonClick(ClickEvent event) {
+							
+							String username = ac.getLogin();
+							String url_consumo = "http://172.17.0.71/consumo2/?u="+username;
+							
+							Window w = new Window();
+							w.setWidth("781px");
+							w.setHeight("561px");
+							w.setCaption("Tráfego em tempo real ( "+username+" )");
+							w.center();
+							w.setResizable(false);							
+													
+							final Embedded consumo = new Embedded(null,new ExternalResource(url_consumo));
+					        consumo.setType(Embedded.TYPE_BROWSER);
+					        consumo.setSizeFull();
+					        
+					        w.setContent(consumo);
+							
+							getUI().addWindow(w);	
+						}
+					});	
+					
+					btTempoReal.setStyleName("atualizar");
+					
+					
 					FormLayout flmBt = new FormLayout(){
 						{					
 							setMargin(true);
 							setSpacing(true);	
 							setStyleName("form-cutom");
-							addComponent(btDesconectar);							
+							addComponent(btDesconectar);
+							addComponent(btTempoReal);		
 						}
 					};
 					
@@ -641,7 +665,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 						setSpacing(true);
 						setStyleName("form-cutom");		
 						
-						TextField tfInterface= new TextField("Interface");				
+						TextField tfInterface= new TextField("VLAN");				
 						tfInterface.setWidth("300px");			
 
 						if(regTable!=null && regTable.get("interface") !=null){	
@@ -771,7 +795,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 	String carencia = "";
 	public Table buildLayout(){
 		
-		fieldGroup = new FieldGroup(item);
+		//fieldGroup = new FieldGroup(item);
 
 		
 		VerticalLayout vlInformacoes = new VerticalLayout(){
@@ -784,7 +808,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 						setStyleName("form-cutom");		
 						
 						TextField tfPlanoAtual = new TextField("Plano Atual");				
-						tfPlanoAtual.setWidth("120px");			
+						tfPlanoAtual.setWidth("185px");			
 						if(ac.getPlano().getNome()!=null){
 
 							tfPlanoAtual.setValue(ac.getPlano().getNome());												
@@ -860,72 +884,50 @@ public class VisualizarContratoInfoTecnica extends Window {
 					}
 				});
 				
+
+				
+			
+				
+				
+				addComponent(new FormLayout(){					
+					{
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new");										
+					}
+				});
+				
+				addComponent(new FormLayout(){					
+					{
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new");		
+						
+						TextField tfSwithl= new TextField("CTO");				
+						tfSwithl.setWidth("200px");			
+						if(ac.getSwith()!=null){
+							
+							tfSwithl.setValue(ac.getSwith().getIdentificacao());												
+						}
+						tfSwithl.setReadOnly(true);
+						tfSwithl.setStyleName("caption-align-fornecedores");
+						
+						addComponent(tfSwithl);
+						setExpandRatio(tfSwithl, 2);						
+					}
+				});
+				
 				addComponent(new FormLayout(){					
 					{
 						setMargin(true);
 						setSpacing(true);
 						setStyleName("form-cutom");		
 						
-						TextField txtPacoteAutocen = new TextField("Pacote Autocensura");				
-						txtPacoteAutocen.setWidth("120px");			
-						if(ac!=null){
-							
-							txtPacoteAutocen.setValue(ac.getPlano().getQtd_censura().toString());												
-						}
-						txtPacoteAutocen.setReadOnly(true);
-						txtPacoteAutocen.setStyleName("caption-align-fornecedores");
-						
-						addComponent(txtPacoteAutocen);												
-					}
-				});
-				
-				addComponent(new FormLayout(){					
-					{
-						setMargin(true);
-						setSpacing(true);
-						setStyleName("form-cutom-new");		
-						
-						CredenciaisAcessoDAO caDAO = new CredenciaisAcessoDAO();
-						
-						List<FiltroAcesso>	result = caDAO.buscarFiltrobyCodAcesso(codAcesso);
-						
-						StringBuilder resultFiltro = new StringBuilder();
-						
-						if(result!=null){
-							Integer i= 0;
-							for (FiltroAcesso r: result){
-								if(i == 0){
-									resultFiltro = resultFiltro.append(r.getNome());	
-								}else{
-									resultFiltro = resultFiltro.append(", "+r.getNome());
-								}
-								i++;
-							}
-						}
-						TextField tfCensura= new TextField("Autocensura");				
-						tfCensura.setWidth("650px");
-	
-						tfCensura.setValue(resultFiltro.toString());												
-
-						tfCensura.setReadOnly(true);
-						tfCensura.setStyleName("caption-align-fornecedores");
-						
-						addComponent(tfCensura);
-						setExpandRatio(tfCensura, 2);						
-					}
-				});
-				
-				addComponent(new FormLayout(){					
-					{
-						setMargin(true);
-						setSpacing(true);
-						setStyleName("form-cutom-new");		
-						
 						TextField tfConcentrador= new TextField("Concentrador");				
 						tfConcentrador.setWidth("200px");			
 						if(ac.getBase()!=null){
 							
-							tfConcentrador.setValue(ac.getBase().getIdentificacao());												
+							tfConcentrador.setValue(ac.getSwith().getConcentrador().getIdentificacao());												
 						}
 						tfConcentrador.setReadOnly(true);
 						tfConcentrador.setStyleName("caption-align-fornecedores");
@@ -941,14 +943,30 @@ public class VisualizarContratoInfoTecnica extends Window {
 						setSpacing(true);
 						setStyleName("form-cutom");		
 						
-						TextField tfInterface= new TextField("Interface");				
+						TextField tfInterface= new TextField("VLAN");				
 						tfInterface.setWidth("300px");			
 						if(ac.getInterfaces()!=null){
 							
-							tfInterface.setValue(ac.getInterfaces());												
+							if(vlan != null){
+								if(!vlan.equals(ac.getSwith().getInterfaces())){
+									tfInterface.setValue(ac.getSwith().getInterfaces()+" ( DIVERGENTE )");
+								}else{
+									tfInterface.setValue(ac.getSwith().getInterfaces());
+								}
+							}else{
+								tfInterface.setValue(ac.getSwith().getInterfaces());
+							}
+							
 						}
 						tfInterface.setReadOnly(true);
 						tfInterface.setStyleName("caption-align-fornecedores");
+						
+						if(vlan != null){
+							if(!vlan.equals(ac.getSwith().getInterfaces())){
+								tfInterface.addStyleName("invalid-cpf");
+							}
+						}
+						
 						
 						addComponent(tfInterface);
 						setExpandRatio(tfInterface, 2);						
@@ -960,6 +978,54 @@ public class VisualizarContratoInfoTecnica extends Window {
 						setMargin(true);
 						setSpacing(true);
 						setStyleName("form-cutom");		
+						
+						TextField tfOnu= new TextField("Olt");				
+						tfOnu.setWidth("220px");			
+						if(ac.getMaterial()!=null){
+							
+							tfOnu.setValue(ac.getSwith() != null && ac.getSwith().getOlt() != null ? ac.getSwith().getOlt() : "");												
+						}
+						tfOnu.setReadOnly(true);
+						tfOnu.setStyleName("caption-align-fornecedores");
+						
+						addComponent(tfOnu);
+						setExpandRatio(tfOnu, 2);						
+					}
+				});
+				
+				addComponent(new FormLayout(){					
+					{
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom");		
+						
+						TextField tfOnu= new TextField("Gpon");				
+						tfOnu.setWidth("220px");			
+						if(ac.getMaterial()!=null){
+							
+							tfOnu.setValue(ac.getSwith() != null && ac.getSwith().getPon() != null && ac.getGpon() != null ? ac.getSwith().getPon() +"/"+ ac.getGpon() : "");												
+						}
+						tfOnu.setReadOnly(true);
+						tfOnu.setStyleName("caption-align-fornecedores");
+						
+						addComponent(tfOnu);
+						setExpandRatio(tfOnu, 2);						
+					}
+				});
+				
+				addComponent(new FormLayout(){					
+					{
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new");										
+					}
+				});
+				
+				addComponent(new FormLayout(){					
+					{
+						setMargin(true);
+						setSpacing(true);
+						setStyleName("form-cutom-new");		
 						
 						TextField tfSignal= new TextField("Signal Strength");				
 						tfSignal.setWidth("200px");			
@@ -979,19 +1045,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 					{
 						setMargin(true);
 						setSpacing(true);
-						setStyleName("form-cutom");		
-						
-						TextField tfSwithl= new TextField("Swith");				
-						tfSwithl.setWidth("200px");			
-						if(ac.getSwith()!=null){
-							
-							tfSwithl.setValue(ac.getSwith().getIdentificacao());												
-						}
-						tfSwithl.setReadOnly(true);
-						tfSwithl.setStyleName("caption-align-fornecedores");
-						
-						addComponent(tfSwithl);
-						setExpandRatio(tfSwithl, 2);						
+						setStyleName("form-cutom-new");										
 					}
 				});
 				
@@ -1076,45 +1130,7 @@ public class VisualizarContratoInfoTecnica extends Window {
 					}
 				});
 				
-				addComponent(new FormLayout(){					
-					{
-						setMargin(true);
-						setSpacing(true);
-						setStyleName("form-cutom");		
-						
-						TextField tfOnu= new TextField("Olt");				
-						tfOnu.setWidth("220px");			
-						if(ac.getMaterial()!=null){
-							
-							tfOnu.setValue(ac.getSwith() != null && ac.getSwith().getOlt() != null ? ac.getSwith().getOlt() : "");												
-						}
-						tfOnu.setReadOnly(true);
-						tfOnu.setStyleName("caption-align-fornecedores");
-						
-						addComponent(tfOnu);
-						setExpandRatio(tfOnu, 2);						
-					}
-				});
 				
-				addComponent(new FormLayout(){					
-					{
-						setMargin(true);
-						setSpacing(true);
-						setStyleName("form-cutom");		
-						
-						TextField tfOnu= new TextField("Gpon");				
-						tfOnu.setWidth("220px");			
-						if(ac.getMaterial()!=null){
-							
-							tfOnu.setValue(ac.getSwith() != null && ac.getSwith().getPon() != null && ac.getGpon() != null ? ac.getSwith().getPon() +"/"+ ac.getGpon() : "");												
-						}
-						tfOnu.setReadOnly(true);
-						tfOnu.setStyleName("caption-align-fornecedores");
-						
-						addComponent(tfOnu);
-						setExpandRatio(tfOnu, 2);						
-					}
-				});
 			}				
 		};
 		

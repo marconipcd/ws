@@ -6163,6 +6163,24 @@ body .dashboard.v-app .v-app-loading {
 	text-align: center;
 }
 
+.dashboard .v-window-GenericDialogRed {
+	padding: 5px;
+	Width: 290px;
+	Height: 380px;
+	border-radius: 3px;
+}
+
+.dashboard .v-verticallayout-GenericDialogRed {
+	padding-top: 10px;
+	padding-left: 5px;
+}
+
+.dashboard .v-label-GenericDialogRed {
+	text-align: center;
+	color:red;
+}
+
+
 .dashboard .vermelho {
 	color: #FF0000;
 	dispay: block;
@@ -9228,6 +9246,9 @@ div.v-table-tb-fonte-menor .v-table-body .v-table-body-noselection .v-table-tabl
 	
 }
 
+.dashboard .dashboard-view .v-horizontallayout-no-padding{
+	padding:0;
+}
 
 
 

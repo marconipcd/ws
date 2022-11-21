@@ -137,7 +137,7 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 		////1366x768
 		//if(OpusERP4UI.browser.getScreenWidth() >= 1024 && OpusERP4UI.browser.getScreenHeight() >= 768){
 				setWidth("723px");
-				setHeight("501px");
+				setHeight("531px");
 		//}
 	}
 	
@@ -218,7 +218,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 					fieldGroup.bind(cbConcentrador, "concentrador");
 				}
 		});
-		
 		vlRoot.addComponent(new FormLayout(){					
 			{					
 				setMargin(true);
@@ -235,9 +234,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				fieldGroup.bind(txtVlan, "interfaces");
 			}
 		});
-
-		
-		
 		vlRoot.addComponent(new FormLayout(){					
 				{
 					
@@ -353,8 +349,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 					setExpandRatio(tfCod, 2);		
 				}
 			});
-		
-		
 		vlRoot.addComponent(new FormLayout(){
 			{
 				setMargin(true);
@@ -379,12 +373,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				
 			}
 		});	
-		
-		
-		
-		
-				
-		
 		vlRoot.addComponent(new FormLayout(){
 			{
 				setMargin(true);
@@ -403,7 +391,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				
 			}
 		});
-		
 		vlRoot.addComponent(new FormLayout(){
 			{
 				setMargin(true);
@@ -433,8 +420,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				
 			}
 		});
-		
-				
 		vlRoot.addComponent(new HorizontalLayout(){
 			{
 				//setWidth("100%");
@@ -619,7 +604,6 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				addComponent(txtIpMonitoramento);				
 			}
 		});
-		
 		vlRoot.addComponent(	new FormLayout(){
 			{
 			
@@ -638,6 +622,27 @@ public class CaixaAtendimentoEditor extends Window implements GenericEditor {
 				
 				addComponent(cbSituacao);
 				fieldGroup.bind(cbSituacao, "situacao");
+						
+			}
+		});
+		
+		vlRoot.addComponent(	new FormLayout(){
+			{
+			
+				setStyleName("form-cutom");
+				setMargin(true);
+				setSpacing(true);
+				
+				ComboBox cbStatus = new ComboBox("Status");
+				cbStatus.setRequired(true); 
+				cbStatus.addItem("ATIVO");
+				cbStatus.addItem("INATIVO");				
+				cbStatus.setNullSelectionAllowed(false);
+				cbStatus.setStyleName("caption-align-concentrador");
+				cbStatus.setTextInputAllowed(false);
+				
+				addComponent(cbStatus);
+				fieldGroup.bind(cbStatus, "status");
 						
 			}
 		});

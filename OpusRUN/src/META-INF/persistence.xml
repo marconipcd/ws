@@ -61,6 +61,9 @@
 		<class>domain.NotificacoesGerencianet</class>
 		<class>domain.RadGroupReply</class>
 		<class>domain.RadAcct</class>
+		<class>domain.TopDesconectados</class>
+		<class>domain.ServicoPlano</class>
+		<class>domain.TokenClientes</class>
 		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

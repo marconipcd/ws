@@ -54,6 +54,7 @@ import com.digital.opuserp.util.GenericDialog;
 import com.digital.opuserp.util.GenericDialog.DialogEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarConcentradorAcessoView.AlterarConcentradorAcessoEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarCredenciaisAcessoView.AlterarCredenciaisAcessoEvent;
+import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarCtoView.AlterarCtoEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarEnderecoEditor.AlterarEnderecoEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarFiadorEditor.MudarFiadorEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.AlterarIpFixoEditor.AlterarIpFixoEvent;
@@ -67,6 +68,7 @@ import com.digital.opuserp.view.modulos.acesso.contratos_acesso.EditarRegimeProp
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.LiberarBoletosContratoEditor.LiberarBoletosEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.LiberarCartaoClienteEditor.LiberarCartaoClienteEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.LiberarCredenciaisAcessoEditor.LiberarCredenciaisAcessoEvent;
+import com.digital.opuserp.view.modulos.acesso.contratos_acesso.MigrarRadio.MigrarRadioEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.MudancaPlanoEditor.RenovarPlanoAcessoEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.MudancaVencimentoEditor.MudancaVencimentoEvent;
 import com.digital.opuserp.view.modulos.acesso.contratos_acesso.MudarTitularidadeEditor.MudarTitularidadeEvent;
@@ -382,6 +384,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					winSubMenuVisualizar.close();
 	             else {
 	            	 
+	            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
+	            	 
 	            	 if(winSubMenuNovo != null && winSubMenuNovo.getUI() != null){
 	            		 winSubMenuNovo.close();
 	            	 }
@@ -505,6 +511,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					winSubMenuEncerrar.close();
              else {
             	 
+            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+            		 winSubMenuConectados.close();
+            	 }	
+            	 
             	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
             		 winSubMenuLiberar.close();
             	 }
@@ -564,6 +574,10 @@ public class ContratoAcessoView extends VerticalLayout {
 				     	winSubMenuMudanca.close();
 	             else {
 	            	 
+	            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
+	            	 
 	            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 	            		 winSubMenuLiberar.close();
 	            	 }
@@ -619,7 +633,11 @@ public class ContratoAcessoView extends VerticalLayout {
 				
 				if (winSubMenuImprimir != null && winSubMenuImprimir.getUI() != null)
 					winSubMenuImprimir.close();
-				else {												
+				else {			
+					
+					 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
 					
 					if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 						winSubMenuLiberar.close();
@@ -680,6 +698,10 @@ public class ContratoAcessoView extends VerticalLayout {
 				if (winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null)
 					winSubMenuLiberar.close();
 	             else {
+	            	 
+	            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
 	            	 
 	            	 if(winSubMenuNovo != null && winSubMenuNovo.getUI() != null){
 	            		 winSubMenuNovo.close();
@@ -777,11 +799,15 @@ public class ContratoAcessoView extends VerticalLayout {
 		container = JPAContainerFactory.makeBatchable(AcessoCliente.class, ConnUtil.getEntity());		
 		container.setAutoCommit(false);
 		container.addNestedContainerProperty("cliente.nome_razao");
+		container.addNestedContainerProperty("cliente.credito_cliente");
 		container.addNestedContainerProperty("cliente.id");
 		container.addNestedContainerProperty("plano.nome");
-		container.addNestedContainerProperty("base.identificacao");
+		container.addNestedContainerProperty("swith.concentrador.identificacao");
 		container.addNestedContainerProperty("swith.identificacao");
+		container.addNestedContainerProperty("swith.interfaces");
+		container.addNestedContainerProperty("swith.concentrador");
 		container.addNestedContainerProperty("swith.olt");
+		
 		container.addNestedContainerProperty("material.nome");
 		container.addNestedContainerProperty("onu.nome");
 		container.addNestedContainerProperty("contrato.nome");
@@ -873,6 +899,8 @@ public class ContratoAcessoView extends VerticalLayout {
 		tb.setColumnCollapsingAllowed(true);
 		tb.setImmediate(true);
 		
+		tb.setColumnCollapsed("cliente.credito_cliente", true);
+		
 		
 		if(!atualizarColumns){
 			tb.setColumnCollapsed("regime", true);
@@ -894,6 +922,7 @@ public class ContratoAcessoView extends VerticalLayout {
 			tb.setColumnCollapsed("carencia", true);
 			tb.setColumnCollapsed("data_instalacao", true);
 			tb.setColumnCollapsed("swith.identificacao", true);
+			
 			tb.setColumnCollapsed("sinal_db", true);
 			tb.setColumnCollapsed("interfaces", true);
 			tb.setColumnCollapsed("signal_strength", true);
@@ -915,9 +944,10 @@ public class ContratoAcessoView extends VerticalLayout {
 		tb.setColumnHeader("id", "Nº");
 		tb.setColumnHeader("codigo_cartao", "Código cartão");
 		tb.setColumnHeader("cliente.nome_razao", "Cliente*");
+		tb.setColumnHeader("cliente.credito_cliente", "Spc/Serasa");		
 		tb.setColumnHeader("plano.nome", "Plano*");
-		tb.setColumnHeader("base.identificacao", "Concentrador*");
-		tb.setColumnHeader("interfaces", "Interfaces");
+		tb.setColumnHeader("swith.concentrador.identificacao", "Concentrador*");
+		tb.setColumnHeader("swith.interfaces", "Vlan");
 		tb.setColumnHeader("signal_strength", "Signal Strength");
 		tb.setColumnHeader("sinal_db", "Sinal DB");
 		tb.setColumnHeader("swith.identificacao","Caixa Atendimento*");
@@ -1047,8 +1077,8 @@ public class ContratoAcessoView extends VerticalLayout {
 		
 				   
 		tb.setVisibleColumns(new Object[] {
-				"id","Up","codigo_cartao","cliente.nome_razao","plano.nome","contrato.nome","regime","Carência","data_venc_contrato",
-				"base.identificacao","interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
+				"id","Up","codigo_cartao","cliente.nome_razao","cliente.credito_cliente","plano.nome","contrato.nome","regime","Carência","data_venc_contrato",
+				"swith.concentrador.identificacao","swith.interfaces","onu.nome","onu_serial","swith.identificacao","swith.olt","gpon","sinal_db","signal_strength",
 				"material.nome","login","senha","endereco_ip","endereco_mac","status_2","data_instalacao","tem_pendencia","data_alteracao_plano","vendedor"});
 		
 		tb.setImmediate(true);
@@ -1315,9 +1345,28 @@ public class ContratoAcessoView extends VerticalLayout {
 				for(Object c:collums){		 			
 					if(!tb.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == Integer.class){					   	
 						filtros.add(new Like(c.toString(), "%"+cod+"%", false));
-					}			
+					}		
 					
-					if(!c.equals("Up") && !c.equals("material.nome") && !c.equals("Dias") && !c.equals("Carência") && !tb.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == String.class){					   	
+					
+//					container.addNestedContainerProperty("swith.concentrador.identificacao");
+//					container.addNestedContainerProperty("swith.identificacao");
+//					container.addNestedContainerProperty("swith.interfaces");
+//					container.addNestedContainerProperty("swith.concentrador");
+//					container.addNestedContainerProperty("swith.olt");
+					
+					if(!c.equals("Up") &&
+							
+							
+							!c.equals("swith.interfaces") &&
+							!c.equals("swith.concentrador") &&
+							
+							!c.equals("material.nome") && 
+							!c.equals("Dias") && 
+							!c.equals("Carência") && 
+							!tb.isColumnCollapsed(c.toString()) && 
+							container.getType(c.toString()) == String.class){	
+						
+						
 						filtros.add(new Like(c.toString(), "%"+s+"%", false));
 					}	
 				}
@@ -1326,7 +1375,18 @@ public class ContratoAcessoView extends VerticalLayout {
 					
 					for(Object c:collums){					
 											
-								if(!c.equals("Up") && !c.equals("material.nome") && !c.equals("Dias") && !c.equals("Carência") && !tb.isColumnCollapsed(c.toString()) && container.getType(c.toString()) == String.class){					   	
+								if(!c.equals("Up") && 
+										
+										
+										!c.equals("swith.interfaces") &&
+										!c.equals("swith.concentrador") &&
+										
+										!c.equals("material.nome") && 
+										!c.equals("material.nome") && 
+										!c.equals("Dias") && 
+										!c.equals("Carência") && 
+										!tb.isColumnCollapsed(c.toString()) && 
+										container.getType(c.toString()) == String.class){					   	
 									filtros.add(new Like(c.toString(), "%"+s+"%", false));			
 								}
 						}
@@ -1353,11 +1413,52 @@ public class ContratoAcessoView extends VerticalLayout {
 			
 			@Override
 			public void buttonClick(ClickEvent event) {
-				ClientesConectadosView clientesConectadosview = new ClientesConectadosView();
-				clientesConectadosview.center();
-				clientesConectadosview.setModal(true); 
 				
-				getUI().addWindow(clientesConectadosview);
+				if (winSubMenuConectados != null && winSubMenuConectados.getUI() != null)
+					winSubMenuConectados.close();
+	             else {
+	            	 
+	            	 if(winSubMenuNovo != null && winSubMenuNovo.getUI() != null){
+	            		 winSubMenuNovo.close();
+	            	 }
+	            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
+	            		 winSubMenuLiberar.close();
+	            	 }	            	 
+	            	 if(winSubMenuHistorico != null && winSubMenuHistorico.getUI() != null){
+	            		 winSubMenuHistorico.close();
+	            	 }	            	 
+	            	 if(winSubMenuMudanca != null && winSubMenuMudanca.getUI() != null){
+	            		 winSubMenuMudanca.close();
+	            	 }	            	 
+	            	 if(winSubMenuImprimir != null && winSubMenuImprimir.getUI() != null){
+	            		 winSubMenuImprimir.close();
+	            	 }	            	 
+	            	 if(winSubMenuBloqueioDesbloqueio != null && winSubMenuBloqueioDesbloqueio.getUI() != null){
+							winSubMenuBloqueioDesbloqueio.close();
+					 }
+	            	 if(winSubMenuFuncoesAdministrativas != null && winSubMenuFuncoesAdministrativas.getUI() != null){
+	            		 winSubMenuFuncoesAdministrativas.close();
+					 }
+	            	 
+	            	 if(winSubMenuEncerrar!= null && winSubMenuEncerrar.getUI() != null){
+	            		 winSubMenuEncerrar.close();
+					 }
+
+	            	             	 
+				     buildSubMenuConectados(event);
+				     
+					 getUI().addWindow(winSubMenuConectados);
+					 winSubMenuConectados.focus();
+	                 ((CssLayout) getUI().getContent()).addLayoutClickListener(new LayoutClickListener() {
+	                             
+	               			@Override
+	                        public void layoutClick(LayoutClickEvent event) {
+	               				winSubMenuConectados.close();
+	                            ((CssLayout) getUI().getContent()).removeLayoutClickListener(this);
+	                        }
+	                 });
+	             }
+
 			}
 		});
 		
@@ -1377,6 +1478,10 @@ public class ContratoAcessoView extends VerticalLayout {
 							 if (winSubMenuBloqueioDesbloqueio != null && winSubMenuBloqueioDesbloqueio.getUI() != null)
 								 winSubMenuBloqueioDesbloqueio.close();
 				             else {
+				            	 
+				            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+				            		 winSubMenuConectados.close();
+				            	 }	
 				            	 
 				            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 				            		 winSubMenuLiberar.close();
@@ -1489,6 +1594,10 @@ public class ContratoAcessoView extends VerticalLayout {
 					 winSubMenuLogs.close();
 	             else {
 	            	 
+	            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
+	            	 
 	            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 	            		 winSubMenuLiberar.close();
 	            	 }
@@ -1596,6 +1705,10 @@ public class ContratoAcessoView extends VerticalLayout {
 				 if (winSubMenuNovo != null && winSubMenuNovo.getUI() != null)
 					 winSubMenuNovo.close();
 	             else {
+	            	 
+	            	 if(winSubMenuConectados != null && winSubMenuConectados.getUI() != null){
+	            		 winSubMenuConectados.close();
+	            	 }	
 	            	 
 	            	 if(winSubMenuLiberar != null && winSubMenuLiberar.getUI() != null){
 	            		 winSubMenuLiberar.close();
@@ -1793,7 +1906,8 @@ public class ContratoAcessoView extends VerticalLayout {
 				{
 					if (tb.getValue() != null){		
 						item = tb.getItem(tb.getValue());
-						VisualizarContratoInfoTecnica visualizar = new VisualizarContratoInfoTecnica(item,"Visualizar Contrato", true);
+						Integer cod_acesso = Integer.parseInt(tb.getItem(tb.getValue()).getItemProperty("id").getValue().toString());
+						VisualizarContratoInfoTecnica visualizar = new VisualizarContratoInfoTecnica(cod_acesso,null,"Visualizar Contrato", true);
 						visualizar.setResizable(true);
 						
 						
@@ -2129,7 +2243,7 @@ public class ContratoAcessoView extends VerticalLayout {
 										txtEmail.setWidth("280px");
 										txtEmail.setStyleName("caption-align-ittv");
 										txtEmail.setValue(contrato.getCliente().getEmail().toLowerCase());
-										txtEmail.setReadOnly(true); 
+										//txtEmail.setReadOnly(true); 
 
 										addComponent(txtEmail);
 									}
@@ -2498,7 +2612,58 @@ public class ContratoAcessoView extends VerticalLayout {
     }	
 	
 	Window winSubMenuNovo;
+	Window winSubMenuConectados;
 	Window wNovoPreContrato;
+	
+	private void buildSubMenuConectados(ClickEvent event) {
+		winSubMenuConectados = new Window("Escolha uma das Opções:");
+        VerticalLayout l = new VerticalLayout();
+        //l.setMargin(true);
+        //l.setSpacing(true);
+        winSubMenuConectados.setContent(l);
+        winSubMenuConectados.setWidth("300px");
+        winSubMenuConectados.addStyleName("notifications");
+        winSubMenuConectados.setClosable(false);
+        winSubMenuConectados.setResizable(false);
+        winSubMenuConectados.setDraggable(false);
+        winSubMenuConectados.setPositionX(event.getClientX() - event.getRelativeX());
+        winSubMenuConectados.setPositionY(event.getClientY() - event.getRelativeY());
+        winSubMenuConectados.setCloseShortcut(KeyCode.ESCAPE, null);
+        
+        Button bt1 = new Button("Mikrotik", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				ClientesConectadosView clientesConectadosview = new ClientesConectadosView();
+				clientesConectadosview.center();
+				clientesConectadosview.setModal(true); 
+				
+				getUI().addWindow(clientesConectadosview);
+			}
+			
+		});     
+        bt1.setPrimaryStyleName("btSubMenu");
+        
+        Button bt2 = new Button("Huawei", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				ClientesConectadosView2 cl = new ClientesConectadosView2(false,true);
+				cl.center();
+				cl.setModal(false);
+				
+				getUI().addWindow(cl);
+			}
+			
+		});     
+        bt2.setPrimaryStyleName("btSubMenu");
+        
+     
+        l.addComponent(bt1);
+        l.addComponent(bt2);
+            
+    }
+	
 	
 	private void buildSubMenu(ClickEvent event) {
 		winSubMenuNovo = new Window("Escolha uma das Opções:");
@@ -3140,75 +3305,272 @@ public class ContratoAcessoView extends VerticalLayout {
 			}
 		});
         btAlterarCredenciais.setPrimaryStyleName("btSubMenu");
-        
+             
         Button btAltConcentrador = new Button("Alterar Concentrador", new Button.ClickListener() {
-			
-			@Override
-			public void buttonClick(ClickEvent event) {
-				
-				closeAllWindows();
-				if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Alterar Concentrador"))				
-				{
-					
-					if(tb.getValue() != null){
-						
-						Object value = tb.getValue();
-						btAtualizar.click();
-						item = tb.getItem(value);	
-						
-						EntityItem<AcessoCliente> entityItem =(EntityItem<AcessoCliente>)item;					
-						final AcessoCliente ac = ContratosAcessoDAO.find(entityItem.getEntity().getId());
-						final BeanItem<AcessoCliente> beanItem = new BeanItem<AcessoCliente>(entityItem.getEntity());
-
-						if(ac.getStatus_2().equals("PENDENTE_INSTALACAO")){							
-							Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);	
-						}else if(ac.getEndereco_ip() != null && !ac.getEndereco_ip().equals("") && !ac.getEndereco_ip().isEmpty()){
-							Notify.Show("Não é possivel alterar o concentrador antes de remover o ip fixo!", Notify.TYPE_ERROR);
-						}else{
-							janelaAtiva = true;
-							final AlterarConcentradorAcessoView acaEditor = new AlterarConcentradorAcessoView(beanItem, "Alterar Concentrador", true);
-														
-							acaEditor.addListerner(new AlterarConcentradorAcessoView.AlterarConcentradorAcessoListerner() {
-								
-								@Override
-								public void onClose(AlterarConcentradorAcessoEvent event) {
-									if(event.isConfirm()){
-										boolean check = AcessoDAO.alterarConcentrador(beanItem.getBean(), ac);				
-										
-										if(check){
-											acaEditor.close();
-											refresh();
-											Notify.Show("Concentrador alterado com sucesso", Notify.TYPE_SUCCESS);					
-										}
-									}else{
-										acaEditor.close();
-										Notify.Show("alteraçao de concentrador cancelada", Notify.TYPE_NOTICE);		
-									}
-								}
-							});
-							
-							acaEditor.addCloseListener(new Window.CloseListener() {
-								
-								@Override
-								public void windowClose(CloseEvent e) {
-									tb.focus();
-									janelaAtiva = false;
-								}
-							});
-							
-							getUI().addWindow(acaEditor);
-					
-						}
-					}
-				
-				
-				}else{
-					Notify.Show("Você não Possui Permissão para Editar Concentrador de Acesso", Notify.TYPE_ERROR);
-				}
-			}
-		});
+        	
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		
+        		closeAllWindows();
+        		if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Alterar Concentrador"))				
+        		{
+        			
+        			if(tb.getValue() != null){
+        				
+        				Object value = tb.getValue();
+        				btAtualizar.click();
+        				item = tb.getItem(value);	
+        				
+        				EntityItem<AcessoCliente> entityItem =(EntityItem<AcessoCliente>)item;					
+        				final AcessoCliente ac = ContratosAcessoDAO.find(entityItem.getEntity().getId());
+        				final BeanItem<AcessoCliente> beanItem = new BeanItem<AcessoCliente>(entityItem.getEntity());
+        				
+        				if(ac.getStatus_2().equals("PENDENTE_INSTALACAO")){							
+        					Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);	
+        				}else if(ac.getEndereco_ip() != null && !ac.getEndereco_ip().equals("") && !ac.getEndereco_ip().isEmpty()){
+        					Notify.Show("Não é possivel alterar o concentrador antes de remover o ip fixo!", Notify.TYPE_ERROR);
+        				}else{
+        					janelaAtiva = true;
+        					final AlterarConcentradorAcessoView acaEditor = new AlterarConcentradorAcessoView(beanItem, "Alterar Concentrador", true);
+        					
+        					acaEditor.addListerner(new AlterarConcentradorAcessoView.AlterarConcentradorAcessoListerner() {
+        						
+        						@Override
+        						public void onClose(AlterarConcentradorAcessoEvent event) {
+        							if(event.isConfirm()){
+        								boolean check = AcessoDAO.alterarConcentrador(beanItem.getBean(), ac);				
+        								
+        								if(check){
+        									acaEditor.close();
+        									refresh();
+        									Notify.Show("Concentrador alterado com sucesso", Notify.TYPE_SUCCESS);					
+        								}
+        							}else{
+        								acaEditor.close();
+        								Notify.Show("alteraçao de concentrador cancelada", Notify.TYPE_NOTICE);		
+        							}
+        						}
+        					});
+        					
+        					acaEditor.addCloseListener(new Window.CloseListener() {
+        						
+        						@Override
+        						public void windowClose(CloseEvent e) {
+        							tb.focus();
+        							janelaAtiva = false;
+        						}
+        					});
+        					
+        					getUI().addWindow(acaEditor);
+        					
+        				}
+        			}
+        			
+        			
+        		}else{
+        			Notify.Show("Você não Possui Permissão para Editar Concentrador de Acesso", Notify.TYPE_ERROR);
+        		}
+        	}
+        });
         btAltConcentrador.setPrimaryStyleName("btSubMenu");
         
+        Button btAltCto = new Button("Alterar Cto", new Button.ClickListener() {
+        	
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		
+        		closeAllWindows();
+        		if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
+        				OpusERP4UI.getUsuarioLogadoUI().getId(), "Alterar Concentrador"))				
+        		{
+        			
+        			if(tb.getValue() != null){
+        				
+        				Object value = tb.getValue();
+        				btAtualizar.click();
+        				item = tb.getItem(value);	
+        				
+        				EntityItem<AcessoCliente> entityItem =(EntityItem<AcessoCliente>)item;					
+        				final AcessoCliente ac = ContratosAcessoDAO.find(entityItem.getEntity().getId());
+        				final BeanItem<AcessoCliente> beanItem = new BeanItem<AcessoCliente>(entityItem.getEntity());
+        				
+        				if(ac.getStatus_2().equals("PENDENTE_INSTALACAO")){							
+        					Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);	
+        				}else if(ac.getEndereco_ip() != null && !ac.getEndereco_ip().equals("") && !ac.getEndereco_ip().isEmpty()){
+        					Notify.Show("Não é possivel alterar o concentrador antes de remover o ip fixo!", Notify.TYPE_ERROR);
+        				}else{
+        					janelaAtiva = true;
+        					final AlterarCtoView acaEditor = new AlterarCtoView(beanItem, "Alterar Cto", true);
+        					
+        					acaEditor.addListerner(new AlterarCtoView.AlterarCtoListerner() {
+        						
+        						@Override
+								public void onClose(AlterarCtoEvent event) {
+									if(event.isConfirm()){
+										
+										boolean check = AcessoDAO.alterarConcentrador(beanItem.getBean(), ac);			
+										
+										refresh();
+										Notify.Show("CTO alterada com sucesso", Notify.TYPE_SUCCESS);	
+									}
+								}
+        					});
+        				
+        					getUI().addWindow(acaEditor);
+        					
+        				}
+        			}
+        			
+        			
+        		}else{
+        			Notify.Show("Você não Possui Permissão para Editar Concentrador de Acesso", Notify.TYPE_ERROR);
+        		}
+        	}
+        });
+        btAltCto.setPrimaryStyleName("btSubMenu");
+        
+        Button btMigrarParaRadio = new Button("Migrar para radio", new Button.ClickListener() {
+        	
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		
+        		       		
+        		
+        		closeAllWindows();
+        		if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), OpusERP4UI.getUsuarioLogadoUI().getId(), "Alterar Concentrador"))				
+        		{
+        			
+        			if(tb.getValue() != null){
+        				
+        				Object value = tb.getValue();
+        				btAtualizar.click();
+        				item = tb.getItem(value);	
+        				
+        				EntityItem<AcessoCliente> entityItem =(EntityItem<AcessoCliente>)item;					
+        				final AcessoCliente ac = ContratosAcessoDAO.find(entityItem.getEntity().getId());
+        				final BeanItem<AcessoCliente> beanItem = new BeanItem<AcessoCliente>(entityItem.getEntity());
+        				
+        				if(ac.getStatus_2().equals("PENDENTE_INSTALACAO")){							
+        					Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);	
+        				}else if(ac.getEndereco_ip() != null && !ac.getEndereco_ip().equals("") && !ac.getEndereco_ip().isEmpty()){
+        					Notify.Show("Não é possivel alterar o concentrador antes de remover o ip fixo!", Notify.TYPE_ERROR);
+        				}else{
+        					janelaAtiva = true;
+        					final MigrarRadio acaEditor = new MigrarRadio(beanItem, "Alterar Concentrador", true);
+        					
+        					acaEditor.addListerner(new MigrarRadio.MigrarRadioListerner() {
+        						
+        						@Override
+        						public void onClose(MigrarRadioEvent event) {
+//        							if(event.isConfirm()){
+//        								boolean check = AcessoDAO.alterarConcentrador(beanItem.getBean(), ac);				
+//        								
+//        								if(check){
+//        									acaEditor.close();
+//        									refresh();
+//        									Notify.Show("Concentrador alterado com sucesso", Notify.TYPE_SUCCESS);					
+//        								}
+//        							}else{
+//        								acaEditor.close();
+//        								Notify.Show("alteraçao de concentrador cancelada", Notify.TYPE_NOTICE);		
+//        							}
+        						}
+        					});
+        					
+        					acaEditor.addCloseListener(new Window.CloseListener() {
+        						
+        						@Override
+        						public void windowClose(CloseEvent e) {
+        							tb.focus();
+        							janelaAtiva = false;
+        						}
+        					});
+        					
+        					getUI().addWindow(acaEditor);
+        					
+        				}
+        			}
+        			
+        			
+        		}else{
+        			Notify.Show("Você não Possui Permissão para Editar Concentrador de Acesso", Notify.TYPE_ERROR);
+        		}
+        		
+        	}
+        });
+        btMigrarParaRadio.setPrimaryStyleName("btSubMenu");
+        
+        Button btMigrarParaFibra = new Button("Migrar para fibra", new Button.ClickListener() {
+        	
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		
+        		closeAllWindows();
+        		if(gmDAO.checkPermissaoEmpresaSubModuloUsuario(codSubModulo, OpusERP4UI.getEmpresa().getId(), 
+        				OpusERP4UI.getUsuarioLogadoUI().getId(), "Alterar Concentrador"))				
+        		{
+        			
+        			if(tb.getValue() != null){
+        				
+        				Object value = tb.getValue();
+        				btAtualizar.click();
+        				item = tb.getItem(value);	
+        				
+        				EntityItem<AcessoCliente> entityItem =(EntityItem<AcessoCliente>)item;					
+        				final AcessoCliente ac = ContratosAcessoDAO.find(entityItem.getEntity().getId());
+        				final BeanItem<AcessoCliente> beanItem = new BeanItem<AcessoCliente>(entityItem.getEntity());
+        				
+        				if(ac.getStatus_2().equals("PENDENTE_INSTALACAO")){							
+        					Notify.Show("Cliente Possui Instalação Pendente!", Notify.TYPE_ERROR);	
+        				}else if(ac.getEndereco_ip() != null && !ac.getEndereco_ip().equals("") && !ac.getEndereco_ip().isEmpty()){
+        					Notify.Show("Não é possivel alterar o concentrador antes de remover o ip fixo!", Notify.TYPE_ERROR);
+        				}else{
+        					janelaAtiva = true;
+        					final AlterarCtoView acaEditor = new AlterarCtoView(beanItem, "Alterar Cto", true);
+        					
+        					acaEditor.addListerner(new AlterarCtoView.AlterarCtoListerner() {
+        						
+        						@Override
+        						public void onClose(AlterarCtoEvent event) {
+        							if(event.isConfirm()){
+        								boolean check = AcessoDAO.alterarConcentrador(beanItem.getBean(), ac);				
+        								
+        								if(check){
+        									acaEditor.close();
+        									refresh();
+        									Notify.Show("Concentrador alterado com sucesso", Notify.TYPE_SUCCESS);					
+        								}
+        							}else{
+        								acaEditor.close();
+        								Notify.Show("alteraçao de concentrador cancelada", Notify.TYPE_NOTICE);		
+        							}
+        						}
+        					});
+        					
+        					acaEditor.addCloseListener(new Window.CloseListener() {
+        						
+        						@Override
+        						public void windowClose(CloseEvent e) {
+        							tb.focus();
+        							janelaAtiva = false;
+        						}
+        					});
+        					
+        					
+        					
+        					getUI().addWindow(acaEditor);
+        					
+        				}
+        			}
+        			
+        			
+        		}else{
+        			Notify.Show("Você não Possui Permissão para Editar Concentrador de Acesso", Notify.TYPE_ERROR);
+        		}
+        	}
+        });
+        btMigrarParaFibra.setPrimaryStyleName("btSubMenu");
+         
         Button btAlterarTitularidade = new Button("Alterar Titularidade", new Button.ClickListener() {
 			
 			@Override
@@ -4271,7 +4633,27 @@ public class ContratoAcessoView extends VerticalLayout {
         
         l.addComponent(btAlterarPlano);
         l.addComponent(btAlterarCredenciais);
-        l.addComponent(btAltConcentrador);
+        
+        
+        if( tb.getValue() != null){
+        	
+        	EntityItem<AcessoCliente> eiAcesso = (EntityItem<AcessoCliente>)tb.getItem(tb.getValue());
+        	Swith s = eiAcesso.getEntity().getSwith();
+        	if(s.getIdentificacao().contains("CTO-NENHUMA")){
+        		//RADIO
+        		l.addComponent(btAltConcentrador);
+        		l.addComponent(btMigrarParaFibra);
+        	}else{
+        		//FIBRA
+        		l.addComponent(btAltCto);
+        		l.addComponent(btMigrarParaRadio);
+        	}
+        	
+        }
+        
+        
+        
+        
         l.addComponent(btAlterarIpFixo);
         l.addComponent(btAlterarMaterial);
         l.addComponent(btRemoverMaterial); 
@@ -4644,11 +5026,22 @@ public class ContratoAcessoView extends VerticalLayout {
 		});
         bt5.setPrimaryStyleName("btSubMenu");
         
+        Button bt6 = new Button("Consumo", new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				ConsumoView consumo = new ConsumoView(true, true, "2299");				
+				getUI().addWindow(consumo); 
+			}
+		});
+        bt6.setPrimaryStyleName("btSubMenu");
+        
         l.addComponent(bt1);
         l.addComponent(bt2);
         l.addComponent(bt4);
         l.addComponent(bt3);
-        l.addComponent(bt5); 
+        l.addComponent(bt5);
+        l.addComponent(bt6); 
        
     }
 	

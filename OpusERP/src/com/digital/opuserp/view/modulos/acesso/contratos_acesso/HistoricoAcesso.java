@@ -54,7 +54,7 @@ public class HistoricoAcesso extends Window {
 	
 	public HistoricoAcesso(boolean modal, boolean center, String username, Item item){
 		
-		super("Histórico de Acesso");
+		super("Histórico de Acesso ( "+username+" )");
 		
 		this.username = username;
 		this.item = item;
@@ -113,7 +113,7 @@ public class HistoricoAcesso extends Window {
 		container = JPAContainerFactory.make(RadAcct.class, ConnUtil.getEntity());
 		container.addContainerFilter(Filters.eq("username", username));
 		container.sort(new String[]{"radacctid"}, new boolean[]{false});
-		container.applyFilters();
+		container.applyFilters(); 
 		return container;
 	}
 	
@@ -221,6 +221,8 @@ public class HistoricoAcesso extends Window {
 					valor = "Erro do Usuário";
 				}else if(valor.equals("Host-Request")){
 					valor = "Requisitado pelo Host";
+				}else{
+					valor = "";
 				}
 				return valor;
 			}

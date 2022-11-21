@@ -39,6 +39,7 @@ import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -85,7 +86,15 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			addComponent(hlButons);
 			setComponentAlignment(hlButons, Alignment.TOP_RIGHT);
 						
-			addComponent(buildTfbusca());
+			addComponent(new HorizontalLayout(){
+				{
+					setWidth("100%");
+					addComponent(buildCbStatus());
+					addComponent(buildTfbusca());
+					
+					setExpandRatio(tfBusca, 1f);
+				}
+			});
 			
 			addComponent(buildTbGeneric());
 //			addComponent(buildLbRegistros());
@@ -170,7 +179,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			tb.setSelectable(true);
 			tb.setColumnCollapsingAllowed(true);
 			tb.setVisibleColumns(new Object[] {"id","identificacao","olt","pon","sinal_db","concentrador.identificacao","interfaces","modelo",
-					"contrato_monitoramento.id","ip_monitoramento","endereco","numero","referencia","situacao"});
+					"contrato_monitoramento.id","ip_monitoramento","endereco","numero","referencia","situacao","status"});
 			
 			tb.setColumnCollapsed("id", true);
 			tb.setColumnCollapsed("referencia", true);
@@ -188,7 +197,8 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			tb.setColumnHeader("endereco", "Endereço");
 			tb.setColumnHeader("numero", "Número");		
 			tb.setColumnHeader("referencia", "Referencia");
-			tb.setColumnHeader("situacao", "Situação");		
+			tb.setColumnHeader("situacao", "Situação");
+			tb.setColumnHeader("status", "Status");	
 			
 			
 			tb.setImmediate(true);
@@ -231,6 +241,23 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			return tb;
 		}
 
+		private ComboBox cbStatus;
+		public ComboBox buildCbStatus(){
+			cbStatus = new ComboBox();
+			cbStatus.setNullSelectionAllowed(false);
+			cbStatus.addItem("ATIVO");
+			cbStatus.addItem("INATIVO");
+			cbStatus.select("ATIVO");
+			cbStatus.addValueChangeListener(new Property.ValueChangeListener() {
+				
+				@Override
+				public void valueChange(ValueChangeEvent event) {
+					addFilter(tfBusca.getValue());
+				}
+			});
+			
+			return cbStatus;
+		}
 		
 		public TextField buildTfbusca() {
 			tfBusca = new TextField();
@@ -253,6 +280,12 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 			
 			container.removeAllContainerFilters();
 			container.addContainerFilter(Filters.eq("empresa_id", OpusERP4UI.getEmpresa().getId()));
+			
+			if(cbStatus != null && cbStatus.getValue() != null){
+				container.addContainerFilter(Filters.eq("status", cbStatus.getValue().toString()));
+			}else{
+				container.addContainerFilter(Filters.eq("status", "ATIVO"));
+			}
 			
 			Object[] collums = tb.getVisibleColumns();		
 			List<Filter> filtros = new ArrayList<Filter>();	
@@ -331,6 +364,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 									
 									hlFloat.replaceComponent(lbRegistros, buildLbRegistros());
 									Notify.Show("Swith Cadastrado com Sucesso!", Notify.TYPE_SUCCESS);
+									container.refresh();
 									
 									LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Cadastrou Uma Caixa de Atendimento"));
 								} catch (Exception e) {
@@ -486,6 +520,7 @@ public class CaixaDeAtendimentoView extends VerticalLayout{
 										}
 										
 										hlFloat.replaceComponent(lbRegistros, buildLbRegistros());
+										container.refresh();
 										
 										//LogDAO.add(new LogAcoes(null, OpusERP4UI.getUsuarioLogadoUI().getUsername(), "Editou Uma Caixa de Atendimento"));
 									}else{
